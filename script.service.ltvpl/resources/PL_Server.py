@@ -28,7 +28,8 @@ from resources.lib.Network.ClientServer import Server
 from resources.lib.Network.SecretSauce import *
 from resources.lib.Network.utilities import decodeRequest, encodeResponse, encodeErrorResponse, decodeError, genericEncode
 from resources.lib.Utilities.DebugPrint import DbgPrint, setDebugMode, startTimer, stopTimer
-from resources.lib.Utilities.Messaging import Cmd, OpStatus, xlateCmd2Notification, DAILYSTOPCOMMAND, STOPCMD_ACTIVE
+from resources.lib.Utilities.Messaging import Cmd, OpStatus, xlateCmd2Notification, DAILYSTOPCOMMAND, STOPCMD_ACTIVE, \
+    NotificationAction, VACATIONMODE,DEBUGMODE, ALARMTIME, PREROLLTIME
 from resources.lib.Utilities.VirtualEvents import TS_decorator
 from utility import setDialogActive
 
@@ -91,11 +92,13 @@ class PL_Server(object):
         """
         count = 60
         lastChNumber = self.dataSet.LastChNumber
+
         while count >= 0:
             try:
-                lastCh = getLastChannelInfo(kodiObj)['channelnumber']
-                if lastChNumber is None or lastCh > lastChNumber:
-                    lastChNumber = self.dataSet.LastChNumber = lastCh
+                if lastChNumber is None:
+                    lastCh = getLastChannelInfo(kodiObj)['channelnumber']
+                    if lastChNumber is None or lastCh > lastChNumber:
+                        lastChNumber = self.dataSet.LastChNumber = lastCh
 
                 if lastCh == lastChNumber and TvGuideIsPresent(kodiObj, lastCh):
                     DbgPrint("Got Last Channel & Tv Guide...")
@@ -122,7 +125,8 @@ class PL_Server(object):
 
     def stopServer(self):
         self.dailyMaintenanceFlag = False
-        self.dailyMaintThread.cancel()
+        if self.dailyMaintThread is not None:
+            self.dailyMaintThread.cancel()
 
         startTimer()  # measure time to stop server
         self.dataSet.Shutdown()
@@ -184,10 +188,10 @@ class PL_Server(object):
                 self.ReturnError(conn,OpStatus.ItemDoesNotExist,"Item.ID {} Does Not Exist".format(id))
             try:
                 item.SuspendedFlag=False
-                self.fileManager.Dirty = True
+                self.dataSet.fileManager.Dirty = True
                 self.dataSet.fileManager.backup()
                 self.ReturnData(conn, Cmd.EnablePlayListItem, item.Data)
-            except:
+            except Exception as e:
                 self.dataSet.SkipEventByID(item.ID)
                 self.ReturnData(conn, Cmd.SkipEvent,item.Data)
 
@@ -359,27 +363,36 @@ class PL_Server(object):
         self.dataSet.clear()
         self.ReturnData(conn, Cmd.ClearPlayList,None)
 
-    def setSettings(self, vacationMode, debugMode, dailyStopCmdActive=False, strStopCmdAlarmtime=None, preroll_time=None):
-        #Vacation Mode
-        self.dataSet.VacationMode = vacationMode
-        # msg = genericEncode(NotificationAction.VacationMode, vacationMode)
-        cmd = Cmd.SetVacationMode
-        rData3 = genericEncode(cmd, vacationMode)
-        msg = genericEncode(xlateCmd2Notification(cmd), rData3)
-        DbgPrint("Server Vacation Mode:{}\tNotification:{}".format(vacationMode, msg))
-        self.sendNotification(msg)
+    def setSettings(self, newValues):
+        """
+        :type newValues: dict
+        """
+        for key in newValues.keys():
+            if key == VACATIONMODE:
+                #Vacation Mode
+                vacationMode = newValues[key]
+                self.dataSet.VacationMode = vacationMode
+                cmd = Cmd.SetVacationMode
+                rData3 = genericEncode(cmd, vacationMode)
+                msg = genericEncode(xlateCmd2Notification(cmd), rData3)
+                DbgPrint("Server Vacation Mode:{}\tNotification:{}".format(vacationMode, msg))
+                self.sendNotification(msg)
 
-        #Debug Mode
-        setDebugMode(debugMode)
-        # self.dataSet.FireSettingsChangedEvent('debugmode', debugMode)
-        DbgPrint("***setingsChanged: VacationMode:{}\tDebugMode:{}".format(vacationMode, debugMode))
+            elif key == DEBUGMODE:
+                #Debug Mode
+                debugMode = newValues[key]
+                setDebugMode(debugMode)
+                DbgPrint("***setingsChanged: DebugMode:{}".format(debugMode))
 
-        #Daily Stop Command
-        self.setDailyStopCmdAlarmtime(dailyStopCmdActive, strStopCmdAlarmtime)
+            elif key == STOPCMD_ACTIVE:
+                #Daily Stop Command
+                dailyStopCmdActive = newValues[key]
+                strStopCmdAlarmtime = newValues[ALARMTIME]
+                self.setDailyStopCmdAlarmtime(dailyStopCmdActive, strStopCmdAlarmtime)
 
-        #Preroll Time
-        if preroll_time is not None:
-            self.dataSet.PreRollTime = preroll_time
+            elif key == PREROLLTIME:
+                #Preroll Time
+                self.dataSet.PreRollTime = newValues[key]
 
     def getDailyStopCmdAlarmtime(self):
         itemlist = self.dataSet.FindCh(Cmd.Stop_Player.value)

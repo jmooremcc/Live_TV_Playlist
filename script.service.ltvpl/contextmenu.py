@@ -26,6 +26,7 @@ import xbmcgui
 import xbmcaddon
 import os
 
+__Version__ = "1.0.0"
 
 ACTION_BACK          = 92
 ACTION_PARENT_DIR    = 9
@@ -122,5 +123,5 @@ def showMenu(addonID, menu, shutdownCallback):
     xbmc.log("******ContextMenu Post doModal......")
     params = menu.params
     del menu
-    #xbmc.executebuiltin("ActivateWindowAndFocus(%s)" % parentWindow_ID)
+    #xbmc.executebuiltin("ActivateWindowAndFocus({})".format(parentWindow_ID))
     return params

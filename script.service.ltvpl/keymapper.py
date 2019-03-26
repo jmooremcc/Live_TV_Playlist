@@ -27,6 +27,8 @@ import xbmcaddon, xbmc
 from util import GETTEXT, KEYMAPS_USERDATA_FOLDER, ADDONID, ADDON, ACTIVATIONKEY
 from resources.lib.Utilities.DebugPrint import DbgPrint
 
+__Version__ = "1.0.0"
+
 keymapfile = os.path.join(KEYMAPS_USERDATA_FOLDER,"gen.xml")
 
 class keymapper(object):
@@ -39,7 +41,7 @@ class keymapper(object):
         name, ext = os.path.splitext(basename)
 
         for i in xrange(100):
-            dst = os.path.join(dirname, "%s.bak.%d" % (name, i))
+            dst = os.path.join(dirname, "{}.bak.{:d}".format(name, i))
             if os.path.exists(dst):
                 continue
             shutil.move(src, dst)
@@ -58,7 +60,7 @@ class keymapper(object):
         keyboardelem = tree.find('./global/keyboard')
         if keyboardelem is not None:
             elem = ET.SubElement(keyboardelem,'key',{'id':strNewkey})
-            elem.text = "runaddon(%s)" % addonID
+            elem.text = "runaddon({})".format(addonID)
             elem.tail = "\n\t"
             self.dirty = True
 
@@ -123,11 +125,11 @@ class KeyListener(WindowXMLDialog):
     def onInit(self):
         try:
             self.getControl(401).addLabel(GETTEXT(30002))
-            self.getControl(402).setText(GETTEXT(30010) % self.TIMEOUT)
+            self.getControl(402).setText(GETTEXT(30010).format(self.TIMEOUT))
         except AttributeError as e:
             DbgPrint("****Label Attribute Error: {}".format(e.message))
             self.getControl(401).addLabel(GETTEXT(30002))
-            self.getControl(402).setText(GETTEXT(30010) % self.TIMEOUT)
+            self.getControl(402).setText(GETTEXT(30010).format(self.TIMEOUT))
 
     def onAction(self, action):
         code = action.getButtonCode()

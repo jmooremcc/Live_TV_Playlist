@@ -25,6 +25,8 @@ import os
 import sys
 from datetime import datetime
 
+__Version__ = "1.0.0"
+
 def GetXBMCVersion():
     version = xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')
     version = version.split('.')

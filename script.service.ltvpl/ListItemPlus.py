@@ -19,6 +19,9 @@
 #
 from datetime import datetime, timedelta
 import locale
+
+__Version__ = "1.0.0"
+
 locale.setlocale(locale.LC_ALL, '')
 import copy
 import xbmc
@@ -78,9 +81,9 @@ class ListItemPlus(xbmcgui.ListItem):
         for tag in self.tags:
             try:
                 tmp = dict([(tag,self.getProperty(tag))])
-                myLog("***tmp:%s" % tmp)
+                myLog("***tmp:{}".format(tmp))
                 values.update(tmp)
-                myLog("values:%s" % values)
+                myLog("values:{}".format(values))
             except: pass
 
         for tag in self.dtags:

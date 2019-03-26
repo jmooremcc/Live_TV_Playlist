@@ -28,16 +28,20 @@ from resources.lib.Utilities.Messaging import NotificationAction, OpStatus
 from resources.lib.Utilities.PythonEvent import Event
 from PlayListItem import PlayListItem, isPlayListItem, RecurrenceOptions, ALARMPADDING
 from fileManager import fileManager, FileManagerMode
-from resources.lib.KodiLib.KodiUtilities import kodiObj, changeChannelByChannelNumber, playerStop, getBroadcast_startTimeList
+from resources.lib.KodiLib.KodiUtilities import kodiObj, changeChannelByChannelNumber, playerStop, getBroadcast_startTimeList, KODI_ENV
 from resources.data.dataFileLocation import dataFilePath
 from resources.lib.Utilities.Messaging import Cmd, VACATIONMODE, PREROLLTIME
 from resources.lib.Utilities.AlarmsMgr import _Alarms
 from resources.lib.Utilities.VirtualEvents import TS_decorator
+if KODI_ENV:
+    import xbmcgui
+    import xbmc
 
 __Version__ = "1.1.0"
 
 DELETE_WAIT_TIME=1
 MODULEDEBUGMODE=True
+LTVPL = 'Live TV Playlist'
 #DbgPrint=LoggerSetup("PL_DataSet")
 
         
@@ -59,10 +63,14 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         self.vacationmode = vacationmode
         self.prerolltime = ALARMPADDING
         self.abortOperation = False
+        self.lastChannel = None
         self.fileManager=fileManager(self, dataFilePath, mode=FileManagerMode.PICKLE)
         self.fileManager.restore()
+        DbgPrint("***LastChannel: {}".format(self.lastChannel))
+        if KODI_ENV and self.lastChannel is None:
+            DbgPrint("*****LastChannel->: {} isNone:{}".format(self.lastChannel, self.lastChannel is None))
+            xbmcgui.Dialog().notification(LTVPL, "Scanning Channel List...")
         self.prerolltime=ALARMPADDING
-        self.lastChannel = None
 
 
     def AbortChannelChangeOperation(self):
@@ -282,6 +290,9 @@ class PL_DataSet(list,myPickle_io,myJson_io):
 
         #Restart item with new alarmtime
         if newtime is not None:
+            item.Cancel()
+            time.sleep(1)
+
             item.alarmtime=newtime # type: PlayListItem
             if item.isExpired:
                 self.Remove(item)
@@ -289,8 +300,6 @@ class PL_DataSet(list,myPickle_io,myJson_io):
 
             DbgPrint("newtime: {}".format(newtime))
 
-            item.Cancel()
-            time.sleep(1)
             item.Start()
 
             if doNotBackup == False:
@@ -419,7 +428,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
             self.ItemRemovedEvent(data)
 
     def verifyDataset(self):
-        DbgPrint("Verying Database...")
+        DbgPrint("Veryfying Database...")
         today = datetime.today().date()
         for item in self:  # type: PlayListItem
             if not item.isAlarmtimeLegal():

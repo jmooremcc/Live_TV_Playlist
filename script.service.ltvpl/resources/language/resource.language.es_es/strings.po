@@ -199,16 +199,16 @@ msgid "This item cannot be added because the program has already started!"
 msgstr "¡Este artículo no puede ser agregado porque el programa ya ha comenzado!"
 
 msgctxt "#30065"
-msgid "%s Added Successfully"
-msgstr "%s Agregó Correctamente"
+msgid "{} Added Successfully"
+msgstr "{} Agregó Correctamente"
 
 msgctxt "#30066"
-msgid "%s Updated Successfully"
-msgstr "%s Actualizado Satisfactoriamente"
+msgid "{} Updated Successfully"
+msgstr "{} Actualizado Satisfactoriamente"
 
 msgctxt "#30067"
-msgid "Are you sure you want to delete\n%s?"
-msgstr "¿Seguro que quieres eliminar\n%s?"
+msgid "Are you sure you want to delete\n{}?"
+msgstr "¿Seguro que quieres eliminar\n{}?"
 
 msgctxt "#30070"
 msgid "Live TV Playlist Activation"

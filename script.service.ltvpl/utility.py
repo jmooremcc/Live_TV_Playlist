@@ -21,6 +21,9 @@ from threading import Thread, Event as Signal
 import xbmc
 import xbmcgui
 from resources.lib.Utilities.DebugPrint import DEBUGMODE
+
+__Version__ = "1.0.0"
+
 try:
     from util import LTVPL_HEADER
 except: pass
@@ -59,7 +62,7 @@ def translateResolution(resNo):
     :param resNo: int
     :return: tuple
     """
-    xbmc.log("trasnlateResolution resNo: %s" % resNo)
+    xbmc.log("trasnlateResolution resNo: {}".format(resNo))
     resTable = [
         (1920, 1080),
         (1280, 720),

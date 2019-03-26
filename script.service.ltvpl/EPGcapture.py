@@ -35,6 +35,8 @@ from utility import setDialogActive, isDialogActive, clearDialogActive, myLog
 from util import GETTEXT, setUSpgmDate
 from resources.lib.Utilities.DebugPrint import DbgPrint
 
+__Version__ = "1.0.0"
+
 ACTION_BACK = 92
 ACTION_PARENT_DIR = 9
 ACTION_PREVIOUS_MENU = 10
@@ -276,13 +278,13 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
             if cmd == Cmd.AddPlayListItem:
                 self.client.AddPlayListObj(obj)
                 if self.signal.wait(5.0):
-                    xbmcgui.Dialog().notification(LTVPL_HEADER, GETTEXT(30065) % title, icon=icon) #Added Succesfully
+                    xbmcgui.Dialog().notification(LTVPL_HEADER, GETTEXT(30065).format(title), icon=icon) #Added Succesfully
                 else:
                     xbmc.log("******Added Item Error")
             elif cmd == Cmd.UpdatePlayListItem:
                 self.client.UpdatePlayListObj(obj)
                 if self.signal.wait(20.0):
-                    xbmcgui.Dialog().notification(LTVPL_HEADER, GETTEXT(30066) % title, icon=icon) #Updated Successfully
+                    xbmcgui.Dialog().notification(LTVPL_HEADER, GETTEXT(30066).format(title), icon=icon) #Updated Successfully
                 else:
                     xbmc.log("******Update Item Error")
 

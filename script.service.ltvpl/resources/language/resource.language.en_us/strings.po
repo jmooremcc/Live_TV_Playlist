@@ -199,11 +199,11 @@ msgid "This item cannot be added because the program has already started!"
 msgstr ""
 
 msgctxt "#30065"
-msgid "%s Added Successfully"
+msgid "{} Added Successfully"
 msgstr ""
 
 msgctxt "#30066"
-msgid "%s Updated Successfully"
+msgid "{} Updated Successfully"
 msgstr ""
 
 msgctxt "#30070"

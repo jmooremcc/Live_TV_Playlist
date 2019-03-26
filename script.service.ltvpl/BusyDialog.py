@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from util import GETTEXT
 
+__Version__ = "1.0.0"
+
 PROGRESSBARID = 10
 WORKING = GETTEXT(30047)
 

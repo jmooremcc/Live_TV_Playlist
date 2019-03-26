@@ -200,10 +200,13 @@ class PlayListItem(myPickle_io):
     def SuspendedFlag(self, value):
         if value != self.suspendedFlag:
             self.suspendedFlag = value
-            if self.isAlarmtimeLegal():
-                self.reStart()
+            if value == False:
+                if self.isAlarmtimeLegal():
+                    self.reStart()
+                else:
+                    raise Exception("Invalid AlarmTime")
             else:
-                raise Exception("Invalid AlarmTime")
+                self.Cancel()
 
     @property
     def PreRollTime(self):

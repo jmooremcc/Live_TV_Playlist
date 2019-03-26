@@ -23,6 +23,8 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 
+__Version__ = "1.0.0"
+
 #from logger import logxbmc.log("***path")
 
 # print str(sys.path)
@@ -88,10 +90,12 @@ class Monitor(xbmc.Monitor):
     def onSettingsChanged(self):
         global LocalOperationFlag
         global RemoteOperationFlag
+
         if RemoteOperationFlag:
+            RemoteOperationFlag = False
             return
 
-        settingsChangedFlag=False
+        newValues = {}
         myLog("onSettingsChanged Called", level=xbmc.LOGDEBUG)
         #Local Settings
 
@@ -99,15 +103,12 @@ class Monitor(xbmc.Monitor):
         countdown_duration = int(ADDON.getSetting(COUNTDOWN_DURATION))
         if self.countdown_duration != countdown_duration:
             self.countdown_duration=countdown_duration
-            settingsChangedFlag = True
-
-        self.cdService.CountDownDuration = countdown_duration
+            self.cdService.CountDownDuration = countdown_duration
 
         # Activation Key
         activationkey=ADDON.getSetting(ACTIVATIONKEY)
         if self.activationkey != activationkey:
             self.activationkey=activationkey
-            settingsChangedFlag = True
 
         #Debug_Mode
         LocalOperationFlag=True
@@ -115,14 +116,14 @@ class Monitor(xbmc.Monitor):
         debugMode = str(ADDON.getSetting(DEBUGMODE)).lower() == TRUE
         if self.debugMode != debugMode:
             self.debugMode=debugMode
-            settingsChangedFlag=True
+            newValues.update({DEBUGMODE:debugMode})
 
         #Vacation Mode
         vacationMode = str(ADDON.getSetting(VACATIONMODE)).lower() == TRUE
         # import web_pdb;web_pdb.set_trace()
         if self.vacationMode != vacationMode:
             self.vacationMode=vacationMode
-            settingsChangedFlag = True
+            newValues.update({VACATIONMODE:vacationMode})
 
         #Daily Stop Command
         stopcmd_active = str(ADDON.getSetting(STOPCMD_ACTIVE)).lower() == TRUE
@@ -130,38 +131,41 @@ class Monitor(xbmc.Monitor):
         if self.stopcmd_active != stopcmd_active or self.strAlarmtime != strAlarmtime:
             self.stopcmd_active = stopcmd_active
             self.strAlarmtime = strAlarmtime
-            settingsChangedFlag = True
+            newValues.update({STOPCMD_ACTIVE:stopcmd_active})
+            newValues.update({ALARMTIME:strAlarmtime})
 
 
         #Preroll Time
         preroll_time = int(ADDON.getSetting(PREROLLTIME))
         if self.preroll_time!= preroll_time:
             self.preroll_time=preroll_time
-            settingsChangedFlag = True
+            newValues.update({PREROLLTIME:preroll_time})
 
         #Process Changed Settings
         try:
-            if settingsChangedFlag:
+            if len(newValues) > 0:
                 # import web_pdb; web_pdb.set_trace()
                 myLog("settingsChangedFlag: True", level=xbmc.LOGDEBUG)
-                self.server.setSettings(vacationMode, debugMode, stopcmd_active, strAlarmtime, preroll_time=preroll_time)
+                try:
+                    self.server.setSettings(newValues)
+                except Exception as e:
+                    xbmcgui.Dialog().notification(LTVPL,str(e), xbmcgui.NOTIFICATION_ERROR)
 
         except ValueError as e:
             xbmcgui.Dialog().notification(LTVPL, e.message)
-
-        LocalOperationFlag=False
-
 
 
 
 def onServerSettingsChanged(setting, value):
     global LocalOperationFlag
     global RemoteOperationFlag
+
     if LocalOperationFlag:
+        LocalOperationFlag = False
         return
 
     RemoteOperationFlag = True
-    # import web_pdb; web_pdb.set_trace()
+
     if setting==PREROLLTIME:
         ADDON.setSetting(PREROLLTIME, str(value))
     elif setting==VACATIONMODE:
@@ -173,7 +177,7 @@ def onServerSettingsChanged(setting, value):
         else:
             ADDON.setSetting(STOPCMD_ACTIVE, FALSE)
 
-    RemoteOperationFlag = False
+    # RemoteOperationFlag = False
 
 if __name__ == '__main__':
     from resources.PL_Server import PLSERVERTAG
@@ -187,6 +191,7 @@ if __name__ == '__main__':
         vacationMode = str(ADDON.getSetting(VACATIONMODE)).lower() == TRUE
         debugMode = str(ADDON.getSetting(DEBUGMODE)).lower() == TRUE
         # import web_pdb;web_pdb.set_trace()
+
         server = PL_Server(address, vacationMode, debugMode)
         strAlarmtime = server.getDailyStopCmdAlarmtime()
         if strAlarmtime is not None:

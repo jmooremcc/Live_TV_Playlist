@@ -42,6 +42,7 @@ from ListItemPlus import ListItemPlus
 from keymapper import setActivationKey, reloadKeyMaps
 from BusyDialog import BusyDialog, BusyDialog2
 
+__Version__ = "1.0.0"
 
 MAIN_DIALOGTAG = "LTVPL_MAINDIALOG_VISIBLE"
 MODULEDEBUGMODE = True
@@ -75,6 +76,7 @@ ACTION_SELECT_ITEM          = 7
 ACTION_PREVIOUS_MENU        = 10
 ACTION_NAV_BACK             = 92
 ACTION_CONTEXT_MENU         = 117
+ACTION_MOUSE_LEFT_CLICK     = 100
 
 JUSTIFY_LEFT                = 0
 JUSTIFY_CENTER              = 2
@@ -104,11 +106,11 @@ ContextMenuItems2 = [(GETTEXT(30020), MENU_SKIP_ITEM, 'Skip Event'), (GETTEXT(30
 
 
 
-myLog("addonname: %s" % ADDON_NAME)
-myLog("addonID: %s" % ADDONID)
-myLog("xmlpath: %s" % XMLPATH)
-myLog("addonpath: %s" % ADDON_PATH)
-myLog("bgdimage: %s" % BGDIMAGE)
+myLog("addonname: {}".format(ADDON_NAME))
+myLog("addonID: {}".format(ADDONID))
+myLog("xmlpath: {}".format(XMLPATH))
+myLog("addonpath: {}".format(ADDON_PATH))
+myLog("bgdimage: {}".format(BGDIMAGE))
 
 
 class myBusyDialog(object):
@@ -142,10 +144,10 @@ class myBusyDialog(object):
         totalMS = delay * 1000
         xbmc.sleep(totalMS)
         self.stopFlag = True
-        DbgPrint("****%s Second Delayed Busy Dialog Closing" % delay)
+        DbgPrint("****{} Second Delayed Busy Dialog Closing".format(delay))
 
     def Stop(self, delay=0):
-        DbgPrint("******Dialog Stop Delay = %s" % delay)
+        DbgPrint("******Dialog Stop Delay = {}".format(delay))
         if delay == 0:
             self.stopFlag = True
             DbgPrint("****Busy Dialog Closing")
@@ -194,12 +196,12 @@ def getEPG_Data(win=None):
     DbgPrint("***USpgmDate: {}".format(USpgmDate))
     diff = liDateTime - datetime.now()
 
-    myLog("****item title: %s " % pgmTitle)
-    myLog("****item date: %s " % pgmDate)
-    myLog("****item time: %s " % pgmTime)
-    myLog("****item ch: %s " % pgmCh)
-    myLog("****item icon: %s " % pgmIcon)
-    myLog("****Listitem.Date: %s" % xbmc.getInfoLabel('Listitem.Date'))
+    myLog("****item title: {} ".format(pgmTitle))
+    myLog("****item date: {} ".format(pgmDate))
+    myLog("****item time: {} ".format(pgmTime))
+    myLog("****item ch: {} ".format(pgmCh))
+    myLog("****item icon: {} ".format(pgmIcon))
+    myLog("****Listitem.Date: {}".format(xbmc.getInfoLabel('Listitem.Date')))
 
     if win is not None:
         win.setProperty('pgmTitle', pgmTitle)
@@ -247,7 +249,7 @@ def getHdrKeysExtended():
 def BuildHeader():
     item = xbmcgui.ListItem()
     for val in HDR_FORMAT:
-        strval = "%s " % val[0]
+        strval = "{} ".format(val[0])
         myLog(strval)
         label = val[0].split()[0]
         item.setProperty(label, val[0])
@@ -316,9 +318,9 @@ class GUI(xbmcgui.WindowXMLDialog):
         super(GUI, self).onInit()
         winID = xbmcgui.getCurrentWindowDialogId()
         self.queue.put(winID)
-        myLog("*******My WinID is %s......" % winID)
+        myLog("*******My WinID is {}......".format(winID))
         # define a temporary list where we are going to add all the listitems to
-        listitems = []
+        # listitems = []
         self.setProperty('windowtitle', GETTEXT(30072))
         self.BuildHeader()
 
@@ -327,7 +329,7 @@ class GUI(xbmcgui.WindowXMLDialog):
         self.signal.wait(30.0)  # playlist has been set
         myLog("***Got the Playlist")
 
-        self.addItems(listitems)
+        # self.addItems(listitems)
         self.sortItemListByDate()
         myLog("***Finshed Processing Playlist...")
         self.setProperty('Go', '1')
@@ -351,7 +353,7 @@ class GUI(xbmcgui.WindowXMLDialog):
 
 
     def onClick(self, controlId):
-        DbgPrint("***onClick ctl: %s" % controlId)
+        DbgPrint("***onClick ctl: {}".format(controlId))
         if controlId == 20:
             self.closeDialog()
 
@@ -366,7 +368,7 @@ class GUI(xbmcgui.WindowXMLDialog):
 
 
     def ShutdownState(self):
-        myLog("******ShutdownState: %s" % self.shutdown)
+        myLog("******ShutdownState: {}".format(self.shutdown))
         return self.shutdown
 
     def launchEditor(self, data):
@@ -382,11 +384,13 @@ class GUI(xbmcgui.WindowXMLDialog):
 
         return data
 
-    def onAction(self, actionID):
+    def onAction(self, action):
+        actionID = action.getId()
+
         if type(actionID) == int:
-            myLog("***Main onAction actionID: %d" % actionID)
+            myLog("***Main onAction actionID: {:d}".format(actionID))
         else:
-            myLog("****Main onAction actionID: %d" % actionID.getId())
+            myLog("****Main onAction actionID: {:d}".format(actionID.getId()))
 
         if actionID == ACTION_NAV_BACK or actionID == ACTION_PREVIOUS_MENU:
             self.closeDialog()
@@ -397,19 +401,20 @@ class GUI(xbmcgui.WindowXMLDialog):
         elif actionID == ACTION_CONTEXT_MENU:
             self.openSettingsDialog()
 
-        elif actionID == ACTION_MOVE_DOWN and self.getFocusId() == 50:
+        elif actionID == ACTION_MOVE_DOWN and self.getFocusId() == MAIN_LIST:
             index = self.getCurrentListPosition()
-            myLog("***Main ActionDown: %d" % index)
+            myLog("***Main ActionDown: {:d}".format(index))
             if index == self.getListSize():
                 self.setCurrentListPosition(0)
 
-        elif actionID == ACTION_MOVE_UP and self.getFocusId() == 50:
+        elif actionID == ACTION_MOVE_UP and self.getFocusId() == MAIN_LIST:
             index = self.getCurrentListPosition()
-            myLog("***Main ActionUp: %d" % index)
+            myLog("***Main ActionUp: {:d}".format(index))
             if index < 0:
                 self.setCurrentListPosition(self.getListSize() - 1)
 
-        elif actionID == ACTION_SELECT_ITEM:
+
+        elif actionID == ACTION_SELECT_ITEM or actionID == ACTION_MOUSE_LEFT_CLICK:
             pos = self.getCurrentListPosition()
             item = ListItemPlus(self.getListItem(pos))
             myLog("***********>Item Selected: {} at {}".format(item.getProperty('Description'), self.currentPos))
@@ -421,13 +426,13 @@ class GUI(xbmcgui.WindowXMLDialog):
                 else:
                     cmd = contextmenu.showMenu(ADDONID, ContextMenuItems2, self.ShutdownState)
 
-                myLog("************Cmd:%s" % cmd)
+                myLog("************Cmd:{}".format(cmd))
                 if cmd is not None:
                     id = item.getProperty('ID')
                     self.toolboxBusyDialog = myBusyDialog()
                     if cmd == MENU_DELETE_ITEM:
                         dialog = xbmcgui.Dialog()
-                        if dialog.yesno(LTVPL, GETTEXT(30067) % item.getProperty('Description')):
+                        if dialog.yesno(LTVPL, GETTEXT(30067).format(item.getProperty('Description'))):
                             myLog("******Delete Event Selected")
                             self.toolboxBusyDialog.show()
                             xbmc.sleep(250)
@@ -447,7 +452,7 @@ class GUI(xbmcgui.WindowXMLDialog):
                         self.toolboxBusyDialog.show()
                         self.suspendPlayListItem(self.getListItem(pos))
                         self.toolboxBusyDialog.Stop()
-                        del self.toolboxBusyDialog
+                        self.toolboxBusyDialog = None
 
                     elif cmd == MENU_EDIT_ITEM:
                         myLog("******Edit Event Selected")
@@ -483,7 +488,7 @@ class GUI(xbmcgui.WindowXMLDialog):
             if id == item.getProperty('ID'):
                 return (item, i)
 
-        raise (Exception("Item ID %s Not Found" % id))
+        raise (Exception("Item ID {} Not Found".format(id)))
 
     def updateItemByID(self, id, data):
 
@@ -598,7 +603,6 @@ class GUI(xbmcgui.WindowXMLDialog):
                 global VACATIONMODE_VALUE
 
                 DbgPrint("VacationMode: {}".format(data))
-                # import web_pdb; web_pdb.set_trace()
                 try:
                     VACATIONMODE_VALUE = data['SetVacationMode']
                 except:
@@ -608,9 +612,10 @@ class GUI(xbmcgui.WindowXMLDialog):
 
             if self.toolboxBusyDialog is not None:
                 self.toolboxBusyDialog.Stop()
-                del self.toolboxBusyDialog
+                self.toolboxBusyDialog = None
 
         except Exception as e:
+            import web_pdb; web_pdb.set_trace()
             DbgPrint("onNotification Error Message:{}".format(e.message))
 
 
@@ -667,16 +672,16 @@ class GUI(xbmcgui.WindowXMLDialog):
             self.signal.set()
 
         elif cmd == Cmd.AddPlayListItem:
-            myLog("********onResponseReceived.addPlayListItem: %s" % data)
+            myLog("********onResponseReceived.addPlayListItem: {}".format(data))
             self.addNewItem(data)
 
         elif cmd == Cmd.UpdatePlayListItem or cmd == Cmd.SkipEvent:
-            myLog("********onResponseReceived.UpdatePlayListItem: %s" % data)
+            myLog("********onResponseReceived.UpdatePlayListItem: {}".format(data))
             id = data['id']
             self.updateItemByID(id, data)
 
         elif cmd == Cmd.RemovePlayListItem:
-            myLog("********onResponseReceived.RemovePlayListItem: %s" % data)
+            myLog("********onResponseReceived.RemovePlayListItem: {}".format(data))
             id = data
             self.removeItemByID(id)
 
@@ -691,7 +696,7 @@ class GUI(xbmcgui.WindowXMLDialog):
         id = item.getProperty('ID')
         title = item.getProperty(DESC)
 
-        DbgPrint("********SuspendFlag: %s" % suspendFlag)
+        DbgPrint("********SuspendFlag: {}".format(suspendFlag))
 
 
         if suspendFlag == 'True':
@@ -707,7 +712,7 @@ class GUI(xbmcgui.WindowXMLDialog):
 
 
     def openSettingsDialog(self):
-        xbmc.executebuiltin("Addon.OpenSettings(%s)" % ADDONID)
+        xbmc.executebuiltin("Addon.OpenSettings({})".format(ADDONID))
 
     def showVacationModeDialog(self):
         xbmcgui.Dialog().notification(LTVPL, GETTEXT(30062)) #"Vacation Mode is Active..."
@@ -735,10 +740,10 @@ def showEPGCaptureDialog(epgData, bDialog):
 @TS_decorator
 def ShowBusyDialog(bDialog, queue, tmpBD):
     winID = queue.get(True, None)
-    myLog("****Activating Busy Dialog...: %s" % winID)
+    myLog("****Activating Busy Dialog...: {}".format(winID))
     tmpBD.Stop()
     # bDialog.show()
-    myLog("****Main winID: %s" % winID)
+    myLog("****Main winID: {}".format(winID))
     # bDialog.show()
 
 

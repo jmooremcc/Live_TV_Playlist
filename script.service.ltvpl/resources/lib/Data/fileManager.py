@@ -60,7 +60,7 @@ class fileManager(object):
         filter = os.path.splitext(os.path.basename(self.filePath))[0] + ".bak[0-9]?"
         files = getTimeFilteredDirList(dirname, filter=filter)
         for f in files:
-            DbgPrint("Deleteing:" + f)
+            DbgPrint("Deleting:" + f)
             os.remove(f)
 
     def addSentinel(self, dstfile):

@@ -31,6 +31,8 @@ from keymapper import keymapper
 from ListItemPlus import ListItemPlus
 from util import GETTEXT
 
+__Version__ = "1.0.0"
+
 def IdCmd(obj):
     return id(obj)
 
@@ -195,12 +197,12 @@ class miniClient(Thread):
             self.signal.set()
 
         elif cmd == Cmd.AddPlayListItem:
-            myLog("********onResponseReceived.addPlayListItem: %s" % data)
+            myLog("********onResponseReceived.addPlayListItem: {}".format(data))
             self.plList.append(data)
             self.sortData()
 
         elif cmd == Cmd.UpdatePlayListItem or cmd == Cmd.SkipEvent:
-            myLog("********onResponseReceived.UpdatePlayListItem: %s" % data)
+            myLog("********onResponseReceived.UpdatePlayListItem: {}".format(data))
             try:
                 id = data['id']
                 n = self.searchByID(id)
@@ -210,7 +212,7 @@ class miniClient(Thread):
                 pass
 
         elif cmd == Cmd.RemovePlayListItem:
-            DbgPrint("********onResponseReceived.RemovePlayListItem: %s" % data)
+            DbgPrint("********onResponseReceived.RemovePlayListItem: {}".format(data))
             try:
                 id = data['id']
                 n = self.searchByID(id)
@@ -223,7 +225,7 @@ class miniClient(Thread):
             pass
 
         elif cmd == Cmd.GetVacationMode:
-            DbgPrint("***setting vacation mode: %s" % data)
+            DbgPrint("***setting vacation mode: {}".format(data))
             ADDON.setSetting('vacationmode', str(data).lower())
             self.sortData()
 
@@ -254,15 +256,15 @@ class miniClient(Thread):
                     id = data
 
                 try:
-                    DbgPrint("****self.removeItemByID(%s)" % id)
+                    DbgPrint("****self.removeItemByID({})".format(id))
                     n = self.searchByID(id)
-                    DbgPrint("*****Preparing to delete item at index: %s" % n)
+                    DbgPrint("*****Preparing to delete item at index: {}".format(n))
                     del self.plList[n]
-                    DbgPrint("*****Successfully deleted item at index: %s" % n)
+                    DbgPrint("*****Successfully deleted item at index: {}".format(n))
                     self.sortData()
 
                 except Exception as e:
-                    DbgPrint("Exception in Notification: %s" % e.message)
+                    DbgPrint("Exception in Notification: {}".format(e.message))
 
             elif cmd == NotificationAction.ItemAdded:
                 cmd, data = genericDecode(data)
@@ -274,7 +276,7 @@ class miniClient(Thread):
                 try:
                     cmd, data = genericDecode(data)
                     id = data['id']
-                    DbgPrint("****self.updateItemByID(%s,%s)" % (id, data))
+                    DbgPrint("****self.updateItemByID({},{})".format(id, data))
                     n = self.searchByID(id)
                     self.plList[n] = data
                     self.sortData()
@@ -348,7 +350,7 @@ class miniClient(Thread):
         alarmtime = self.strDate2TimeStamp(listitem.getProperty('pgmAlarmtime'))
         td = alarmtime - datetime.now() - timedelta(seconds=self.clockStartTime + 2)
         if td.days >= 0:
-            DbgPrint("****td: %s\t%s" % (td, listitem.getProperty('pgmTitle')))
+            DbgPrint("****td: {}\t{}".format(td, listitem.getProperty('pgmTitle')))
             self.currentLaunchItem = listitem
             self.t = Timer(td.total_seconds() - preroll_time, self.launchCountDown, [listitem])
             self.t.start()
@@ -363,22 +365,22 @@ class miniClient(Thread):
         self.plList.sort(key=lambda item: item['alarmtime'])
 
         for n, d in enumerate(self.plList):
-            myLog("******{}:{}".format(n, d['title']))
+            myLog("******{}:({}){}".format(n,d['alarmtime'], d['title']))
 
         self.signal.set()
 
     def searchByID(self, id):
         try:
-            DbgPrint("********len(self.plList): %s" % len(self.plList))
+            DbgPrint("********len(self.plList): {}".format(len(self.plList)))
             for n, item in enumerate(self.plList):
-                DbgPrint("*******searvhByID item:%s" % item)
+                DbgPrint("*******searchByID item:{}".format(item))
                 itemID = item['id']
-                DbgPrint("****itemID: %s\n****itemID == id: %s" % (itemID, itemID == id))
+                DbgPrint("****itemID: {}\n****itemID == id: {}".format(itemID, itemID == id))
                 if itemID == id:
-                    DbgPrint("****SearchByID returning n: %s" % n)
+                    DbgPrint("****SearchByID returning n: {}".format(n))
                     return n
         except Exception as e:
-            DbgPrint("****SearchByID Unexpected Error:%s" % e.message)
+            DbgPrint("****SearchByID Unexpected Error:{}: n={} : item={}".format(str(e), n, item))
 
         #import web_pdb; web_pdb.set_trace()
         DbgPrint("SearchByID: Should only get here if there is an ERROR....")
@@ -405,7 +407,7 @@ class miniClient(Thread):
             xbmc.sleep(1000)
 
         if self.client is None:
-            msg = "****miniClient Could not connect to Server...cnt: %s" % count
+            msg = "****miniClient Could not connect to Server...cnt: {}".format(count)
             raise Exception(msg)
 
         xbmcgui.Dialog().notification(LTVPL, GETTEXT(30063)) #"miniClient Service Started..."
