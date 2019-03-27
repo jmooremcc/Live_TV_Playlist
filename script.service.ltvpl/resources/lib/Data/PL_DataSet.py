@@ -51,7 +51,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
             ItemRemovedEvent -> Fired when a PlayList item is removed from the dataset
             ItemCancelledEvent -> Fired when a PlayList item is cancelled
     """
-    def __init__(self, vacationmode=False):
+    def __init__(self, vacationmode=False, autocleanMode=True):
         list.__init__(self)
         myPickle_io.__init__(self)
         self.ItemRemovedEvent=Event("ItemRemovedEvent",spawn=True)
@@ -61,6 +61,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         self.SettingsChangedEvent=Event("SettingsChangedEvent", spawn=True)
         self.skipOperationActive = False
         self.vacationmode = vacationmode
+        self.autocleanmode = autocleanMode
         self.prerolltime = ALARMPADDING
         self.abortOperation = False
         self.lastChannel = None
@@ -104,6 +105,16 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         self._processVacationMode(mode)
 
         self.FireSettingsChangedEvent(VACATIONMODE, mode)
+
+    @property
+    def AutocleanMode(self):
+        return self.autocleanmode
+
+    @AutocleanMode.setter
+    def AutocleanMode(self, value):
+        if self.autocleanmode != value:
+            self.autocleanmode = value
+            DbgPrint("Playlist Autoclean Mode: {}".format(self.autocleanmode))
 
     @property
     def LastChNumber(self):
@@ -435,7 +446,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                 status = self.SkipEvent(item)
                 self._verifyNotification(item, status)
             try:
-                if today == item.Alarmtime.date() and item.Ch != Cmd.Stop_Player.value:
+                if today == item.Alarmtime.date() and item.Ch != Cmd.Stop_Player.value and self.autocleanmode:
                     DbgPrint("Updating item:{}:{}:ch {}".format(item.Title, item.Alarmtime, item.Ch))
                     startTimes = getBroadcast_startTimeList(kodiObj, item.Ch, item.Title)
                     if not item.Alarmtime in startTimes:

@@ -153,4 +153,5 @@ TRUE='true'
 FALSE='false'
 WRITEMODE='w'
 READMODE='r'
+AUTOCLEANMODE='autocleanmode'
 

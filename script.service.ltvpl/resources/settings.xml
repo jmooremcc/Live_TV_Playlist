@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
   <category label="General">
+    <setting id="autocleanmode" type="bool" label="Playlist Autoclean Mode" default="true"/>
     <setting id="vacationmode" type="bool" label="Vacation Mode" default="false"/>
     <setting id="debugmode" type="bool" label="Debug Mode" default="false"/>
     <setting type="sep"/>

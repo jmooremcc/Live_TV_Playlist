@@ -35,7 +35,7 @@ from util import ADDON, ADDON_PATH, ADDONID, ADDON_USERDATA_FOLDER, BASEPATH, DA
 from resources.lib.Network.SecretSauce import ServerPort, ServerHost
 from resources.PL_Server import PL_Server
 from resources.lib.Utilities.Messaging import VACATIONMODE, PREROLLTIME, DAILYSTOPCOMMAND, DEBUGMODE, STOPCMD_ACTIVE,\
-    ALARMTIME, ACTIVATIONKEY, COUNTDOWN_DURATION, TRUE, FALSE, WRITEMODE
+    ALARMTIME, ACTIVATIONKEY, COUNTDOWN_DURATION, TRUE, FALSE, WRITEMODE, AUTOCLEANMODE
 import Countdown
 
 xbmc.log("***sys.path: "+str(sys.path))
@@ -86,6 +86,7 @@ class Monitor(xbmc.Monitor):
         self.strAlarmtime=str(ADDON.getSetting(ALARMTIME))
         self.preroll_time=int(ADDON.getSetting(PREROLLTIME))
         self.activationkey=ADDON.getSetting(ACTIVATIONKEY)
+        self.autocleanMode=ADDON.getSetting(AUTOCLEANMODE)
 
     def onSettingsChanged(self):
         global LocalOperationFlag
@@ -124,6 +125,12 @@ class Monitor(xbmc.Monitor):
         if self.vacationMode != vacationMode:
             self.vacationMode=vacationMode
             newValues.update({VACATIONMODE:vacationMode})
+
+        #Playlist Auto Clean Mode
+        autocleanMode = str(ADDON.getSetting(AUTOCLEANMODE)).lower() == TRUE
+        if self.autocleanMode != autocleanMode:
+            self.autocleanMode = autocleanMode
+            newValues.update({AUTOCLEANMODE:autocleanMode})
 
         #Daily Stop Command
         stopcmd_active = str(ADDON.getSetting(STOPCMD_ACTIVE)).lower() == TRUE
@@ -170,6 +177,8 @@ def onServerSettingsChanged(setting, value):
         ADDON.setSetting(PREROLLTIME, str(value))
     elif setting==VACATIONMODE:
         ADDON.setSetting(VACATIONMODE, str(value).lower())
+    elif setting==AUTOCLEANMODE:
+        ADDON.setSetting(AUTOCLEANMODE, str(value).lower())
     elif setting==DAILYSTOPCOMMAND:
         if value[STOPCMD_ACTIVE]:
             ADDON.setSetting(STOPCMD_ACTIVE, TRUE)
@@ -190,9 +199,9 @@ if __name__ == '__main__':
         establishDataLocations()
         vacationMode = str(ADDON.getSetting(VACATIONMODE)).lower() == TRUE
         debugMode = str(ADDON.getSetting(DEBUGMODE)).lower() == TRUE
-        # import web_pdb;web_pdb.set_trace()
+        autocleanMode = str(ADDON.getSetting(AUTOCLEANMODE)).lower() == TRUE
 
-        server = PL_Server(address, vacationMode, debugMode)
+        server = PL_Server(address, vacationMode, debugMode, autocleanMode)
         strAlarmtime = server.getDailyStopCmdAlarmtime()
         if strAlarmtime is not None:
             ADDON.setSetting(STOPCMD_ACTIVE, TRUE)

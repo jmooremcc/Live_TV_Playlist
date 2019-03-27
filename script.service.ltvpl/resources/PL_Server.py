@@ -29,7 +29,7 @@ from resources.lib.Network.SecretSauce import *
 from resources.lib.Network.utilities import decodeRequest, encodeResponse, encodeErrorResponse, decodeError, genericEncode
 from resources.lib.Utilities.DebugPrint import DbgPrint, setDebugMode, startTimer, stopTimer
 from resources.lib.Utilities.Messaging import Cmd, OpStatus, xlateCmd2Notification, DAILYSTOPCOMMAND, STOPCMD_ACTIVE, \
-    NotificationAction, VACATIONMODE,DEBUGMODE, ALARMTIME, PREROLLTIME
+    NotificationAction, VACATIONMODE,DEBUGMODE, ALARMTIME, PREROLLTIME, AUTOCLEANMODE
 from resources.lib.Utilities.VirtualEvents import TS_decorator
 from utility import setDialogActive
 
@@ -43,9 +43,9 @@ PLSERVERTAG = "LTVPL_PLSERVER_ACTIVE"
 
 
 class PL_Server(object):
-    def __init__(self, address, vacationmode=False, debugmode=False):
+    def __init__(self, address, vacationmode=False, debugmode=False, autocleanMode=True):
         setDebugMode(debugmode)
-        self.dataSet=PL_DataSet(vacationmode)
+        self.dataSet=PL_DataSet(vacationmode, autocleanMode)
         self.dataSet.AddItemRemovedEventHandler(self.onDataSetEvent)
         self.dataSet.AddItemCancelledEventHandler(self.onDataSetEvent)
         self.dataSet.AddItemUpdatedEventHandler(self.onDataSetEvent)
@@ -377,6 +377,11 @@ class PL_Server(object):
                 msg = genericEncode(xlateCmd2Notification(cmd), rData3)
                 DbgPrint("Server Vacation Mode:{}\tNotification:{}".format(vacationMode, msg))
                 self.sendNotification(msg)
+
+            elif key == AUTOCLEANMODE:
+                #Playlist Auto Clean Mode
+                autocleanMode = newValues[key]
+                self.dataSet.AutocleanMode = autocleanMode
 
             elif key == DEBUGMODE:
                 #Debug Mode
