@@ -12,7 +12,7 @@
     <!--<origin x="200" y="200">Window.IsActive(Home)</origin>-->
   </coordinates>
   <zorder>0</zorder>
-  <defaultcontrol>50</defaultcontrol>
+  <defaultcontrol>800</defaultcontrol>
   <PreviousMenu>Home</PreviousMenu>
   <controls>
 
@@ -58,9 +58,9 @@
         <font>-</font>
         <visible>true</visible>
         <onclick>PreviousMenu</onclick>
-        <onleft>50</onleft>
-        <onright>50</onright>
-        <onup>50</onup>
+        <onleft>800</onleft>
+        <onright>800</onright>
+        <onup>800</onup>
         <ondown>17</ondown>
         <texturefocus>DialogCloseButton-focus.png</texturefocus>
         <texturenofocus>DialogCloseButton.png</texturenofocus>
@@ -74,7 +74,7 @@
         <width>920</width>
         <height>350</height>
         <texture border="10">button-focus.png</texture>
-        <visible>Control.HasFocus(50)</visible>
+        <visible>Control.HasFocus(800)</visible>
         <!--texture colordiffuse="FFAA66AA" border="5">WhiteDialogBack.png</texture-->
       </control>
       <!--Header-->
@@ -218,8 +218,8 @@
           </control>
         </control>
       </control>
-      <!--Main List 50-->
-      <control type="list" id="50">
+      <!--Main List 800-->
+      <control type="list" id="800">
         <description>The Playlist Display</description>
         <left>10</left>
         <top>85</top>
@@ -445,8 +445,8 @@
         <orientation>vertical</orientation>
         <showonepage>true</showonepage>
         <!--onup>20</onup>
-        <ondown>50</ondown-->
-        <onleft>50</onleft>
+        <ondown>800</ondown-->
+        <onleft>800</onleft>
         <onright>20</onright>
       </control>
     </control>

@@ -320,7 +320,6 @@ class miniClient(Thread):
                     item.setProperty('pgmTitle', data['title'])
                     item.setProperty('pgmAlarmtime', data['alarmtime'])
                     item.setProperty('pgmId', data['id'])
-                    # import web_pdb; web_pdb.set_trace()
                     DbgPrint("***Returning item: {}".format(data['title']))
                     return item
         except Exception as e:
@@ -340,6 +339,9 @@ class miniClient(Thread):
 
     def Launch(self, listitem):
         global VACATIONMODE_VALUE
+        if listitem is None:
+            return
+
         if VACATIONMODE_VALUE == True:
             DbgPrint("**Vacation Mode Active...")
             return
@@ -382,7 +384,6 @@ class miniClient(Thread):
         except Exception as e:
             DbgPrint("****SearchByID Unexpected Error:{}: n={} : item={}".format(str(e), n, item))
 
-        #import web_pdb; web_pdb.set_trace()
         DbgPrint("SearchByID: Should only get here if there is an ERROR....")
         raise Exception("Item Not Found")
 

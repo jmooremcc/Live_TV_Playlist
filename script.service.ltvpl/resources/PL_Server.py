@@ -91,7 +91,7 @@ class PL_Server(object):
             also before launching daily maintenance service 
         """
         count = 60
-        lastChNumber = self.dataSet.LastChNumber
+        lastCh = lastChNumber = self.dataSet.LastChNumber
 
         while count >= 0:
             try:
@@ -154,20 +154,23 @@ class PL_Server(object):
         status=self.cmds[cmd](conn, arg) #Call the service provider
         DbgPrint("Exiting onServerDataReceived",MODULEDEBUGMODE=MODULEDEBUGMODE)
 
+    def NotificationSend(self, cmd, data):
+        try:
+            rData3 = genericEncode(cmd, data)
+            rData4 = genericEncode(xlateCmd2Notification(cmd), rData3)
+            self.sendNotification(rData4)
+            return rData4
+        except Exception as e:
+            DbgPrint("Exception:{}".format(e.message))
+
     def ReturnData(self,conn,cmd, data, notify=True):
         rData = encodeResponse(cmd, data)
-
         rData2 = self.server._processData(rData) + DATAEndMarker
         conn.send(rData2)
 
         if notify:
             time.sleep(1)
-            try:
-                rData3 = genericEncode(cmd, data)
-                rData4 = genericEncode(xlateCmd2Notification(cmd), rData3)
-                self.sendNotification(rData4)
-            except Exception as e:
-                DbgPrint("Exception:{}".format(e.message))
+            self.NotificationSend(cmd, data)
 
 
     def ReturnError(self,conn,opStatus,errMsg):
@@ -372,11 +375,8 @@ class PL_Server(object):
                 #Vacation Mode
                 vacationMode = newValues[key]
                 self.dataSet.VacationMode = vacationMode
-                cmd = Cmd.SetVacationMode
-                rData3 = genericEncode(cmd, vacationMode)
-                msg = genericEncode(xlateCmd2Notification(cmd), rData3)
+                msg = self.NotificationSend(Cmd.SetVacationMode, vacationMode)
                 DbgPrint("Server Vacation Mode:{}\tNotification:{}".format(vacationMode, msg))
-                self.sendNotification(msg)
 
             elif key == AUTOCLEANMODE:
                 #Playlist Auto Clean Mode
@@ -415,14 +415,21 @@ class PL_Server(object):
             self.dataSet.FireSettingsChangedEvent(DAILYSTOPCOMMAND, {STOPCMD_ACTIVE: False, 'alarmtime': None})
 
         elif dailyStopCmdActive and strStopCmdAlarmtime is not None:
-            tmp = strStopCmdAlarmtime.split(':')
-            seconds = int(tmp[0]) * 3600 + int(tmp[1]) * 60
-            alarmtime = datetime.combine(datetime.today(), datetime.min.time()) + timedelta(seconds=seconds)
-            if alarmtime < datetime.now():
-                alarmtime = datetime.combine(datetime.today(), datetime.min.time()) + timedelta(days=1, seconds=seconds)
+            if dailyStopCmdActive == False:
+                return
 
-            self.enableDailyStopCmd(alarmtime)
-            self.dataSet.FireSettingsChangedEvent(DAILYSTOPCOMMAND,{'stopcmd_active': True, 'alarmtime': strStopCmdAlarmtime})
+            if len(strStopCmdAlarmtime) <= 0:
+                return
+            try:
+                tmp = strStopCmdAlarmtime.split(':')
+                seconds = int(tmp[0]) * 3600 + int(tmp[1]) * 60
+                alarmtime = datetime.combine(datetime.today(), datetime.min.time()) + timedelta(seconds=seconds)
+                if alarmtime < datetime.now():
+                    alarmtime = datetime.combine(datetime.today(), datetime.min.time()) + timedelta(days=1, seconds=seconds)
+
+                self.enableDailyStopCmd(alarmtime)
+                self.dataSet.FireSettingsChangedEvent(DAILYSTOPCOMMAND,{'stopcmd_active': True, 'alarmtime': strStopCmdAlarmtime})
+            except Exception as e: pass
 
     def enableDailyStopCmd(self, alarmtime):
         itemlist = self.dataSet.FindCh(Cmd.Stop_Player.value)
@@ -432,10 +439,8 @@ class PL_Server(object):
                 DbgPrint("Updating Stop Command")
                 item.alarmtime = alarmtime
                 self.dataSet.updatePlayListItem(item)
-                cmd = Cmd.UpdatePlayListItem
-                rData3 = genericEncode(cmd, item.Data)
-                rData4 = genericEncode(xlateCmd2Notification(cmd), rData3)
-                self.sendNotification(rData4)
+                self.NotificationSend(Cmd.UpdatePlayListItem, item.Data)
+
         else:
             item = PlayListItem(alarmtime=alarmtime, ch=Cmd.Stop_Player.value, title="Daily Player Stop Command",
                                recurrenceInterval=RecurrenceOptions.DAILY)
@@ -443,11 +448,7 @@ class PL_Server(object):
             item.eventHandler=self.onChannelChange
             DbgPrint("Creating Stop Command")
             self.dataSet.AddPlayList(item)
-            cmd = Cmd.AddPlayListItem
-            rData3 = genericEncode(cmd, item.Data)
-            rData4 = genericEncode(xlateCmd2Notification(cmd), rData3)
-            self.sendNotification(rData4)
-
+            self.NotificationSend(Cmd.AddPlayListItem, item.Data)
 
 
     def disableDailyStopCmd(self):
@@ -456,10 +457,8 @@ class PL_Server(object):
             item = itemlist[0]
             id = item.ID
             self.dataSet.Remove(itemlist[0])
-            cmd = Cmd.RemovePlayListItem
-            rData3 = genericEncode(cmd, item.Data)
-            rData4 = genericEncode(xlateCmd2Notification(cmd), rData3)
-            self.sendNotification(rData4)
+            self.NotificationSend(Cmd.RemovePlayListItem, item.Data)
+
 
     def getDailyStopCmdTime(self,conn,args):
         itemlist = self.dataSet.FindCh(Cmd.Stop_Player.value)

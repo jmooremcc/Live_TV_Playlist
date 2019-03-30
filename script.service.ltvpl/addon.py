@@ -64,7 +64,7 @@ LTVPL               =   'Live TV Playlist'
 PAGE_SIZE                   = 10
 CLOSE_BUTTON                = 20
 SCROLL_BAR                  = 17
-MAIN_LIST                   = 50
+MAIN_LIST                   = 800
 
 ACTION_MOVE_LEFT            = 1
 ACTION_MOVE_RIGHT           = 2
@@ -77,6 +77,7 @@ ACTION_PREVIOUS_MENU        = 10
 ACTION_NAV_BACK             = 92
 ACTION_CONTEXT_MENU         = 117
 ACTION_MOUSE_LEFT_CLICK     = 100
+ACTION_MOUSE_RIGHT_CLICK    = 101
 
 JUSTIFY_LEFT                = 0
 JUSTIFY_CENTER              = 2
@@ -279,12 +280,6 @@ class GUI(xbmcgui.WindowXMLDialog):
         self.connectToServer()
         self.clearList()
         self.toolboxBusyDialog = None
-        # now we are going to add all the items we have defined to the (built-in) container
-        # Wait for data to come from the server before proceeding
-        self.signal.clear()
-        if self.client is not None:
-            myLog("***Calling GetPlaylist....")
-            self.client.GetPlayList()
 
         setDialogActive(MAIN_DIALOGTAG)
 
@@ -316,6 +311,13 @@ class GUI(xbmcgui.WindowXMLDialog):
     def onInit(self):
         global VACATIONMODE_VALUE
         super(GUI, self).onInit()
+        self.list = self.getControl(MAIN_LIST) # type: xbmcgui.ControlList
+        # now we are going to add all the items we have defined to the list control
+        # Wait for data to come from the server before proceeding
+        self.signal.clear()
+        if self.client is not None:
+            myLog("***Calling GetPlaylist....")
+            self.client.GetPlayList()
         winID = xbmcgui.getCurrentWindowDialogId()
         self.queue.put(winID)
         myLog("*******My WinID is {}......".format(winID))
@@ -346,7 +348,6 @@ class GUI(xbmcgui.WindowXMLDialog):
             val = GETTEXT(30037)
         else:
             val = GETTEXT(30038)
-        # import web_pdb; web_pdb.set_trace()
         DbgPrint("val: {}".format(val))
         self.setProperty('vacationMode', val)
         ADDON.setSetting(VACATIONMODE, str(VACATIONMODE_VALUE).lower())
@@ -392,31 +393,34 @@ class GUI(xbmcgui.WindowXMLDialog):
         else:
             myLog("****Main onAction actionID: {:d}".format(actionID.getId()))
 
-        if actionID == ACTION_NAV_BACK or actionID == ACTION_PREVIOUS_MENU:
-            self.closeDialog()
 
-        elif actionID == ACTION_MOVE_LEFT or actionID == ACTION_MOVE_RIGHT:
+        if actionID == ACTION_MOVE_LEFT or actionID == ACTION_MOVE_RIGHT:
             pass
 
-        elif actionID == ACTION_CONTEXT_MENU:
+        elif actionID == ACTION_CONTEXT_MENU or actionID == ACTION_MOUSE_RIGHT_CLICK:
             self.openSettingsDialog()
 
+        elif actionID == ACTION_NAV_BACK or actionID == ACTION_PREVIOUS_MENU:
+            self.closeDialog()
+
         elif actionID == ACTION_MOVE_DOWN and self.getFocusId() == MAIN_LIST:
-            index = self.getCurrentListPosition()
+            index = self.list.getSelectedPosition()
             myLog("***Main ActionDown: {:d}".format(index))
-            if index == self.getListSize():
+            if index == self.list.size():
                 self.setCurrentListPosition(0)
 
         elif actionID == ACTION_MOVE_UP and self.getFocusId() == MAIN_LIST:
-            index = self.getCurrentListPosition()
+            index = self.list.getSelectedPosition()
             myLog("***Main ActionUp: {:d}".format(index))
             if index < 0:
-                self.setCurrentListPosition(self.getListSize() - 1)
-
+                self.setCurrentListPosition(self.list.size() - 1)
 
         elif actionID == ACTION_SELECT_ITEM or actionID == ACTION_MOUSE_LEFT_CLICK:
-            pos = self.getCurrentListPosition()
-            item = ListItemPlus(self.getListItem(pos))
+            pos = self.list.getSelectedPosition()
+            if pos < 0:
+                return
+
+            item = ListItemPlus(self.list.getListItem(pos))
             myLog("***********>Item Selected: {} at {}".format(item.getProperty('Description'), self.currentPos))
             suspendedFlag = item.getProperty('suspendedFlag') == 'True'
 
@@ -450,7 +454,7 @@ class GUI(xbmcgui.WindowXMLDialog):
                     elif cmd == MENU_SUSPEND_ITEM:
                         myLog("******Suspend Event Selected")
                         self.toolboxBusyDialog.show()
-                        self.suspendPlayListItem(self.getListItem(pos))
+                        self.suspendPlayListItem(self.list.getListItem(pos))
                         self.toolboxBusyDialog.Stop()
                         self.toolboxBusyDialog = None
 
@@ -462,29 +466,31 @@ class GUI(xbmcgui.WindowXMLDialog):
 
 
     def onFocus(self, ctrlID):
-        ctrl = self.getControl(ctrlID)
         if ctrlID == MAIN_LIST:
+            ctrl = self.getControl(ctrlID)
             ctrl.selectItem(0)
-        self.currentPos = ctrl.getPosition()
-        myLog("******CurrentPos: {}\tctrlID: {}".format(self.currentPos, ctrlID))
+            self.currentPos = ctrl.getPosition()
+            myLog("******CurrentPos: {}\tctrlID: {}".format(self.currentPos, ctrlID))
 
     def getItemList(self):
-        maxitems = self.getListSize()
-        ilist = [self.getListItem(pos) for pos in range(maxitems)]
+        maxitems = self.list.size()
+        ilist = [self.list.getListItem(pos) for pos in range(maxitems)]
         return ilist
 
     def sortItemListByDate(self):
         # TODO sort does not respect region date format
         itemlist = self.getItemList()
-        newlist = sorted(itemlist, key=lambda item: item.getProperty('alarmtime'))
-        self.clearList()
-        self.addItems(newlist)
+        if len(itemlist) > 0:
+            newlist = sorted(itemlist, key=lambda item: item.getProperty('alarmtime'))
+            self.list.reset()
+            self.list.addItems(newlist)
+            # self.list_items = newlist
 
 
     def findItemByID(self, id):
-        maxitems = self.getListSize()
+        maxitems = self.list.size()
         for i in range(maxitems):
-            item = self.getListItem(i)
+            item = self.list.getListItem(i)
             if id == item.getProperty('ID'):
                 return (item, i)
 
@@ -535,23 +541,27 @@ class GUI(xbmcgui.WindowXMLDialog):
             myLog("**********Calling findItemByID......")
             pos = self.findItemByID(id)[1]
             myLog("***removeItemByID Found itemID:{} at pos:{}".format(id, pos))
-            self.removeItem(pos)
-            self.sortItemListByDate()
+
+            try:
+                self.list.removeItem(pos)
+                self.sortItemListByDate()
+            except Exception as e:
+                myLog(e)
         except Exception as e:
             myLog(e.message)
 
 
     def addNewItem(self, data):
         try:
-            #item = BuildPlaylistItem(data)
             dateformat = xbmc.getRegion('dateshort')
             item = ListItemPlus(dateformat=dateformat)
             item.Data = data
             setUSpgmDate(self)
             self.xlateFrequencyValue(data, item)
-            self.addItem(item)
+            self.list.addItem(item)
+            self.list_items.append(item)
+            self.sortItemListByDate()
         except: pass
-        self.sortItemListByDate()
 
     def clearItems(self):
         self.clearList()
@@ -615,7 +625,6 @@ class GUI(xbmcgui.WindowXMLDialog):
                 self.toolboxBusyDialog = None
 
         except Exception as e:
-            import web_pdb; web_pdb.set_trace()
             DbgPrint("onNotification Error Message:{}".format(e.message))
 
 
@@ -667,8 +676,8 @@ class GUI(xbmcgui.WindowXMLDialog):
 
                 ilist.append(obj)
 
-
-            self.addItems(ilist)
+            self.list_items = ilist
+            self.list.addItems(ilist)
             self.signal.set()
 
         elif cmd == Cmd.AddPlayListItem:
@@ -697,7 +706,6 @@ class GUI(xbmcgui.WindowXMLDialog):
         title = item.getProperty(DESC)
 
         DbgPrint("********SuspendFlag: {}".format(suspendFlag))
-
 
         if suspendFlag == 'True':
             item.setProperty(SF,'False')

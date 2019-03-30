@@ -81,9 +81,9 @@ class ListItemPlus(xbmcgui.ListItem):
         for tag in self.tags:
             try:
                 tmp = dict([(tag,self.getProperty(tag))])
-                myLog("***tmp:{}".format(tmp))
+                DbgPrint("***tmp:{}".format(tmp))
                 values.update(tmp)
-                myLog("values:{}".format(values))
+                DbgPrint("values:{}".format(values))
             except: pass
 
         for tag in self.dtags:
@@ -114,6 +114,7 @@ class ListItemPlus(xbmcgui.ListItem):
             strDate, strTime = strTimeStamp(alarmtime, dataformat=dateformat)
             self.setProperty('Date',strDate)
             self.setProperty('Time', strTime)
+            self.setInfo('video',{'date':values['alarmtime']})
 
             if 'expiryDate' in values and  values['expiryDate'] is not None:
                 expiryDate = strDate2TimeStamp(values['expiryDate'], "%Y-%m-%d %H:%M:%S")

@@ -121,7 +121,6 @@ class Monitor(xbmc.Monitor):
 
         #Vacation Mode
         vacationMode = str(ADDON.getSetting(VACATIONMODE)).lower() == TRUE
-        # import web_pdb;web_pdb.set_trace()
         if self.vacationMode != vacationMode:
             self.vacationMode=vacationMode
             newValues.update({VACATIONMODE:vacationMode})
@@ -151,7 +150,6 @@ class Monitor(xbmc.Monitor):
         #Process Changed Settings
         try:
             if len(newValues) > 0:
-                # import web_pdb; web_pdb.set_trace()
                 myLog("settingsChangedFlag: True", level=xbmc.LOGDEBUG)
                 try:
                     self.server.setSettings(newValues)
@@ -200,12 +198,21 @@ if __name__ == '__main__':
         vacationMode = str(ADDON.getSetting(VACATIONMODE)).lower() == TRUE
         debugMode = str(ADDON.getSetting(DEBUGMODE)).lower() == TRUE
         autocleanMode = str(ADDON.getSetting(AUTOCLEANMODE)).lower() == TRUE
+        stopcmd_active = str(ADDON.getSetting(STOPCMD_ACTIVE)).lower() == TRUE
 
         server = PL_Server(address, vacationMode, debugMode, autocleanMode)
+        # check for daily stop command and add it if settings authorize it
         strAlarmtime = server.getDailyStopCmdAlarmtime()
         if strAlarmtime is not None:
             ADDON.setSetting(STOPCMD_ACTIVE, TRUE)
             ADDON.setSetting(ALARMTIME, strAlarmtime)
+        elif stopcmd_active == True:
+            strAlarmtime = str(ADDON.getSetting(ALARMTIME))
+            if strAlarmtime is not None:
+                newValues = {}
+                newValues.update({STOPCMD_ACTIVE: stopcmd_active})
+                newValues.update({ALARMTIME: strAlarmtime})
+                server.setSettings(newValues)
 
         server.startServer()
         server.addSettingsChangedEventHandler(onServerSettingsChanged)

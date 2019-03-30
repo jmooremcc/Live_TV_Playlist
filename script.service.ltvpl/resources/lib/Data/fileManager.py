@@ -139,6 +139,7 @@ class fileManager(object):
             fp.close()
             self.dirtyflag = False
             self.restoreOperationActive = False
+            DbgPrint("***Restore Operation Complete...")
             # self.cleanupBackupFiles()
 
 
