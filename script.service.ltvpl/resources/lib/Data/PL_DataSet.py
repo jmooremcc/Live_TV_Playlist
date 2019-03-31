@@ -29,7 +29,6 @@ from resources.lib.Utilities.PythonEvent import Event
 from PlayListItem import PlayListItem, isPlayListItem, RecurrenceOptions, ALARMPADDING
 from fileManager import fileManager, FileManagerMode
 from resources.lib.KodiLib.KodiUtilities import kodiObj, changeChannelByChannelNumber, playerStop, getBroadcast_startTimeList, KODI_ENV
-from resources.data.dataFileLocation import dataFilePath
 from resources.lib.Utilities.Messaging import Cmd, VACATIONMODE, PREROLLTIME
 from resources.lib.Utilities.AlarmsMgr import _Alarms
 from resources.lib.Utilities.VirtualEvents import TS_decorator
@@ -51,7 +50,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
             ItemRemovedEvent -> Fired when a PlayList item is removed from the dataset
             ItemCancelledEvent -> Fired when a PlayList item is cancelled
     """
-    def __init__(self, vacationmode=False, autocleanMode=True):
+    def __init__(self, dataFileName, vacationmode=False, autocleanMode=True):
         list.__init__(self)
         myPickle_io.__init__(self)
         self.ItemRemovedEvent=Event("ItemRemovedEvent",spawn=True)
@@ -65,12 +64,9 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         self.prerolltime = ALARMPADDING
         self.abortOperation = False
         self.lastChannel = None
-        self.fileManager=fileManager(self, dataFilePath, mode=FileManagerMode.PICKLE)
+        self.fileManager=fileManager(self, dataFileName, mode=FileManagerMode.PICKLE)
         DbgPrint("***Calling Data Restore Operation...")
-        try:
-            self.fileManager.restore()
-        except Exception as e:
-            DbgPrint("***Mystery Error: {}".format(str(e)))
+        self.fileManager.restore()
         DbgPrint("***LastChannel: {}".format(self.lastChannel))
         if KODI_ENV and self.lastChannel is None:
             DbgPrint("*****LastChannel->: {} isNone:{}".format(self.lastChannel, self.lastChannel is None))

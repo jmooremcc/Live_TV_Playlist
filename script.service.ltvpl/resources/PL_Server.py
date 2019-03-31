@@ -43,9 +43,9 @@ PLSERVERTAG = "LTVPL_PLSERVER_ACTIVE"
 
 
 class PL_Server(object):
-    def __init__(self, address, vacationmode=False, debugmode=False, autocleanMode=True):
+    def __init__(self, address, dataFileName, vacationmode=False, debugmode=False, autocleanMode=True):
         setDebugMode(debugmode)
-        self.dataSet=PL_DataSet(vacationmode, autocleanMode)
+        self.dataSet=PL_DataSet(dataFileName, vacationmode, autocleanMode)
         self.dataSet.AddItemRemovedEventHandler(self.onDataSetEvent)
         self.dataSet.AddItemCancelledEventHandler(self.onDataSetEvent)
         self.dataSet.AddItemUpdatedEventHandler(self.onDataSetEvent)

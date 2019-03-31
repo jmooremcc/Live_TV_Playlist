@@ -200,7 +200,7 @@ if __name__ == '__main__':
         autocleanMode = str(ADDON.getSetting(AUTOCLEANMODE)).lower() == TRUE
         stopcmd_active = str(ADDON.getSetting(STOPCMD_ACTIVE)).lower() == TRUE
 
-        server = PL_Server(address, vacationMode, debugMode, autocleanMode)
+        server = PL_Server(address, ADDON_DATAFILENAME, vacationMode, debugMode, autocleanMode)
         # check for daily stop command and add it if settings authorize it
         strAlarmtime = server.getDailyStopCmdAlarmtime()
         if strAlarmtime is not None:
