@@ -67,7 +67,10 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         self.lastChannel = None
         self.fileManager=fileManager(self, dataFilePath, mode=FileManagerMode.PICKLE)
         DbgPrint("***Calling Data Restore Operation...")
-        self.fileManager.restore()
+        try:
+            self.fileManager.restore()
+        except Exception as e:
+            DbgPrint("***Mystery Error: {}".format(str(e)))
         DbgPrint("***LastChannel: {}".format(self.lastChannel))
         if KODI_ENV and self.lastChannel is None:
             DbgPrint("*****LastChannel->: {} isNone:{}".format(self.lastChannel, self.lastChannel is None))
