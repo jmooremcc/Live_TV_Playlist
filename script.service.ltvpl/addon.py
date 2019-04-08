@@ -178,7 +178,10 @@ def getEPG_Data(win=None):
 
     pgmTitle = xbmc.getInfoLabel('Listitem.Title')
     DbgPrint("***pgmTitle: {}".format(pgmTitle))
-    pgmDate = xbmc.getInfoLabel('Listitem.Date')[:10]
+    pgmDate = xbmc.getInfoLabel('Listitem.Date')
+    pos=pgmDate.find(' ')
+    if pos > 0:
+        pgmDate = pgmDate[:pos]
     DbgPrint("***pgmDate: {}".format(pgmDate))
     pgmTime = xbmc.getInfoLabel('Listitem.StartTime')
     pgmCh = xbmc.getInfoLabel('Listitem.ChannelNumberLabel')
@@ -189,6 +192,8 @@ def getEPG_Data(win=None):
         liDateTime = datetime.strptime(xbmc.getInfoLabel('Listitem.Date'), dateformat)
     except Exception as e:
         print(e.message)
+        dateformat = dateformat.replace('-', '')
+        DbgPrint("new DateFormat: {}".format(dateformat))
         myLog("Listitem.Date: {}".format(xbmc.getInfoLabel('Listitem.Date')))
         liDateTime = datetime.strptime(xbmc.getInfoLabel('Listitem.Date'), dateformat)
 
