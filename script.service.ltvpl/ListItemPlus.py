@@ -20,7 +20,7 @@
 from datetime import datetime, timedelta
 import locale
 
-__Version__ = "1.0.0"
+__Version__ = "1.1.0"
 
 locale.setlocale(locale.LC_ALL, '')
 import copy
@@ -37,7 +37,11 @@ def strTimeStamp(tData, dataformat="{:%m/%d/%Y}"):
     """
     try:
         strDate = dataformat.format(tData)
-        strTime = "{:%I:%M %p}".format(tData)
+        fmt = xbmc.getRegion('time')
+        fmt = fmt.replace(':%S', '')
+        strTime = "{:" + fmt + "}"
+        DbgPrint("***strTime: {}".format(strTime))
+        strTime = strTime.format(tData)
     except:
         strDate = strTime = ''
 

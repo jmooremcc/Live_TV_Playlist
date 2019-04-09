@@ -20,7 +20,9 @@
 
 import os, sys
 from threading import Event as Signal, Thread
-from datetime import datetime, timedelta
+from datetime import datetime as dt, timedelta
+import locale
+import copy
 import sys
 if sys.version_info[0] == 2:
     from Queue import Queue
@@ -30,7 +32,7 @@ else:
 import xbmc
 import xbmcaddon
 import xbmcgui
-from util import ADDON, ADDONID, ADDON_PATH, ADDON_NAME, XMLPATH, FANART_PATH, BGDIMAGE, LTVPL_HEADER, GETTEXT, setUSpgmDate
+from util import ADDON, ADDONID, ADDON_PATH, ADDON_NAME, XMLPATH, FANART_PATH, BGDIMAGE, LTVPL_HEADER, GETTEXT, setUSpgmDate, getRegionDatetimeFmt
 from resources.lib.Data.PlayListItem import PlayListItem
 from resources.PL_Client import PL_Client, genericDecode
 from resources.lib.Utilities.Messaging import Cmd, NotificationAction,DEBUGMODE,TRUE,VACATIONMODE
@@ -42,7 +44,7 @@ from ListItemPlus import ListItemPlus
 from keymapper import setActivationKey, reloadKeyMaps
 from BusyDialog import BusyDialog, BusyDialog2
 
-__Version__ = "1.0.0"
+__Version__ = "1.1.0"
 
 MAIN_DIALOGTAG = "LTVPL_MAINDIALOG_VISIBLE"
 MODULEDEBUGMODE = True
@@ -106,7 +108,7 @@ ContextMenuItems2 = [(GETTEXT(30020), MENU_SKIP_ITEM, 'Skip Event'), (GETTEXT(30
                      (GETTEXT(30022), MENU_EDIT_ITEM, 'Edit Event'), (GETTEXT(30023), MENU_DELETE_ITEM, 'Delete Event')]
 
 
-
+locale.setlocale(locale.LC_ALL, '')
 myLog("addonname: {}".format(ADDON_NAME))
 myLog("addonID: {}".format(ADDONID))
 myLog("xmlpath: {}".format(XMLPATH))
@@ -163,7 +165,7 @@ def strTimeStamp(tData):
     """
     # TODO customize date per regional value
     try:
-        dateformat = "{:" + xbmc.getRegion('dateshort') + "}"
+        dateformat = "{:" + getRegionDatetimeFmt() + "}"
         strDate = dateformat.format(tData)
         strTime = "{:%I:%M %p}".format(tData)
     except:
@@ -173,12 +175,13 @@ def strTimeStamp(tData):
 
 
 def getEPG_Data(win=None):
-    dateformat = xbmc.getRegion('dateshort') + " %I:%M %p"
+    dateformat = getRegionDatetimeFmt()
     DbgPrint("***DateFormat: {}". format(dateformat))
 
     pgmTitle = xbmc.getInfoLabel('Listitem.Title')
     DbgPrint("***pgmTitle: {}".format(pgmTitle))
-    pgmDate = xbmc.getInfoLabel('Listitem.Date')
+    fullPgmDate = xbmc.getInfoLabel('Listitem.Date')
+    pgmDate = copy.copy(fullPgmDate)
     pos=pgmDate.find(' ')
     if pos > 0:
         pgmDate = pgmDate[:pos]
@@ -186,21 +189,31 @@ def getEPG_Data(win=None):
     pgmTime = xbmc.getInfoLabel('Listitem.StartTime')
     pgmCh = xbmc.getInfoLabel('Listitem.ChannelNumberLabel')
     pgmIcon = xbmc.getInfoLabel('Listitem.Icon')
+    DbgPrint("Locale: {}".format(locale.getlocale()))
+    DbgPrint("Default Locale: {}".format(locale.getdefaultlocale()))
 
-    # calculate USpgmDate - a region independent datetime object
+    #Initially try a 12 hour clock
     try:
-        liDateTime = datetime.strptime(xbmc.getInfoLabel('Listitem.Date'), dateformat)
+        liDateTime = dt.strptime(fullPgmDate, dateformat)
     except Exception as e:
-        print(e.message)
+        DbgPrint("Error Msg: {}".format(e.message))
         dateformat = dateformat.replace('-', '')
         DbgPrint("new DateFormat: {}".format(dateformat))
-        myLog("Listitem.Date: {}".format(xbmc.getInfoLabel('Listitem.Date')))
-        liDateTime = datetime.strptime(xbmc.getInfoLabel('Listitem.Date'), dateformat)
+        myLog("Listitem.Date: {}".format(pgmDate))
+        try:
+            liDateTime = dt.strptime(fullPgmDate, dateformat)
+        except Exception as e2:
+            #Now try a 24 hour clock
+            DbgPrint("Error Msg: {}".format(e2.message))
+            dateformat = getRegionDatetimeFmt()
+            dateformat = dateformat.replace('-', '')
+            liDateTime = dt.strptime(fullPgmDate, dateformat)
 
+    # calculate USpgmDate - a region independent datetime object
     USpgmDate = liDateTime.strftime("%m/%d/%Y")
     DbgPrint("***liDateTime: {}".format(liDateTime))
     DbgPrint("***USpgmDate: {}".format(USpgmDate))
-    diff = liDateTime - datetime.now()
+    diff = liDateTime - dt.now()
 
     myLog("****item title: {} ".format(pgmTitle))
     myLog("****item date: {} ".format(pgmDate))

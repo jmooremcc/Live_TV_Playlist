@@ -32,10 +32,10 @@ from resources.lib.Network.utilities import decodeErrorResponse
 from resources.lib.Network.SecretSauce import *
 from addon import LTVPL_HEADER, strTimeStamp, RECURRENCE_OPTIONS
 from utility import setDialogActive, isDialogActive, clearDialogActive, myLog
-from util import GETTEXT, setUSpgmDate
+from util import GETTEXT, setUSpgmDate, getRegionDatetimeFmt
 from resources.lib.Utilities.DebugPrint import DbgPrint
 
-__Version__ = "1.0.0"
+__Version__ = "1.1.0"
 
 ACTION_BACK = 92
 ACTION_PARENT_DIR = 9
@@ -69,10 +69,18 @@ except: pass
 
 # RECURRENCE_OPTIONS = [(GETTEXT(30050),'Once'), (GETTEXT(30051),'Daily'), (GETTEXT(30052),'Weekdays'), (GETTEXT(30053),'Weekends'), (GETTEXT(30054),'Weekly'), (GETTEXT(30055),'Monthly')]
 
+
+
 def getDateItem(strDate, strTime):
     dateval = strDate + " " + strTime
     DbgPrint("***dateval: {}".format(dateval))
-    retval = datetime.strptime(dateval, "%m/%d/%Y %I:%M %p")
+    fmt = getRegionDatetimeFmt()
+    try:
+        retval = datetime.strptime(dateval, fmt)
+    except Exception as e:
+        fmt = fmt.replace('-','')
+        retval = datetime.strptime(dateval, fmt)
+
     return retval
 
 def strDate2TimeStamp(tdata):
@@ -135,7 +143,8 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
 
     def processEditData(self, data):
         self.setProperty('pgmTitle', data['Description'])
-        strDate , strTime = strTimeStamp(strDate2TimeStamp(data['alarmtime']))
+        strDate = data['Date']
+        strTime = data['Time']
         self.setProperty('pgmDate', strDate)
         self.setProperty('pgmTime', strTime)
         self.setProperty('pgmCh', data['Ch'])
@@ -248,7 +257,7 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
                 return opt[1]
 
     def createPlaylistObj(self):
-        alarmtime = getDateItem(self.getProperty('USpgmDate'), self.getProperty('pgmTime'))
+        alarmtime = getDateItem(self.getProperty('pgmDate'), self.getProperty('pgmTime'))
         ch = self.getProperty('pgmCh')
         title = self.getProperty('pgmTitle')
         selectctrl = self.getControl(FREQ_SELECTOR)

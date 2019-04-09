@@ -25,7 +25,7 @@ import os
 import sys
 from datetime import datetime
 
-__Version__ = "1.0.0"
+__Version__ = "1.1.0"
 
 def GetXBMCVersion():
     version = xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')
@@ -71,6 +71,10 @@ ACTIVATIONKEY = 'activationkey'
 def GETTEXT(id):
     return ADDON.getLocalizedString(id).encode('utf-8')
 
+def getRegionDatetimeFmt():
+    timefmt = xbmc.getRegion('time')
+    timefmt = timefmt.replace(':%S','')
+    return xbmc.getRegion('dateshort') + " " + timefmt
 
 def setUSpgmDate(obj):
     try:
