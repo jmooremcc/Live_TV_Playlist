@@ -115,7 +115,7 @@ def processChannelNumber(channelNumber):
         s=int(t1[1])
         return([c,s])
 
-    return(None)
+    return([int(channelNumber), 0])
 
 def getLastChannelInfo(kodiObj, chGroup=1):
     p1 = {"channelgroupid": chGroup, \
@@ -170,7 +170,7 @@ def getChannelInfoByChannelNumber(kodiObj,channelNumber,chGroup=1,params=None):
         else:
             return(None)
     except:
-        raise Exception(KODI_OPERATION_FAILED + "Could Not Retrieve Channel Info by Channel Number")
+        raise Exception(KODI_OPERATION_FAILED + "Could Not Retrieve Channel Info by Channel Number {}".format(channelNumber))
 
 
 def getChannelInfoByCallSign(kodiObj,callSign,chGroup=1,params=None):
