@@ -81,9 +81,13 @@ class _dbmm():
 
 dbmm = _dbmm()
 
-import xbmc
+try:
+    import xbmc
+    XBMC_PRESENT = xbmc.getFreeMem() != long
+except:
+    XBMC_PRESENT = False
 
-if xbmc.getFreeMem() != long:
+if XBMC_PRESENT:
     def myLog(*args, **kwargs):
         DEBUGMODE = dbmm.DebugMode
         if DEBUGMODE:

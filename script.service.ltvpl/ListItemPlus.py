@@ -118,7 +118,7 @@ class ListItemPlus(xbmcgui.ListItem):
             strDate, strTime = strTimeStamp(alarmtime, dataformat=dateformat)
             self.setProperty('Date',strDate)
             self.setProperty('Time', strTime)
-            self.setInfo('video',{'date':values['alarmtime']})
+            # self.setInfo('video',{'date':values['alarmtime']})
 
             if 'expiryDate' in values and  values['expiryDate'] is not None:
                 expiryDate = strDate2TimeStamp(values['expiryDate'], "%Y-%m-%d %H:%M:%S")
