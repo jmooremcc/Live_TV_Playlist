@@ -173,6 +173,17 @@ def strTimeStamp(tData):
 
     return (strDate, strTime)
 
+def _germanAM_PM_Fix(data):
+    pos = data.lower().find('vormittags')
+    if pos > 0:
+        data = data[:pos] + 'AM'
+    else:
+        pos = data.lower().find('nachmittags')
+        if pos > 0:
+            data = data[:pos] + 'PM'
+
+    return data
+
 
 def getEPG_Data(win=None):
     dateformat = getRegionDatetimeFmt()
@@ -181,6 +192,7 @@ def getEPG_Data(win=None):
     pgmTitle = xbmc.getInfoLabel('Listitem.Title')
     DbgPrint("***pgmTitle: {}".format(pgmTitle))
     fullPgmDate = xbmc.getInfoLabel('Listitem.Date')
+    DbgPrint("***fullPgmDate: {}".format(fullPgmDate))
     pgmDate = copy.copy(fullPgmDate)
     pos=pgmDate.find(' ')
     if pos > 0:
@@ -197,7 +209,13 @@ def getEPG_Data(win=None):
         liDateTime = dt.strptime(fullPgmDate, dateformat)
     except Exception as e:
         DbgPrint("Error Msg: {}".format(e.message))
-        dateformat = dateformat.replace('-', '')
+
+        fullPgmDate = _germanAM_PM_Fix(fullPgmDate)
+
+        if os.name == 'nt':
+            dateformat = dateformat.replace('%#', '%')
+        else:
+            dateformat = dateformat.replace('%-', '%')
         DbgPrint("new DateFormat: {}".format(dateformat))
         myLog("Listitem.Date: {}".format(pgmDate))
         try:
@@ -214,6 +232,8 @@ def getEPG_Data(win=None):
     DbgPrint("***liDateTime: {}".format(liDateTime))
     DbgPrint("***USpgmDate: {}".format(USpgmDate))
     diff = liDateTime - dt.now()
+
+    pgmTime = _germanAM_PM_Fix(pgmTime)
 
     myLog("****item title: {} ".format(pgmTitle))
     myLog("****item date: {} ".format(pgmDate))

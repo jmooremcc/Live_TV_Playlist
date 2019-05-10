@@ -46,7 +46,7 @@
           <textcolor>yellow</textcolor>
         </control>
         <control type="label">
-          <left>47</left>
+          <left>45</left>
           <font>font10</font>
           <label>$INFO[Window.Property(pgmDate)]</label>
           <width>150</width>
@@ -56,7 +56,7 @@
       <!--Time Label-->
       <control type="group">
         <description>Time Data Item</description>
-        <left>150</left>
+        <left>145</left>
         <top>6</top>
         <width>100</width>
         <control type="label">

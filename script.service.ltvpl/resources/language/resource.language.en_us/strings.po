@@ -249,3 +249,59 @@ msgstr ""
 msgctxt "#30088"
 msgid "Server Connection Error"
 msgstr ""
+
+msgctxt "#30090"
+msgid "Add To Live TV Playlist"
+msgstr ""
+
+msgctxt "#30100"
+msgid "General"
+msgstr ""
+
+msgctxt "#30101"
+msgid "Playlist Autoclean Mode"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Vacation Mode"
+msgstr ""
+
+msgctxt "#30103"
+msgid "Debug Mode"
+msgstr ""
+
+msgctxt "#30104"
+msgid "Count Down Dialog Duration"
+msgstr ""
+
+msgctxt "#30105"
+msgid "Preroll Time"
+msgstr ""
+
+msgctxt "#30106"
+msgid "Addon Activation Key"
+msgstr ""
+
+msgctxt "#30107"
+msgid "Set Addon Activation Key"
+msgstr ""
+
+msgctxt "#30108"
+msgid "Activation Key"
+msgstr ""
+
+msgctxt "#30109"
+msgid "Reload Keymaps"
+msgstr ""
+
+msgctxt "#30110"
+msgid "Daily Stop Command"
+msgstr ""
+
+msgctxt "#30111"
+msgid "Active"
+msgstr ""
+
+msgctxt "#30112"
+msgid "Time (24 hr)"
+msgstr ""

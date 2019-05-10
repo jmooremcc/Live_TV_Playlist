@@ -8,7 +8,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://trac.kodi.tv/\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Kodi Translation Team\n"
+"Last-Translator: jmooremcc\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/kodi-main/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -261,3 +261,59 @@ msgstr "Error al Cancelar el Elemento"
 msgctxt "#30088"
 msgid "Server Connection Error"
 msgstr "Error de Conexión del Servidor"
+
+msgctxt "#30090"
+msgid "Add To Live TV Playlist"
+msgstr ""
+
+msgctxt "#30100"
+msgid "General"
+msgstr ""
+
+msgctxt "#30101"
+msgid "Playlist Autoclean Mode"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Vacation Mode"
+msgstr ""
+
+msgctxt "#30103"
+msgid "Debug Mode"
+msgstr ""
+
+msgctxt "#30104"
+msgid "Count Down Dialog Duration"
+msgstr ""
+
+msgctxt "#30105"
+msgid "Preroll Time"
+msgstr ""
+
+msgctxt "#30106"
+msgid "Addon Activation Key"
+msgstr ""
+
+msgctxt "#30107"
+msgid "Set Addon Activation Key"
+msgstr ""
+
+msgctxt "#30108"
+msgid "Activation Key"
+msgstr ""
+
+msgctxt "#30109"
+msgid "Reload Keymaps"
+msgstr ""
+
+msgctxt "#30110"
+msgid "Daily Stop Command"
+msgstr ""
+
+msgctxt "#30111"
+msgid "Active"
+msgstr ""
+
+msgctxt "#30112"
+msgid "Time (24 hr)"
+msgstr ""

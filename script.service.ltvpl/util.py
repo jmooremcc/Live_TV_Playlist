@@ -74,6 +74,7 @@ def GETTEXT(id):
 def getRegionDatetimeFmt():
     timefmt = xbmc.getRegion('time')
     timefmt = timefmt.replace(':%S','')
+
     if "%I%I" in timefmt:
         timefmt = timefmt.replace('%I%I', "%I")
     elif "%H%H" in timefmt:
