@@ -186,7 +186,7 @@
           <textwidth>100</textwidth>
           <textcolor>white</textcolor>
           <focusedcolor>yellow</focusedcolor>
-          <textoffsetx>10</textoffsetx>
+          <align>center</align>
           <textoffsety>5</textoffsety>
           <texturefocus colordiffuse="FF2266AA" border="10">white.png</texturefocus>
           <texturenofocus colordiffuse="FF333388" border="10">white.png</texturenofocus>
@@ -198,14 +198,14 @@
         </control>
         <control type="button" id="211">
           <left>90</left>
-          <width>70</width>
+          <width>90</width>
           <height>20</height>
           <font>font10</font>
           <label>$INFO[Window.Property(cancel)]</label>
           <textwidth>100</textwidth>
           <textcolor>white</textcolor>
           <focusedcolor>yellow</focusedcolor>
-          <textoffsetx>10</textoffsetx>
+          <align>center</align>
           <textoffsety>5</textoffsety>
           <texturefocus colordiffuse="FF2266AA" border="10">white.png</texturefocus>
           <texturenofocus colordiffuse="FF333388" border="10">white.png</texturenofocus>
