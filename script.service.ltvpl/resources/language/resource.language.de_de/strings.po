@@ -1,4 +1,4 @@
-﻿# Kodi Media Center language file
+# Kodi Media Center language file
 # Addon Name: Live TV Playlist
 # Addon id: script.service.ltvpl
 # Addon Provider: jmooremcc
