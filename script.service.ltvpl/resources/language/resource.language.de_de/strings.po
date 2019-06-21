@@ -1,6 +1,6 @@
 ﻿# Kodi Media Center language file
 # Addon Name: Live TV Playlist
-# Addon id: service.ltvpl
+# Addon id: script.service.ltvpl
 # Addon Provider: jmooremcc
 msgid ""
 msgstr ""
@@ -20,7 +20,7 @@ msgctxt "#30000"
 msgid "Keymap Editor"
 msgstr "Keymap-Editor"
 
-#empty string with id 30001
+# empty string with id 30001
 
 msgctxt "#30002"
 msgid "Press the key you want to assign now"

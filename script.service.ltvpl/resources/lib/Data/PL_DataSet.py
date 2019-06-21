@@ -146,7 +146,8 @@ class PL_DataSet(list,myPickle_io,myJson_io):
     def SuspendItem(self, id):
         item = self.SearchByID(id)
         if item is None:
-            raise(Exception("ItemID: {} Not Found".format(id)))
+            raise Exception
+            # raise(Exception("ItemID: {} Not Found".format(id)))
 
         item.SuspendedFlag=True
         self.fileManager.Dirty = True
@@ -155,7 +156,8 @@ class PL_DataSet(list,myPickle_io,myJson_io):
     def EnableItem(self, id):
         item = self.SearchByID(id)
         if item is None:
-            raise (Exception("ItemID: {} Not Found".format(id)))
+            raise Exception
+            # raise (Exception("ItemID: {} Not Found".format(id)))
 
         item.SuspendedFlag=False
         self.fileManager.Dirty = True

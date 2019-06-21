@@ -35,7 +35,7 @@ from utility import setDialogActive, isDialogActive, clearDialogActive, myLog
 from util import GETTEXT, setUSpgmDate, getRegionDatetimeFmt
 from resources.lib.Utilities.DebugPrint import DbgPrint
 
-__Version__ = "1.1.0"
+__Version__ = "1.1.1"
 
 ACTION_BACK = 92
 ACTION_PARENT_DIR = 9
@@ -93,6 +93,7 @@ def calstrDate2TimeStamp(tdata):
     fmt = "%m/%d/%Y"
     import time
     ts = datetime(*(time.strptime(tdata, fmt)[0: 6]))
+    ts = ts + timedelta(days=1) - timedelta(seconds=1)
     return ts
 
 

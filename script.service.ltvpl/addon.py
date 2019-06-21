@@ -532,7 +532,8 @@ class GUI(xbmcgui.WindowXMLDialog):
             if id == item.getProperty('ID'):
                 return (item, i)
 
-        raise (Exception("Item ID {} Not Found".format(id)))
+        # raise (Exception("Item ID {} Not Found".format(id)))
+        raise Exception
 
     def updateItemByID(self, id, data):
 
