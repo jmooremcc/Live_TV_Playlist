@@ -167,7 +167,3 @@ def reloadKeyMaps():
     xbmc.executebuiltin('Action(reloadkeymaps)')
 
 
-if __name__ == "__main__":
-    keymapper.add_key("gen2.xml","service.ltvpl", 123)
-    # path = r"D:\My Documents\GitHub\LiveTV_PlayList\script.service.ltvpl\gen.xml"
-    # prepDirectory(path)

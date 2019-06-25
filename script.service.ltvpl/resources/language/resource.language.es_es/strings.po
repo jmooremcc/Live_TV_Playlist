@@ -55,8 +55,8 @@ msgid "Select the action to assign a key"
 msgstr "Seleccione la acción para asignar una tecla"
 
 msgctxt "#30010"
-msgid "Timeout in %.0f seconds..."
-msgstr "de clave en %.0f de segundos..."
+msgid "Timeout in {:.0f} seconds..."
+msgstr "de clave en {:.0f} de segundos..."
 
 msgctxt "#30011"
 msgid "Edit key"

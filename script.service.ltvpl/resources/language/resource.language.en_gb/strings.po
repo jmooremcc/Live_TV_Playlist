@@ -55,7 +55,7 @@ msgid "Select the action to assign a key"
 msgstr ""
 
 msgctxt "#30010"
-msgid "Timeout in %.0f seconds..."
+msgid "Timeout in {:.0f} seconds..."
 msgstr ""
 
 msgctxt "#30011"
