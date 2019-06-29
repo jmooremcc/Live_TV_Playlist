@@ -25,9 +25,9 @@ import xml.etree.ElementTree as ET
 from enum import Enum
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Network.utilities import getTimeFilteredDirList
-from resources.lib.Utilities.Messaging import WRITEMODE
+from resources.lib.Utilities.Messaging import WRITEMODE, READMODE, WRITEBINARYMODE, READBINARYMODE
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 class FileManagerMode(Enum):
     JSON=1
@@ -90,7 +90,7 @@ class fileManager(object):
                 BACKUPNUM = (BACKUPNUM + 1) % MAXBACKUPS
                 self.addSentinel(dstfile)
         except Exception as e:
-            DbgPrint(e.message)
+            DbgPrint(str(e))
 
     def backup(self):
         if self.dirtyflag == False:
@@ -109,7 +109,7 @@ class fileManager(object):
                     self.dataSet.ExportXML(fp)
 
             except Exception as e:
-                DbgPrint(e.message)
+                DbgPrint(str(e))
 
             finally:
                 if fp is not None:
@@ -128,7 +128,7 @@ class fileManager(object):
 
         if os.path.isfile(self.filePath):
             self.restoreOperationActive = True
-            fp=open(self.filePath,'r')
+            fp=open(self.filePath,READMODE)
             if self.mode==FileManagerMode.JSON:
                 self.dataSet.ImportJSON(fp)
             elif self.mode == FileManagerMode.PICKLE:

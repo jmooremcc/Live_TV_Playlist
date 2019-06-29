@@ -25,6 +25,7 @@ import os
 from datetime import datetime, timedelta
 from threading import Event as Signal
 from addon import getEPG_Data, checkForEPG
+
 from resources.lib.Data.PlayListItem import PlayListItem, RecurrenceOptions
 from resources.lib.Utilities.Messaging import Cmd, OpStatus
 from resources.PL_Client import PL_Client, genericDecode
@@ -323,9 +324,9 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
                 else:
                     self.sendRequest(Cmd.AddPlayListItem, obj)
             except Exception as e:
-                DbgPrint("***Exception:{}".format(e.message))
+                DbgPrint("***Exception:{}".format(str(e)))
                 DbgPrint("***USpgmDate Property: {}".format(self.getProperty('USpgmDate')))
-                xbmcgui.Dialog().notification(LTVPL_HEADER, e.message, xbmcgui.NOTIFICATION_ERROR)
+                xbmcgui.Dialog().notification(LTVPL_HEADER, str(e), xbmcgui.NOTIFICATION_ERROR)
             self.closeDialog()
 
 

@@ -21,6 +21,7 @@ import logging
 import os
 import json
 from datetime import datetime, timedelta
+
 try:
     from resources.data.debugFileLocation import DEBUGCACHEFILE
 except ImportError:
@@ -69,7 +70,7 @@ class _dbmm():
             return value
 
         self.debugmode = value
-        print("**DEBUGCACHEFILE: {}".format(DEBUGCACHEFILE))
+        # print("**DEBUGCACHEFILE: {}".format(DEBUGCACHEFILE))
         try:
             with open(DEBUGCACHEFILE,'w') as fp:
                 jval = json.dumps(value)
@@ -136,7 +137,7 @@ def DbgPrint(*args, **kwargs):
         # DebugFlag=kwargs['MODULEDEBUGMODE'] and DEBUGMODE
         del kwargs['MODULEDEBUGMODE']
         DebugFlag = DEBUGMODE
-    except:
+    except Exception as e:
         DebugFlag=DEBUGMODE
 
     if DebugFlag:

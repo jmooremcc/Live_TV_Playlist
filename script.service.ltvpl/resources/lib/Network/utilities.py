@@ -18,20 +18,27 @@
 #  http://www.gnu.org/copyleft/gpl.html
 #
 import pickle
-import os
+import os, sys
 from enum import Enum
 from time import sleep
-from Queue import Queue
+
+try:
+    from Queue import Queue
+except ImportError:
+    from queue import Queue
+
 from glob import glob
 from datetime import datetime, timedelta
+
 from resources.lib.Network.PL_json import json
 from resources.lib.Utilities.Messaging import Cmd, MsgType, NotificationAction, OpStatus
 from resources.lib.Utilities.DebugPrint import DbgPrint
-from resources.lib.Network.SecretSauce import DATAEndMarker
+from resources.lib.Network.SecretSauce import DATAEndMarker, RUHERE
 
 __Version__ = "1.0.0"
 
 MODULEDEBUGMODE=False
+PYVER = float('{}.{}'.format(*sys.version_info[:2]))
 
 jqueue = Queue()
 
@@ -41,6 +48,14 @@ class DataMode(Enum):
     JSON=2
 
 EncodingFMT='utf-8'
+
+def getDictKey(dict):
+    if PYVER < 3.0:
+        keyslist = dict.keys()
+    else:
+        keyslist = list(dict.keys())
+
+    return keyslist[0]
 
 def getFileTimeStamp(file):
     """
@@ -104,7 +119,7 @@ def checkForDict(data):
 
 def parseCmdData(data):
     try:
-        cmd=data.keys()[0] #string
+        cmd=getDictKey(data)#string
         args=checkForDict(data[cmd])
         cmd=Cmd[cmd] #Convert string to Cmd object
     except:
@@ -115,7 +130,7 @@ def parseCmdData(data):
 
 def parseErrorData(data):
     try:
-        err=data.keys()[0] #string
+        err=getDictKey(data)#string
         args=checkForDict(data[err])
         error= OpStatus[err] #Convert string to Cmd object
     except:
@@ -136,10 +151,10 @@ def genericEncode(cmd,data):
 
 def genericDecode(encodedData):
     try:
-        key=encodedData.keys()[0]
+        key=getDictKey(encodedData)
         cmd=Cmd[key]
         return (cmd,encodedData[key])
-    except:
+    except Exception as e:
         try:
             cmd= OpStatus[key]
             return (cmd, encodedData[key])
@@ -151,7 +166,7 @@ def genericDecode(encodedData):
                 try:
                     cmd=NotificationAction[key]
                     return(cmd,encodedData[key])
-                except:
+                except Exception as e:
                     raise Exception("Invalid Cmd Decoded")
 
 def encodeRequest(cmd, data):
@@ -161,13 +176,14 @@ def decodeRequest(request):
     """
     :type request: dict
     """
+
     try:
         key = str(MsgType.Request)
         rData = request[key]
         cmd, data = genericDecode(rData)
     except Exception as e:
-        DbgPrint("Error:{}:{}".format(request,e.message))
-        raise Exception("MsgType is Not a Request:{}".format(e.message))
+        DbgPrint("Error:{}:{}".format(request,str(e)))
+        raise Exception("MsgType is Not a Request:{}".format(str(e)))
 
     #validateCmd(cmd)
     return (cmd,parseCmdData(data))
@@ -231,7 +247,7 @@ def decodeError(result):
         err, errMsg=genericDecode(data)
         return (err,errMsg)
     except Exception as e:
-        raise Exception("MsgType is Result Not an Error", e.message)
+        raise Exception("MsgType is Result Not an Error", str(e))
 
 class Utilities(object):
     def __init__(self):
@@ -279,7 +295,11 @@ class Utilities(object):
     def writeJSON(self,conn,data):
         # DbgPrint("writeJSON Called",MODULEDEBUGMODE=MODULEDEBUGMODE)
         try:
-            jdata=json.dumps(data) + DATAEndMarker
+            if PYVER < 3.0:
+                jdata=json.dumps(data) + DATAEndMarker.decode()
+            else:
+                jdata = json.dumps(data) + DATAEndMarker
+
             conn.sendall(jdata.encode(EncodingFMT))
 
         except Exception as e:

@@ -22,6 +22,7 @@ import xbmcgui
 import xbmcaddon
 from datetime import datetime, timedelta
 from threading import Thread, Timer
+
 from resources.PL_Client import PL_Client, genericDecode, OpStatus, Cmd, NotificationAction
 from resources.lib.Network.SecretSauce import *
 from utility import TS_decorator, myLog, Signal, setDialogActive, isDialogActive, clearDialogActive
@@ -264,7 +265,7 @@ class miniClient(Thread):
                     self.sortData()
 
                 except Exception as e:
-                    DbgPrint("Exception in Notification: {}".format(e.message))
+                    DbgPrint("Exception in Notification: {}".format(str(e)))
 
             elif cmd == NotificationAction.ItemAdded:
                 cmd, data = genericDecode(data)
@@ -299,7 +300,7 @@ class miniClient(Thread):
                     else:
                         self.sortData()
                 except Exception as e:
-                    DbgPrint(e.message)
+                    DbgPrint(str(e))
 
         except:
             pass

@@ -21,8 +21,8 @@
 import socket
 from threading import Thread
 from resources.lib.Network.utilities import Utilities, DataMode, decodeResponse, decodeRequest, \
-    decodeErrorResponse, decodeNotification, encodeNotification
-from SecretSauce import *
+    decodeErrorResponse, decodeNotification, encodeNotification, PYVER
+from .SecretSauce import *
 from resources.lib.Utilities.Messaging import Cmd, MsgType
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Utilities.PythonEvent import Event
@@ -300,7 +300,7 @@ class Client(Utilities):
                 else:
                     rdata = data
             except Exception as e:
-                DbgPrint(e.message)
+                DbgPrint(str(e))
 
         return rdata
 
@@ -310,50 +310,62 @@ class Client(Utilities):
     def stop(self):
         self.GoFlag = False
 
-    def receiveAll(self):
-        buf=[];data=''
-        while True:
-            try:
-                # self.socketObj.settimeout(30)
-                data = self.socketObj.recv(2048)
-                if DATAEndMarker in data:
-                    buf.append(data[:data.find(DATAEndMarker)])
-                    break
-                elif len(data) == 0:
-                    buf.append(data)
-                    break
-                else:
-                    buf.append(data)
+    def readSocketData(self):
+        # self.socketObj.settimeout(30)
 
-                data = ''
+        if PYVER < 3.0:
+            data = self.socketObj.recv(2048)
+        else:
+            data = self.socketObj.recv(2048).decode()
+
+        return data
+
+    def receiveData(self):
+        data=''
+        dmlen = len(DATAEndMarker)
+
+        while True and self.GoFlag:
+            try:
+                if len(data) == 0:
+                    data = self.readSocketData()
+
+                pos = data.find(DATAEndMarker)
+                if pos >= 0:
+                    yield data[:pos]
+                    data = data[pos+dmlen:]
+                elif len(data) > 0:
+                    data += self.readSocketData()
 
             except socket.timeout as e:
                 if len(data) > 0:
-                    buf.append(data)
                     DbgPrint("ERROR:{}".format(str(e)))
-                break
 
             except Exception as e:
                 raise e
 
         # self.socketObj.settimeout(None)
-        return ''.join(buf)
+
 
     def commMonitor(self):
         DbgPrint("Monitoring Communications Started")
+        dataItem = self.receiveData()
+
         while self.GoFlag:
             try:
-                data = self.receiveAll()
+                data = next(dataItem)
                 pData = self._processData(data)
                 self.commDataHandler(data,pData)
                 # DbgPrint("***data:{}\n***pData:{}".format(data,pData))
             except socket.timeout as e:
                 DbgPrint("ERROR:{}".format(str(e)))
 
+            except StopIteration:
+                dataItem = self.receiveData()
+
             except Exception as e:
                 DbgPrint("ERROR:{}".format(str(e)))
-                if e.errno == 10054:
-                    break
+                # if e.errno == 10054:
+                #     break
 
         DbgPrint("Monitoring Communications Finished...")
 

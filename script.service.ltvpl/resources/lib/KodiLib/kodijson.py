@@ -104,7 +104,7 @@ class KodiJsonTransport(KodiTransport):
                 status = json.loads(xbmc.executeJSONRPC(values.encode('utf-8')))
             except Exception as e:
                 pass
-                # DbgPrint("executeJSONRPC Error: {}".format(e.message))
+                # DbgPrint("executeJSONRPC Error: {}".format(str(e)))
 
             # DbgPrint("JSONRPC Return Value: {}".format(status))
             return status

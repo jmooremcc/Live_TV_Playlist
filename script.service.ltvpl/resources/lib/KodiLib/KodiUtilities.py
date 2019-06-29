@@ -24,7 +24,7 @@ from kodijson import Kodi, PLAYER_VIDEO
 import json
 from resources.lib.Utilities.DebugPrint import DbgPrint
 
-__Version__ = "1.2.0"
+__Version__ = "1.3.0"
 
 def GetOE2():
     """
@@ -39,7 +39,26 @@ if KODI_ENV:
 else:
     kodiObj=GetOE2()
 
-KODI_OPERATION_FAILED= "Kodi Operation Failed: "
+KODI_OPERATION_FAILED = "Kodi Operation Failed: "
+RESULT = 'result'
+CHANNELID = 'channelid'
+BROADCASTS = 'broadcasts'
+TIMERID = 'timerid'
+STARTTIME = 'starttime'
+RECORDINGID = 'recordingid'
+EPISODE = 'episode'
+TVSHOW = 'tvshow'
+LABEL = 'label'
+PROPERTIES = 'properties'
+BROADCASTID = 'broadcastid'
+RECORDINGS = 'recordings'
+CHANNEL = 'channel'
+CHANNELNUMBER = 'channelnumber'
+CHANNELS = 'channels'
+SUBCHANNELNUMBER = 'subchannelnumber'
+ITEM = 'item'
+STATIONID = 'stationID'
+CHANNELGROUPID = 'channelgroupid'
 
 
 def getRecordings2(kodiObj,params=None):
@@ -52,12 +71,12 @@ def getRecordings2(kodiObj,params=None):
         rList = getRecordings(kodiObj, params)
         newList = []
         for item in rList:
-            recordingID = item['recordingid']
+            recordingID = item[RECORDINGID]
             details=getRecordingDetails(kodiObj, recordingID)
-            newData= {'recordingid': recordingID, 'tvshow': details['directory'], 'episode': item['label']}
+            newData= {RECORDINGID: recordingID, TVSHOW: details['directory'], EPISODE: item[LABEL]}
             newList.append(newData)
 
-        tmp = sorted(newList, key=lambda item: (item['tvshow'],item['episode']))
+        tmp = sorted(newList, key=lambda item: (item[TVSHOW],item[EPISODE]))
         return(tmp)
     except:
         raise Exception(KODI_OPERATION_FAILED + "Could Not Retrieve Recordings")
@@ -71,7 +90,7 @@ def getRecordingDetails(kodiObj, recordingID):
     """
     try:
         return(kodiObj.PVR.GetRecordingDetails({"recordingid":recordingID,\
-                'properties':["plot","title","runtime","directory"]})['result']['recordingdetails'])
+                PROPERTIES:["plot","title","runtime","directory"]})[RESULT]['recordingdetails'])
     except:
         raise Exception(KODI_OPERATION_FAILED + "Could Not Retrieve Recording Details")
 
@@ -84,9 +103,9 @@ def getRecordings(kodiObj, params=None):
     """
     try:
         if params is None:
-            return(kodiObj.PVR.GetRecordings()['result']['recordings'])
+            return(kodiObj.PVR.GetRecordings()[RESULT][RECORDINGS])
         else:
-            return(kodiObj.PVR.GetRecordings(params)['result']['recordings'])
+            return(kodiObj.PVR.GetRecordings(params)[RESULT][RECORDINGS])
     except:
         raise Exception(KODI_OPERATION_FAILED + "Could Not Retrieve Recordings")
 
@@ -97,8 +116,8 @@ def getChannelGroups(kodiObj):
     :return:
     """
     try:
-        channelGroups = kodiObj.PVR.GetChannelGroups({"channeltype":"tv"})['result']['channelgroups']
-        groupList = [(dItem['label'],dItem['channelgroupid']) for dItem in channelGroups]
+        channelGroups = kodiObj.PVR.GetChannelGroups({"channeltype":"tv"})[RESULT]['channelgroups']
+        groupList = [(dItem[LABEL],dItem[CHANNELGROUPID]) for dItem in channelGroups]
         return([dict(groupList)])
     except:
         raise Exception(KODI_OPERATION_FAILED + "Cannot Retrieve Channel Groups")
@@ -118,15 +137,14 @@ def processChannelNumber(channelNumber):
     return([int(channelNumber), 0])
 
 def getLastChannelInfo(kodiObj, chGroup=1):
-    p1 = {"channelgroupid": chGroup, \
-          'properties': ['channel', 'channelnumber', 'subchannelnumber']}
+    p1 = {CHANNELGROUPID: chGroup, PROPERTIES: [CHANNEL, CHANNELNUMBER, SUBCHANNELNUMBER]}
 
     d1 = [item for item in (kodiObj.PVR.GetChannels(p1)) \
-        ['result']['channels']]
+        [RESULT][CHANNELS]]
 
     numchannels = len(d1)
     x = d1[numchannels -1]
-    channel = 'channelnumber', float("{}.{}".format(x['channelnumber'], x['subchannelnumber']))
+    channel = CHANNELNUMBER, float("{}.{}".format(x[CHANNELNUMBER], x[SUBCHANNELNUMBER]))
 
     return dict([channel])
 
@@ -143,29 +161,29 @@ def getChannelInfoByChannelNumber(kodiObj,channelNumber,chGroup=1,params=None):
         if chanNums is not None:
             channelNumber, subChanneNumber = chanNums
             try:
-                p1={"channelgroupid":chGroup,\
-                'properties':['channel','channelnumber','subchannelnumber']}
+                p1={CHANNELGROUPID:chGroup,\
+                PROPERTIES:[CHANNEL,CHANNELNUMBER,SUBCHANNELNUMBER]}
 
                 if params is not None:
                     p1.update(params)
 
                 d1=[item for item in (kodiObj.PVR.GetChannels(p1))\
-            ['result']['channels']if channelNumber == item['channelnumber']\
-            and subChanneNumber == item['subchannelnumber']]
+            [RESULT][CHANNELS]if channelNumber == item[CHANNELNUMBER]\
+            and subChanneNumber == item[SUBCHANNELNUMBER]]
 
-                z1=[(('stationID',x['label']),('channelid',x['channelid']),\
-                     ('channelnumber',float("{}.{}".format(x['channelnumber'],
-                       x['subchannelnumber'])))) for x in d1]
+                z1=[((STATIONID,x[LABEL]),(CHANNELID,x[CHANNELID]),\
+                     (CHANNELNUMBER,float("{}.{}".format(x[CHANNELNUMBER],
+                       x[SUBCHANNELNUMBER])))) for x in d1]
 
 
                 return([dict(z) for z in z1])
 
             except:
-                d1=[item for item in (kodiObj.PVR.GetChannels({"channelgroupid":chGroup,\
-                'properties':['channel']}))['result']['channels']\
-                 if channelNumber in item['channelnumber']]
+                d1=[item for item in (kodiObj.PVR.GetChannels({CHANNELGROUPID:chGroup,\
+                PROPERTIES:[CHANNEL]}))[RESULT][CHANNELS]\
+                 if channelNumber in item[CHANNELNUMBER]]
 
-                z1=[(('label',x['label']),('channelid',x['channelid'])) for x in d1]
+                z1=[((LABEL,x[LABEL]),(CHANNELID,x[CHANNELID])) for x in d1]
                 return([dict(z) for z in z1])
         else:
             return(None)
@@ -182,27 +200,26 @@ def getChannelInfoByCallSign(kodiObj,callSign,chGroup=1,params=None):
     :return: list
     """
     try:
-        p1={"channelgroupid":chGroup,\
-        'properties':['channel','channelnumber','subchannelnumber']}
+        p1={CHANNELGROUPID: chGroup, PROPERTIES:[CHANNEL,CHANNELNUMBER,SUBCHANNELNUMBER]}
 
         if params is not None:
             p1.update(params)
         
-        d1=[item for item in (kodiObj.PVR.GetChannels(p1))['result']['channels']\
-         if callSign in item['channel']]
+        d1=[item for item in (kodiObj.PVR.GetChannels(p1))[RESULT][CHANNELS]\
+         if callSign in item[CHANNEL]]
 
-        z1=[(('stationID',x['label']),('channelid',x['channelid']),\
-             ('channelnumber',float("{}.{}".format(x['channelnumber'],
-               x['subchannelnumber'])))) for x in d1]
+        z1=[((STATIONID,x[LABEL]),(CHANNELID,x[CHANNELID]),\
+             (CHANNELNUMBER,float("{}.{}".format(x[CHANNELNUMBER],
+               x[SUBCHANNELNUMBER])))) for x in d1]
         
         return([dict(z) for z in z1])
     
     except:
-        d1=[item for item in (kodiObj.PVR.GetChannels({"channelgroupid":chGroup,\
-        'properties':['channel']}))['result']['channels']\
-         if callSign in item['channel']]
+        d1=[item for item in (kodiObj.PVR.GetChannels({CHANNELGROUPID:chGroup,\
+        PROPERTIES:[CHANNEL]}))[RESULT][CHANNELS]\
+         if callSign in item[CHANNEL]]
 
-        z1=[(('label',x['label']),('channelid',x['channelid'])) for x in d1]        
+        z1=[((LABEL,x[LABEL]),(CHANNELID,x[CHANNELID])) for x in d1]
         return([dict(z) for z in z1])
 
 
@@ -214,25 +231,25 @@ def getChannelInfo(kodiObj,chGroup=1,params=None):
     :return: list
     """
     try:
-        p1={"channelgroupid":chGroup, 'properties':['channel','channelnumber','subchannelnumber']}
+        p1={CHANNELGROUPID:chGroup, PROPERTIES:[CHANNEL,CHANNELNUMBER,SUBCHANNELNUMBER]}
         
         if params is not None:
             p1.update(params)
 
-        d1=[item for item in (kodiObj.PVR.GetChannels(p1))['result']['channels']]
+        d1=[item for item in (kodiObj.PVR.GetChannels(p1))[RESULT][CHANNELS]]
             
-        z1=[(('stationID',x['label']),('channelid',x['channelid']),\
-             ('channelnumber',float("{}.{}".format(x['channelnumber'],
-               x['subchannelnumber'])))) for x in d1]
+        z1=[((STATIONID,x[LABEL]),(CHANNELID,x[CHANNELID]),\
+             (CHANNELNUMBER,float("{}.{}".format(x[CHANNELNUMBER],
+               x[SUBCHANNELNUMBER])))) for x in d1]
         
         return([dict(z) for z in z1])
     
     except Exception as e:
-        d1=[item for item in (kodiObj.PVR.GetChannels({"channelgroupid":chGroup,\
-        'properties':['channel']}))['result']['channels']\
-         if callSign in item['channel']]
+        d1=[item for item in (kodiObj.PVR.GetChannels({CHANNELGROUPID:chGroup,\
+        PROPERTIES:[CHANNEL]}))[RESULT][CHANNELS]\
+         if callSign in item[CHANNEL]]
 
-        z1=[(('label',x['label']),('channelid',x['channelid'])) for x in d1]        
+        z1=[((LABEL,x[LABEL]),(CHANNELID,x[CHANNELID])) for x in d1]
         return([dict(z) for z in z1])
     
 
@@ -242,7 +259,7 @@ def getPlayerInfo(kodiObj):
     :param kodiObj: Kodi
     :return:
     """
-    pList = kodiObj.Player.GetActivePlayers()['result']
+    pList = kodiObj.Player.GetActivePlayers()[RESULT]
     if len(pList) > 0:
         return(pList[0])
     else:
@@ -266,7 +283,7 @@ def changeChannelByChannelID(kodiObj, channelID):
     :param channelID: int
     :return:
     """
-    kodiObj.Player.Open({'item':{'channelid':channelID}})
+    kodiObj.Player.Open({ITEM:{CHANNELID:channelID}})
 
 
 def changeChannelByCallSign(kodiObj, callSign):
@@ -276,7 +293,7 @@ def changeChannelByCallSign(kodiObj, callSign):
     :return:
     """
     channelInfo = getChannelInfoByCallSign(kodiObj, callSign)
-    kodiObj.Player.Open({'item':{'channelid':channelInfo[0]['channelid']}})
+    kodiObj.Player.Open({ITEM:{CHANNELID:channelInfo[0][CHANNELID]}})
 
 
 def changeChannelByChannelNumber(kodiObj, channelNumber):
@@ -286,7 +303,7 @@ def changeChannelByChannelNumber(kodiObj, channelNumber):
     :return:
     """
     channelInfo = getChannelInfoByChannelNumber(kodiObj, channelNumber)
-    kodiObj.Player.Open({'item':{'channelid':channelInfo[0]['channelid']}})
+    kodiObj.Player.Open({ITEM:{CHANNELID:channelInfo[0][CHANNELID]}})
     
 def prettyPrintJSON(txt):
     data=json.dumps(txt, sort_keys=True,indent=4,separators=(',', ': '))
@@ -301,47 +318,100 @@ def datetime_utc_to_local(utc_datetime):
 
 def getChannelId(kodiObj, channel):
     info = getChannelInfoByChannelNumber(kodiObj, channel)
-    channelid = info[0]['channelid']
+    channelid = info[0][CHANNELID]
     return channelid
 
 
 def getBroadcastIdList(broadcasts, tvshow):
     tvshowlc = tvshow.lower()
-    idlist = [broadcast['broadcastid'] for broadcast in broadcasts if tvshowlc in broadcast['label'].lower()]
-    # for broadcast in broadcasts:
-    #     if tvshowlc in broadcast['label'].lower():
-    #         return broadcast['broadcastid']
+    idlist = [broadcast[BROADCASTID] for broadcast in broadcasts if tvshowlc in broadcast[LABEL].lower()]
 
     return idlist
 
+def getUtcOffset():
+    offset = datetime.utcnow() - datetime.now()
+    return offset
 
 def getBroadcast_startTimeList(kodiObj, channel, tvshow):
     fmt = '%Y-%m-%d %H:%M:%S'
-    channelid = getChannelId(kodiObj, channel)
-    args = {"channelid": channelid}
+    startTimeList = []
+    try:
+        channelid = getChannelId(kodiObj, channel)
+    except: startTimeList
+
+    args = {CHANNELID: channelid}
     DbgPrint("tvshow:{}, channel:{}, args:{}".format(tvshow, channel,args))
     broadcastinfo = kodiObj.PVR.GetBroadcasts(args)
     DbgPrint("broadcastinfo:{}".format(broadcastinfo))
-    broadcastidList = getBroadcastIdList(broadcastinfo['result']['broadcasts'], tvshow)
-    startTimeList = []
+    broadcastidList = getBroadcastIdList(broadcastinfo[RESULT][BROADCASTS], tvshow)
+
     if broadcastidList is not None:
         for broadcastid in broadcastidList:
-            pgminfo = kodiObj.PVR.GetBroadcastDetails({'broadcastid': broadcastid, 'properties': ['starttime']})
-            starttime = datetime.strptime(pgminfo['result']['broadcastdetails']['starttime'], fmt)
+            pgminfo = kodiObj.PVR.GetBroadcastDetails({BROADCASTID: broadcastid, PROPERTIES: [STARTTIME]})
+            DbgPrint("pgmInfo: {}".format(pgminfo['result']))
+            starttime = datetime.strptime(pgminfo[RESULT]['broadcastdetails'][STARTTIME], fmt)
             starttime = datetime_utc_to_local(starttime)
+            DbgPrint("***startTime: {}".format(starttime))
             startTimeList.append(starttime)
 
-        return startTimeList
+    return startTimeList
+
+def getBroadcastInfo(kodiObj, channel, starttime):
+    fmt = '%Y-%m-%d %H:%M:%S'
+    offset = getUtcOffset()
+    try:
+        startTime = str(datetime.strptime(starttime, fmt) + offset)
+    except: return
+
+    channelid = getChannelId(kodiObj, channel)
+    args = {CHANNELID: channelid, "properties": [STARTTIME]}
+    broadcastinfo = kodiObj.PVR.GetBroadcasts(args)[RESULT][BROADCASTS]
+    d1 = [x for x in broadcastinfo if x[STARTTIME] == startTime]
+    if len(d1) > 0:
+        d1=d1[0]
+        d1[STARTTIME] = str(datetime.strptime(d1[STARTTIME], fmt) - offset)
+        d1.update({CHANNEL:channel, CHANNELID:channelid})
+
+        return d1
+
+def addTimer(kodiObj, channel, starttime):
+    broadcastinfo = getBroadcastInfo(kodiObj, channel, starttime)
+    if broadcastinfo is not None and len(broadcastinfo) > 0:
+        broadcastid=broadcastinfo[BROADCASTID]
+        args = {BROADCASTID:broadcastid}
+        result = kodiObj.PVR.AddTimer(args)[RESULT]
+
+        return result
+
+def getTimer(kodiObj, channelid, starttime):
+    fmt = '%Y-%m-%d %H:%M:%S'
+    offset = getUtcOffset()
+    startTime = str(datetime.strptime(starttime, fmt) + offset)
+    args = {PROPERTIES:[CHANNELID,STARTTIME]}
+    result = kodiObj.PVR.GetTimers(args)[RESULT]['timers']
+    d1 = [x for x in result if x[CHANNELID]==channelid and x[STARTTIME]== startTime]
+
+    if len(d1)> 0:
+        return d1[0]
+
+
+def deleteTime(kodiObj, channelid,starttime):
+    timer = getTimer(kodiObj, channelid, starttime)
+    if timer is not None and len(timer)> 0:
+        args = {TIMERID:timer[TIMERID]}
+        result = kodiObj.PVR.DeleteTimer(args)
+
+        return result[RESULT]
 
 
 def TvGuideIsPresent(kodiObj, channel):
     try:
         channelid = getChannelId(kodiObj, channel)
-        args = {"channelid": channelid}
+        args = {CHANNELID: channelid}
         broadcastinfo = kodiObj.PVR.GetBroadcasts(args)
         DbgPrint("broadcastinfo:{}".format(broadcastinfo))
-        broadcastdata = broadcastinfo['result']['broadcasts']
-        if len(broadcastdata) > 0 and type(broadcastdata[0]['broadcastid']) == int:
+        broadcastdata = broadcastinfo[RESULT][BROADCASTS]
+        if len(broadcastdata) > 0 and type(broadcastdata[0][BROADCASTID]) == int:
             return True
     except: pass
 
