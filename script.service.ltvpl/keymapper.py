@@ -24,10 +24,11 @@ from threading import Timer
 from time import sleep
 from xbmcgui import Dialog, WindowXMLDialog
 import xbmcaddon, xbmc
-from util import GETTEXT, KEYMAPS_USERDATA_FOLDER, ADDONID, ADDON, ACTIVATIONKEY
+
+from util import GETTEXT, KEYMAPS_USERDATA_FOLDER, ADDONID, ADDON, ACTIVATIONKEY, PYVER
 from resources.lib.Utilities.DebugPrint import DbgPrint
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 keymapfile = os.path.join(KEYMAPS_USERDATA_FOLDER,"gen.xml")
 
@@ -40,7 +41,7 @@ class keymapper(object):
         basename = os.path.basename(src)
         name, ext = os.path.splitext(basename)
 
-        for i in xrange(100):
+        for i in range(100):
             dst = os.path.join(dirname, "{}.bak.{:d}".format(name, i))
             if os.path.exists(dst):
                 continue
@@ -123,13 +124,18 @@ class KeyListener(WindowXMLDialog):
         self.key = None
 
     def onInit(self):
+        if PYVER < 3.0:
+            tmp = GETTEXT(30010).format(self.TIMEOUT)
+        else:
+            tmp = GETTEXT(30010).decode().format(self.TIMEOUT)
+
         try:
             self.getControl(401).addLabel(GETTEXT(30002))
-            self.getControl(402).setText(GETTEXT(30010).format(self.TIMEOUT))
+            self.getControl(402).setText(tmp)
         except AttributeError as e:
-            DbgPrint("****Label Attribute Error: {}".format(e.message))
+            DbgPrint("****Label Attribute Error: {}".format(str(e)))
             self.getControl(401).addLabel(GETTEXT(30002))
-            self.getControl(402).setText(GETTEXT(30010).format(self.TIMEOUT))
+            self.getControl(402).setText(tmp)
 
     def onAction(self, action):
         code = action.getButtonCode()

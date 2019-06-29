@@ -24,14 +24,16 @@ from datetime import datetime as dt, timedelta
 import locale
 import copy
 import sys
-if sys.version_info[0] == 2:
+
+try:
     from Queue import Queue
-else:
+except ImportError:
     from queue import Queue
 
 import xbmc
 import xbmcaddon
 import xbmcgui
+
 from util import ADDON, ADDONID, ADDON_PATH, ADDON_NAME, XMLPATH, FANART_PATH, BGDIMAGE, LTVPL_HEADER, GETTEXT, setUSpgmDate, getRegionDatetimeFmt
 from resources.lib.Data.PlayListItem import PlayListItem
 from resources.PL_Client import PL_Client, genericDecode
@@ -44,7 +46,7 @@ from ListItemPlus import ListItemPlus
 from keymapper import setActivationKey, reloadKeyMaps
 from BusyDialog import BusyDialog, BusyDialog2
 
-__Version__ = "1.1.0"
+__Version__ = "1.1.1"
 
 MAIN_DIALOGTAG = "LTVPL_MAINDIALOG_VISIBLE"
 MODULEDEBUGMODE = True
@@ -208,7 +210,7 @@ def getEPG_Data(win=None):
     try:
         liDateTime = dt.strptime(fullPgmDate, dateformat)
     except Exception as e:
-        DbgPrint("Error Msg: {}".format(e.message))
+        DbgPrint("Error Msg: {}".format(str(e)))
 
         fullPgmDate = _germanAM_PM_Fix(fullPgmDate)
 
@@ -571,7 +573,7 @@ class GUI(xbmcgui.WindowXMLDialog):
                         DbgPrint("*******ChangedProperty:{}:{}".format(key, update.getProperty(key)))
                         item.setProperty(key, update.getProperty(key))
         except Exception as e:
-            DbgPrint("Error in updateItemByID: {}".format(e.message))
+            DbgPrint("Error in updateItemByID: {}".format(str(e)))
 
         self.sortItemListByDate()
 
@@ -587,7 +589,7 @@ class GUI(xbmcgui.WindowXMLDialog):
             except Exception as e:
                 myLog(e)
         except Exception as e:
-            myLog(e.message)
+            myLog(str(e))
 
 
     def addNewItem(self, data):
@@ -664,7 +666,7 @@ class GUI(xbmcgui.WindowXMLDialog):
                 self.toolboxBusyDialog = None
 
         except Exception as e:
-            DbgPrint("onNotification Error Message:{}".format(e.message))
+            DbgPrint("onNotification Error Message:{}".format(str(e)))
 
 
     def xlateFrequencyValue(self, data, obj):
@@ -711,7 +713,7 @@ class GUI(xbmcgui.WindowXMLDialog):
                         if title[0] == "*":
                             obj.setProperty(DESC, title[1:])
                 except Exception as e:
-                    DbgPrint("Data Received Error: {}".format(e.message))
+                    DbgPrint("Data Received Error: {}".format(str(e)))
 
                 ilist.append(obj)
 
@@ -827,7 +829,7 @@ class doSettings(object):
             self.client = None
 
         except Exception as e:
-            DbgPrint("doSettings Error: {}".format(e.message))
+            DbgPrint("doSettings Error: {}".format(str(e)))
             if self.client is not None:
                 self.client.closeConnection()
 

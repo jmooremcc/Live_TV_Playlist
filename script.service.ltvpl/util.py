@@ -25,7 +25,9 @@ import os
 import sys
 from datetime import datetime
 
-__Version__ = "1.1.1"
+__Version__ = "1.1.2"
+
+PYVER = float('{}.{}'.format(*sys.version_info[:2]))
 
 def GetXBMCVersion():
     version = xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')
@@ -37,14 +39,18 @@ def GetXBMCVersion():
 ADDON   =  xbmcaddon.Addon()
 ADDONID = ADDON.getAddonInfo('id')
 ADDON_NAME = ADDON.getAddonInfo('name')
-ADDON_PATH = ADDON.getAddonInfo('path').decode('utf-8')
+if PYVER < 3.0:
+    ADDON_PATH = ADDON.getAddonInfo('path').decode('utf-8')
+else:
+    ADDON_PATH = ADDON.getAddonInfo('path')
+
 ADDON_USERDATA_FOLDER = xbmc.translatePath("special://profile/addon_data/"+ADDONID)
 KEYMAPS_USERDATA_FOLDER = xbmc.translatePath('special://userdata/keymaps')
 BASEPATH = os.path.join(ADDON_PATH,r"resources")
 if BASEPATH not in sys.path:
     sys.path.insert(2,BASEPATH)
-ENUMPATH = os.path.join(BASEPATH,"enum")
-if ENUMPATH not in sys.path:
+ENUMPATH = os.path.join(BASEPATH,"lib2/enum")
+if ENUMPATH not in sys.path and PYVER < 3.0:
     sys.path.insert(0,ENUMPATH)
 DATAFILE_LOCATIONFILE = os.path.join(BASEPATH, r"data/dataFileLocation.py")
 ADDON_DATAFILENAME = os.path.join(ADDON_USERDATA_FOLDER,"LTVPL.pkl")
@@ -98,7 +104,7 @@ def DialogOK(title, line1, line2='', line3=''):
 
 def DialogYesNo(title, line1, line2='', line3='', noLabel=None, yesLabel=None):
     d = xbmcgui.Dialog()
-    if noLabel == None or yesLabel == None:
+    if noLabel is None or yesLabel is None:
         return d.yesno(title + ' - ' + VERSION, line1, line2 , line3) == True
     else:
         return d.yesno(title + ' - ' + VERSION, line1, line2 , line3, noLabel, yesLabel) == True
@@ -112,13 +118,11 @@ def generateMD5(text):
         import hashlib
         return hashlib.md5(text).hexdigest()
     except:
-        pass
-
-    try:
-        import md5
-        return md5.new(text).hexdigest()
-    except:
-        pass
+        try:
+            import md5
+            return md5.new(text).hexdigest()
+        except:
+            pass
 
     return '0'
 

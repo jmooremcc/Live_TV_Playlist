@@ -31,7 +31,6 @@ from resources.lib.Utilities.DebugPrint import DbgPrint, setDebugMode, startTime
 from resources.lib.Utilities.Messaging import Cmd, OpStatus, xlateCmd2Notification, DAILYSTOPCOMMAND, STOPCMD_ACTIVE, \
     NotificationAction, VACATIONMODE,DEBUGMODE, ALARMTIME, PREROLLTIME, AUTOCLEANMODE
 from resources.lib.Utilities.VirtualEvents import TS_decorator
-from utility import setDialogActive
 
 
 __Version__ = "1.1.0"
@@ -73,7 +72,6 @@ class PL_Server(object):
                    Cmd.DisablePlayListItem:self.DisablePlayListItem,
                    Cmd.ClearPlayList:self.ClearPlayList}
 
-        setDialogActive(PLSERVERTAG)
         DbgPrint("Server Initialized",MODULEDEBUGMODE=MODULEDEBUGMODE)
 
 
@@ -161,7 +159,7 @@ class PL_Server(object):
             self.sendNotification(rData4)
             return rData4
         except Exception as e:
-            DbgPrint("Exception:{}".format(e.message))
+            DbgPrint("Exception:{}".format(str(e)))
 
     def ReturnData(self,conn,cmd, data, notify=True):
         rData = encodeResponse(cmd, data)
@@ -199,7 +197,7 @@ class PL_Server(object):
                 self.ReturnData(conn, Cmd.SkipEvent,item.Data)
 
         except Exception as e:
-            self.ReturnError(conn, OpStatus.ItemDoesNotExist, e.message)
+            self.ReturnError(conn, OpStatus.ItemDoesNotExist, str(e))
 
     def DisablePlayListItem(self, conn, args):
         id = args
@@ -211,7 +209,7 @@ class PL_Server(object):
             self.dataSet.fileManager.backup()
             self.ReturnData(conn, Cmd.DisablePlayListItem, item.Data)
         except Exception as e:
-            self.ReturnError(conn, OpStatus.ItemDoesNotExist, e.message)
+            self.ReturnError(conn, OpStatus.ItemDoesNotExist, str(e))
 
     def GetPlayListItemState(self, conn, args):
         id = args
@@ -220,7 +218,7 @@ class PL_Server(object):
             data={id:item.SuspendedFlag}
             self.ReturnData(conn, Cmd.GetPlayListItemState, data, notify=False)
         except Exception as e:
-            self.ReturnError(conn, OpStatus.ItemDoesNotExist, e.message)
+            self.ReturnError(conn, OpStatus.ItemDoesNotExist, str(e))
 
     def SetVacationMode(self, conn, args):
         """
@@ -255,7 +253,7 @@ class PL_Server(object):
             else:
                 self.ReturnData(conn, Cmd.RemovePlayListItem, item.Data)
         except Exception as e:
-            self.ReturnError(conn,OpStatus.GeneralFailure,"SkipEvent:" + e.message)
+            self.ReturnError(conn,OpStatus.GeneralFailure,"SkipEvent:" + str(e))
 
 
     def GetChGroupList(self,conn, args):
@@ -263,7 +261,7 @@ class PL_Server(object):
             grpList = getChannelGroups(kodiObj)
             self.ReturnData(conn,Cmd.GetChGroupList,grpList, notify=False)
         except Exception as e:
-            self.ReturnError(conn,OpStatus.GeneralFailure, "GetChGroupList:" + e.message)
+            self.ReturnError(conn,OpStatus.GeneralFailure, "GetChGroupList:" + str(e))
 
 
     def GetChannelList(self,conn, args):
@@ -271,7 +269,7 @@ class PL_Server(object):
             chList = getChannelInfo(kodiObj, chGroup=args, params=None)
             self.ReturnData(conn, Cmd.GetChannelList, chList, notify=False)
         except Exception as e:
-            self.ReturnError(conn, OpStatus.GeneralFailure, "GetChannelList:" + e.message)
+            self.ReturnError(conn, OpStatus.GeneralFailure, "GetChannelList:" + str(e))
 
 
     def UpdatePlayListItem(self,conn,args):
@@ -282,10 +280,10 @@ class PL_Server(object):
             self.ReturnData(conn, Cmd.UpdatePlayListItem, obj.Data) #Send Display Request
         except DataSetError as e:
             err,errmsg=decodeError(e.errdata)
-            self.ReturnError(conn, err, e.message)
+            self.ReturnError(conn, err, str(e))
         except PlayListItemError as e:
             err, errmsg = decodeError(e.errdata)
-            self.ReturnError(conn, err, e.message)
+            self.ReturnError(conn, err, str(e))
 
 
     def AddPlayListItem(self,conn, args):
@@ -299,7 +297,7 @@ class PL_Server(object):
             self.dataSet.AddPlayList(obj)
             DbgPrint("Exiting AddPlayListItem",MODULEDEBUGMODE=MODULEDEBUGMODE)
 
-            self.ReturnData(conn, Cmd.AddPlayListItem, obj.Data) #Send back display request
+            self.ReturnData(conn, Cmd.AddPlayListItem, obj.Data) # Send back display request
         except DataSetError as e:
             err,errmsg=decodeError(e.errdata)
             self.ReturnError(conn, err, errmsg)
@@ -314,15 +312,15 @@ class PL_Server(object):
             self.dataSet.RemoveAll()
             self.ReturnData(conn, Cmd.RemoveAllPlayListItems, str(OpStatus.Success))
         except Exception as e:
-            self.ReturnError(conn, OpStatus.GeneralFailure, "RemoveAllPlayListItems:" + e.message)
+            self.ReturnError(conn, OpStatus.GeneralFailure, "RemoveAllPlayListItems:" + str(e))
 
     def RemovePlayListItem(self,conn, id):
         try:
             DbgPrint("RemovePlayListItem({})".format(id),MODULEDEBUGMODE=MODULEDEBUGMODE)
             self.dataSet.RemoveByID(id)
-            self.ReturnData(conn, Cmd.RemovePlayListItem, id) #Send back display request
+            self.ReturnData(conn, Cmd.RemovePlayListItem, id) # Send back display request
         except Exception as e:
-            self.ReturnError(conn, OpStatus.GeneralFailure, "RemovePlayListItem:" + e.message)
+            self.ReturnError(conn, OpStatus.GeneralFailure, "RemovePlayListItem:" + str(e))
 
 
     def GetChPlayListItems(self, conn, ch):
@@ -335,7 +333,7 @@ class PL_Server(object):
 
             self.ReturnData(conn, Cmd.GetChPlayListItems, myList, notify=False)
         except Exception as e:
-            self.ReturnError(conn, OpStatus.GeneralFailure, e.message)
+            self.ReturnError(conn, OpStatus.GeneralFailure, str(e))
 
 
     def GetPlayList(self,conn, args):
@@ -348,7 +346,7 @@ class PL_Server(object):
 
             self.ReturnData(conn, Cmd.GetPlayList,data, notify=False)
         except Exception as e:
-            self.ReturnError(conn, OpStatus.GeneralFailure, "GetPlayList:" + e.message)
+            self.ReturnError(conn, OpStatus.GeneralFailure, "GetPlayList:" + str(e))
 
 
     def GetPlayListItem(self,conn,args):
@@ -359,7 +357,7 @@ class PL_Server(object):
             rData = self.server.translateData(data)
             self.ReturnData(conn,Cmd.GetPlayListItem,rData, notify=False)
         except Exception as e:
-            self.ReturnError(conn, OpStatus.GeneralFailure, "GetPlayListItem:" + e.message)
+            self.ReturnError(conn, OpStatus.GeneralFailure, "GetPlayListItem:" + str(e))
 
     def ClearPlayList(self,conn,args):
         DbgPrint("ClearPlayList Called", MODULEDEBUGMODE=MODULEDEBUGMODE)
@@ -474,10 +472,6 @@ class PL_Server(object):
     def Logout(self,conn,args):
         pass
 
-if __name__=='__main__':
-    address=(ServerHost,ServerPort)
-    x1=PL_Server(address)
-    x1.startServer()
-    # x1.setSettings(False,True,True,"11:25")
+
 
 

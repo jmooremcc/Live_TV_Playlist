@@ -52,7 +52,7 @@ class PL_Client(object):
             self.c.start()
         except Exception as e:
             print(e)
-            raise Exception(e.message)
+            raise Exception(str(e))
             #exit(-1)
 
     def closeConnection(self):

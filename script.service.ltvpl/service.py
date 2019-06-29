@@ -38,6 +38,7 @@ from resources.lib.Utilities.Messaging import VACATIONMODE, PREROLLTIME, DAILYST
     ALARMTIME, ACTIVATIONKEY, COUNTDOWN_DURATION, TRUE, FALSE, WRITEMODE, AUTOCLEANMODE
 import Countdown
 
+
 xbmc.log("***sys.path: "+str(sys.path))
 
 LTVPL = 'Live TV Playlist'
@@ -157,7 +158,7 @@ class Monitor(xbmc.Monitor):
                     xbmcgui.Dialog().notification(LTVPL,str(e), xbmcgui.NOTIFICATION_ERROR)
 
         except ValueError as e:
-            xbmcgui.Dialog().notification(LTVPL, e.message)
+            xbmcgui.Dialog().notification(LTVPL, str(e))
 
 
 
@@ -187,8 +188,9 @@ def onServerSettingsChanged(setting, value):
     # RemoteOperationFlag = False
 
 if __name__ == '__main__':
-    from resources.PL_Server import PLSERVERTAG
-    from utility import isDialogActive, clearDialogActive
+    from resources.PL_Server import PLSERVERTAG, PL_Server
+    from utility import isDialogActive, clearDialogActive, setDialogActive
+
     cdService = None #type: Countdown.miniClient
     server = None #type: PL_Server
 
@@ -201,6 +203,7 @@ if __name__ == '__main__':
         stopcmd_active = str(ADDON.getSetting(STOPCMD_ACTIVE)).lower() == TRUE
 
         server = PL_Server(address, ADDON_DATAFILENAME, vacationMode, debugMode, autocleanMode)
+        setDialogActive(PLSERVERTAG)
         # check for daily stop command and add it if settings authorize it
         strAlarmtime = server.getDailyStopCmdAlarmtime()
         if strAlarmtime is not None:

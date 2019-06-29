@@ -388,7 +388,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                         self.fileManager.Dirty = True
                         self.fileManager.backup()
                 except Exception as e:
-                    raise DataSetError(OpStatus.InvalidAlarmTimeError,e.message + ":{}".format(item))
+                    raise DataSetError(OpStatus.InvalidAlarmTimeError,str(e) + ":{}".format(item))
             else:
                 self._addPlayList(item)
         else:

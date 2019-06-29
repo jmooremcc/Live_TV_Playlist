@@ -6,7 +6,6 @@
   <extension library="service.py" point="xbmc.service" />
   <extension library="resources/lib" point="xbmc.python.module" />
   <extension library="resources" point="xbmc.python.module" />
-  <extension library="resources/enum" point="xbmc.python.module" />
   <extension library="addon.py" point="xbmc.python.script">
     <provides>executable</provides>
   </extension>

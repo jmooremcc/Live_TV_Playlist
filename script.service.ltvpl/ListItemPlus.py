@@ -134,5 +134,5 @@ class ListItemPlus(xbmcgui.ListItem):
 
         except Exception as e:
             #
-            DbgPrint("Data.Setter Error:{}".format(e.message))
+            DbgPrint("Data.Setter Error:{}".format(str(e)))
             pass
