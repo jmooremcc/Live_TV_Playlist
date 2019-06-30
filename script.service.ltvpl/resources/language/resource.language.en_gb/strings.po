@@ -227,7 +227,7 @@ msgid "Add to Live TV Playlist"
 msgstr ""
 
 msgctxt "#30080"
-msgid "Item conflicts with existing playlist items"
+msgid "Item conflicts with existing playlist item"
 msgstr ""
 
 msgctxt "#30081"
