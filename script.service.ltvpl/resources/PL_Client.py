@@ -121,7 +121,7 @@ class PL_Client(object):
                 try:
                     cmd, rData = decodeRequest(pData)
                     if cmd in Cmd:
-                        self.onDataReceived(rData)
+                        self.onDataReceived(cmd, rData)
                     else:
                         DbgPrint("ERROR:Unknown Data Type Received:{}".format((cmd,rData)))
                         raise Exception("Unknown Data Type Received")
@@ -137,7 +137,7 @@ class PL_Client(object):
                                 self.fireErrorReceivedEvent(cmd, errMsg)
 
                         except:
-                            self.onDataReceived(pData)
+                            self.onDataReceived(cmd, pData)
 
         else:  # Assuming str type
             if len(data) > 0:

@@ -284,7 +284,7 @@ def getHdrKeys():
 def getHdrKeysExtended():
     DbgPrint("***HDR_FORMAT_EXTENDED:{}".format(HDR_FORMAT_EXTENDED))
     keys = [w[3].split()[0] for w in HDR_FORMAT_EXTENDED]
-    DbgPrint("***keys:".format(keys))
+    DbgPrint("***keys:{}".format(keys))
     return keys
 
 def BuildHeader():

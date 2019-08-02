@@ -25,13 +25,14 @@ import json
 from resources.lib.Utilities.DebugPrint import DbgPrint
 
 MODULEDEBUGMODE=True
-from kodiflags import KODI_ENV
+from . kodiflags import KODI_ENV
+
 if KODI_ENV:
     import xbmc
 else:
     import requests
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 # this list will be extended with types dynamically defined
 __all__ = ["PLAYER_VIDEO",
@@ -54,7 +55,7 @@ __KODI_NAMESPACES__ = (
 class KodiTransport(object):
     """Base class for KodiLib transport."""
 
-    def execute(self, method, args):
+    def execute(self, method, *args, **kwargs):
         """Execute method with given args."""
         pass  # pragma: no cover
 
