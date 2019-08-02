@@ -48,6 +48,7 @@ ACTION_RIGHT = 2
 ACTION_UP = 3
 ACTION_DOWN = 4
 ACTION_SELECT_ITEM = 7
+ACTION_MOUSE_LEFT_CLICK = 100
 
 CLOSE_BUTTON = 3001
 IMAGE_CONTROL = 200
@@ -247,7 +248,7 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
         #
         if actionId in [ACTION_CONTEXT_MENU, ACTION_PARENT_DIR, ACTION_PREVIOUS_MENU, ACTION_BACK]:
             return self.closeDialog()
-        elif actionId == ACTION_SELECT_ITEM:
+        elif actionId == ACTION_SELECT_ITEM or actionId == ACTION_MOUSE_LEFT_CLICK:
             ctrl = self.getControl(SUBMIT_BUTTON)
             myLog("***Frequency Selected")
             self.setFocus(ctrl)

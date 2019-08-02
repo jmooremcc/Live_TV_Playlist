@@ -27,7 +27,7 @@ from resources.lib.Utilities.Messaging import Cmd, MsgType
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Utilities.PythonEvent import Event
 
-__Version__ = "1.0.1"
+__Version__ = "1.0.2"
 
 def getNewSocket():
     socketObj = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -90,9 +90,9 @@ class Server(Thread, Utilities):
         while countdown > 0:
             try:
                 conn.settimeout(10)
-                data = conn.recv(1024)
-                if data == RUHERE:
-                    conn.send(IAMHERE)
+                data = conn.recv(1024).decode()
+                if RUHERE in data:
+                    conn.send(IAMHERE.encode())
                     DbgPrint("Server: Connection Test Has Suceeded!!!")
                     conn.settimeout(None)
                     return
@@ -127,7 +127,7 @@ class Server(Thread, Utilities):
         notification= self._processData(encodeNotification(msg)) + DATAEndMarker
         DbgPrint("Notification Sent: {}".format(notification))
         for client in self.clientList:
-            client.send(notification)
+            client.send(notification.encode())
 
 
     def ClientHandler(self, connection, address):
@@ -145,7 +145,7 @@ class Server(Thread, Utilities):
                 elif self.dataMode == DataMode.XML:
                     pass
                 else:
-                    recvData = connection.recv(2048)
+                    recvData = connection.recv(2048).decode()
 
                 DbgPrint("Server***>", recvData)
 
@@ -235,9 +235,9 @@ class Client(Utilities):
         DbgPrint("ConnectionCheck Started")
         while countdown > 0:
             try:
-                conn.send(RUHERE)
+                conn.send(RUHERE.encode())
                 conn.settimeout(5)
-                data = conn.recv(1024)
+                data = conn.recv(1024).decode()
                 if data == IAMHERE:
                     DbgPrint("Client: Connection Test Has Suceeded!!!")
                     return
@@ -251,14 +251,14 @@ class Client(Utilities):
     def closeConnection(self):
         try:
             self.stop()
-            self.socketObj.send(EndSession)
+            self.socketObj.send(EndSession.encode())
             self.socketObj.close()
 
         except Exception as e:
             DbgPrint("ERROR:", str(e))
 
     def ServerShutDown(self):
-        self.socketObj.send(ShutDown)
+        self.socketObj.send(ShutDown.encode())
         self.closeConnection()
 
     def Send(self, data):
@@ -285,7 +285,7 @@ class Client(Utilities):
         self.socketObj.send(msg.encode())
 
     def SendRawMsg(self, msg):
-        self.socketObj.send(msg)
+        self.socketObj.send(msg.encode())
 
     def _processData(self, data):
         rdata = None

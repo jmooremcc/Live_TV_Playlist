@@ -23,7 +23,7 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 #from logger import logxbmc.log("***path")
 
@@ -31,7 +31,7 @@ __Version__ = "1.0.0"
 myLog = xbmc.log
 
 from util import ADDON, ADDON_PATH, ADDONID, ADDON_USERDATA_FOLDER, BASEPATH, DATAFILE_LOCATIONFILE, ADDON_DATAFILENAME,\
-    DEFAULTPATH, DEBUGFILE_LOCATIONFILE, DEBUGFILE_LOCATIONCONTENT, ENUMPATH
+    DEFAULTPATH, DEBUGFILE_LOCATIONFILE, DEBUGFILE_LOCATIONCONTENT
 from resources.lib.Network.SecretSauce import ServerPort, ServerHost
 from resources.PL_Server import PL_Server
 from resources.lib.Utilities.Messaging import VACATIONMODE, PREROLLTIME, DAILYSTOPCOMMAND, DEBUGMODE, STOPCMD_ACTIVE,\

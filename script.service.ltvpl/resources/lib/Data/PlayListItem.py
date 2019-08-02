@@ -48,7 +48,7 @@ from resources.lib.Utilities.PythonEvent import Event
 from resources.lib.Utilities.Messaging import OpStatus
 from resources.lib.Utilities import indent
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 MODULEDEBUGMODE=True
 ALARMPADDING = 5
@@ -78,7 +78,7 @@ def isStr(item):
     if sys.version_info[0]==2:
         return isinstance(item,str) or type(item) == unicode
     else:
-        return type(item) == str or type(item) == unicode
+        return type(item) == str
 
 class PlayListItem(myPickle_io):
     """

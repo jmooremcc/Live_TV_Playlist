@@ -27,7 +27,7 @@ from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Network.utilities import getTimeFilteredDirList
 from resources.lib.Utilities.Messaging import WRITEMODE, READMODE, WRITEBINARYMODE, READBINARYMODE
 
-__Version__ = "1.0.1"
+__Version__ = "1.0.2"
 
 class FileManagerMode(Enum):
     JSON=1

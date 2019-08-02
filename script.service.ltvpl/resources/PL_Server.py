@@ -33,7 +33,7 @@ from resources.lib.Utilities.Messaging import Cmd, OpStatus, xlateCmd2Notificati
 from resources.lib.Utilities.VirtualEvents import TS_decorator
 
 
-__Version__ = "1.1.0"
+__Version__ = "1.1.1"
 
 MODULEDEBUGMODE=True
 
@@ -164,7 +164,7 @@ class PL_Server(object):
     def ReturnData(self,conn,cmd, data, notify=True):
         rData = encodeResponse(cmd, data)
         rData2 = self.server._processData(rData) + DATAEndMarker
-        conn.send(rData2)
+        conn.send(rData2.encode())
 
         if notify:
             time.sleep(1)
@@ -174,7 +174,7 @@ class PL_Server(object):
     def ReturnError(self,conn,opStatus,errMsg):
         rData = encodeErrorResponse(opStatus, errMsg)
         rData2 = self.server._processData(rData) + DATAEndMarker
-        conn.send(rData2)
+        conn.send(rData2.encode())
 
     def onChannelChange(self, PL_OBJ):
         DbgPrint("Deleting {} From List".format(PL_OBJ),MODULEDEBUGMODE=MODULEDEBUGMODE)

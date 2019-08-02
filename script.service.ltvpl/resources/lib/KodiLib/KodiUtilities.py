@@ -19,12 +19,12 @@
 #
 from datetime import datetime, timedelta
 import time
-from kodiflags import KODI_ENV
-from kodijson import Kodi, PLAYER_VIDEO
+from .kodiflags import KODI_ENV
+from .kodijson import Kodi, PLAYER_VIDEO
 import json
 from resources.lib.Utilities.DebugPrint import DbgPrint
 
-__Version__ = "1.3.0"
+__Version__ = "1.3.1"
 
 def GetOE2():
     """
