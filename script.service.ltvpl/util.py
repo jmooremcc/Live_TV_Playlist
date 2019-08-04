@@ -49,7 +49,7 @@ KEYMAPS_USERDATA_FOLDER = xbmc.translatePath('special://userdata/keymaps')
 BASEPATH = os.path.join(ADDON_PATH,r"resources")
 if BASEPATH not in sys.path:
     sys.path.insert(2,BASEPATH)
-ENUMPATH = os.path.join(BASEPATH,"lib2/enum")
+ENUMPATH = os.path.join(BASEPATH,"lib2")
 if ENUMPATH not in sys.path and PYVER < 3.0:
     sys.path.insert(0,ENUMPATH)
 DATAFILE_LOCATIONFILE = os.path.join(BASEPATH, r"data/dataFileLocation.py")
