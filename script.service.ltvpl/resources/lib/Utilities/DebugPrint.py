@@ -28,9 +28,8 @@ except ImportError:
     print("import error for DEBUGCACHEFILE")
     from util import DEBUGFILE_DEFAULTPATH as DEBUGCACHEFILE
 
-print("DEBUGCACHEFILE: {}".format(DEBUGCACHEFILE))
 
-__Version__ = "1.0.2"
+__Version__ = "1.0.3"
 
 """
     Place MODULEDEBUGMODE=value at the top of a module to control DebugMode
@@ -48,7 +47,7 @@ class _dbmm():
 
 
     def getDebugMode(self):
-        print("*DEBUGCACHEFILE: {}".format(DEBUGCACHEFILE))
+
         try:
             with open(DEBUGCACHEFILE, 'r') as fp:
                 jvalue = fp.read()
@@ -70,7 +69,7 @@ class _dbmm():
             return value
 
         self.debugmode = value
-        # print("**DEBUGCACHEFILE: {}".format(DEBUGCACHEFILE))
+
         try:
             with open(DEBUGCACHEFILE,'w') as fp:
                 jval = json.dumps(value)
