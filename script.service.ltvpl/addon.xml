@@ -38,6 +38,7 @@
     </description>
     <platform>all</platform>
     <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+    <source>https://github.com/jmooremcc/Live_TV_Playlist</source>
     <email>jmooremcc@hotmail.com</email>
     <assets>
       <icon>icon.png</icon>
