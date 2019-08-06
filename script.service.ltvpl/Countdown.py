@@ -358,6 +358,8 @@ class miniClient(Thread):
             self.t = Timer(td.total_seconds() - preroll_time, self.launchCountDown, [listitem])
             self.t.start()
 
+    imap={True:'*', False:''}
+
     def sortData(self):
         global VACATIONMODE_VALUE
         if VACATIONMODE_VALUE == True:
@@ -365,10 +367,10 @@ class miniClient(Thread):
             return
 
         DbgPrint("******miniClient sortData Called...")
-        self.plList.sort(key=lambda item: item['alarmtime'])
+        self.plList.sort(key=lambda item: str(int(item['suspendedFlag'])) + item['alarmtime'])
 
         for n, d in enumerate(self.plList):
-            myLog("******{}:({}){}".format(n,d['alarmtime'], d['title']))
+            myLog("******{}:({}){}".format(n, d['alarmtime'], self.imap[d['suspendedFlag']] +  d['title']))
 
         self.signal.set()
 
