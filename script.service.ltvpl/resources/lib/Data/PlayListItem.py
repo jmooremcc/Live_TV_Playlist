@@ -250,12 +250,14 @@ class PlayListItem(myPickle_io):
 
         if self.SuspendedFlag:
             DbgPrint("Playlist has been suspended")
-            return
+            changeOp = self._suspendedPLX_Op
+        else:
+            changeOp = self._ChangeCh
 
         DbgPrint("\ntype(self.alarmtime):{}".format(type(self.alarmtime)))
         td= self.alarmtime - datetime.now() - timedelta(seconds=self.PreRollTime)
         if td.days >= 0:
-            self.t=Timer(td.total_seconds() + 1, self._ChangeCh)
+            self.t=Timer(td.total_seconds() + 1, changeOp)
             self.t.start()
             #TODO: Error Log Output
         else:
@@ -388,6 +390,9 @@ class PlayListItem(myPickle_io):
             return False
 
         return self.alarmtime > self.expiryDate
+
+    def _suspendedPLX_Op(self):
+        self.PLX_Event(self)
 
     def _ChangeCh(self):
         DbgPrint("Changing to channel {} at {}\n".format(self.ch,datetime.now()))
