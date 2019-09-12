@@ -508,7 +508,6 @@ class GUI(xbmcgui.WindowXMLDialog):
     def onFocus(self, ctrlID):
         if ctrlID == MAIN_LIST:
             ctrl = self.getControl(ctrlID)
-            ctrl.selectItem(0)
             self.currentPos = ctrl.getPosition()
             myLog("******CurrentPos: {}\tctrlID: {}".format(self.currentPos, ctrlID))
 

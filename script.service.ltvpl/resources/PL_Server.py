@@ -33,7 +33,7 @@ from resources.lib.Utilities.Messaging import Cmd, OpStatus, xlateCmd2Notificati
 from resources.lib.Utilities.VirtualEvents import TS_decorator
 
 
-__Version__ = "1.1.0"
+__Version__ = "1.1.1"
 
 MODULEDEBUGMODE=True
 

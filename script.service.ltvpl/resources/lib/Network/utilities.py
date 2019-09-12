@@ -35,7 +35,7 @@ from resources.lib.Utilities.Messaging import Cmd, MsgType, NotificationAction, 
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Network.SecretSauce import DATAEndMarker, RUHERE
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.2"
 
 MODULEDEBUGMODE=False
 PYVER = float('{}.{}'.format(*sys.version_info[:2]))

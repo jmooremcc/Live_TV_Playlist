@@ -24,7 +24,7 @@ from kodijson import Kodi, PLAYER_VIDEO
 import json
 from resources.lib.Utilities.DebugPrint import DbgPrint
 
-__Version__ = "1.3.0"
+__Version__ = "1.3.1"
 
 def GetOE2():
     """
@@ -59,7 +59,6 @@ SUBCHANNELNUMBER = 'subchannelnumber'
 ITEM = 'item'
 STATIONID = 'stationID'
 CHANNELGROUPID = 'channelgroupid'
-
 
 def getRecordings2(kodiObj,params=None):
     """

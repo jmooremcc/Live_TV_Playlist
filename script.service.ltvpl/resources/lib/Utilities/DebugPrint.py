@@ -21,6 +21,8 @@ import logging
 import os
 import json
 from datetime import datetime, timedelta
+import threading
+import inspect
 
 try:
     from resources.data.debugFileLocation import DEBUGCACHEFILE
@@ -104,6 +106,8 @@ if XBMC_PRESENT:
                     fmtmsg = msg.format(*args[1:])
                 except TypeError:
                     fmtmsg = msg.format(args)
+                except:
+                    fmtmsg = msg
 
             xbmc.log(fmtmsg)
 
@@ -117,6 +121,8 @@ else:
                 fmtmsg = msg.format(*args[1:])
             except TypeError:
                 fmtmsg = msg.format(args)
+            except:
+                fmtmsg = msg
 
         log.debug(fmtmsg)
 
@@ -130,7 +136,6 @@ getDebugMode = dbmm.getDebugMode
 
 
 def DbgPrint(*args, **kwargs):
-    import inspect
     DEBUGMODE = dbmm.DebugMode
     try:
         # DebugFlag=kwargs['MODULEDEBUGMODE'] and DEBUGMODE
@@ -144,6 +149,7 @@ def DbgPrint(*args, **kwargs):
         className = None
         dataRow=1
         info=inspect.stack()[dataRow]
+        threadname = threading.current_thread().name
         try:
             className = info[0].f_locals['self'].__class__.__name__
         except:
@@ -159,7 +165,7 @@ def DbgPrint(*args, **kwargs):
             fnName = info[3]
         except:
             pass
-        DbgText="line#{}:{}->{}->{}()".format(lineNo, modName,className, fnName)
+        DbgText="{}:line#{}:{}->{}->{}()".format(threadname,lineNo, modName,className, fnName)
         argCnt=len(args)
         kwargCnt=len(kwargs)
 

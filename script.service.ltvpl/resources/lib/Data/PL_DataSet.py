@@ -36,7 +36,7 @@ if KODI_ENV:
     import xbmcgui
     import xbmc
 
-__Version__ = "1.1.0"
+__Version__ = "1.1.1"
 
 DELETE_WAIT_TIME=1
 MODULEDEBUGMODE=True
@@ -226,9 +226,9 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         playerStop(kodiObj)
 
 
-    def onPLX_Event(self, item, doNotBackup=False):
+    def onPLX_Event(self, item, doNotBackup=False, simulationOn=False):
         """
-        :param item: PlayK=ListItem
+        :param PlayListItem item:
         :param doNotBackup:
         :return:
         """
@@ -236,7 +236,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         recurrenceInterval=item.recurrenceInterval
         alarmtime=item.alarmtime
         DbgPrint("alarmtime: {}".format(alarmtime))
-        newtime=None
+        newtime=None # type: datetime
 
         if recurrenceInterval==RecurrenceOptions.ONCE:
             DbgPrint("\nWating to Remove {} from list".format(item),MODULEDEBUGMODE=MODULEDEBUGMODE)
@@ -301,43 +301,72 @@ class PL_DataSet(list,myPickle_io,myJson_io):
 
             newtime=one_month_later
 
-        #Restart item with new alarmtime
-        if newtime is not None:
-            item.Cancel()
-            time.sleep(1)
+        if simulationOn == False:
+            #Restart item with new alarmtime
+            if newtime is not None:
+                item.Cancel()
+                time.sleep(1)
 
-            item.alarmtime=newtime # type: PlayListItem
-            if item.isExpired:
-                self.Remove(item)
-                return
+                item.alarmtime=newtime
 
+                if item.isExpired:
+                    self.Remove(item)
+                    return
+
+                DbgPrint("newtime: {}".format(newtime))
+
+                item.Start()
+
+                if doNotBackup == False:
+                    self.fileManager.Dirty = True
+                    self.fileManager.backup()
+
+                if self.skipOperationActive == False:
+                    data1 = genericEncode(Cmd.UpdatePlayListItem, item.Data)
+                    data = genericEncode(NotificationAction.ItemUpdated, data1)
+                    self.ItemUpdatedEvent(data)
+
+                return NotificationAction.ItemUpdated
+        else: # simulationOn == True
             DbgPrint("newtime: {}".format(newtime))
-
-            item.Start()
-
-            if doNotBackup == False:
-                self.fileManager.Dirty = True
-                self.fileManager.backup()
-
-            if self.skipOperationActive == False:
-                data1 = genericEncode(Cmd.UpdatePlayListItem, item.Data)
-                data = genericEncode(NotificationAction.ItemUpdated, data1)
-                self.ItemUpdatedEvent(data)
-
-            return NotificationAction.ItemUpdated
+            item.alarmtime = newtime
 
     def CreatePlayListItem(self,data):
         obj=PlayListItem()
         obj.Data=data
         return obj
 
-    def identifyConflicts(self,item):
-        alarmtime=item.alarmtime
-        conflictList=[]
-        for lstItem in self:
+    def _check4conflicts(self, alarmtime, conflictList):
+        for lstItem in self: # type: PlayListItem
+            if lstItem.suspendedFlag:
+                continue
+
             diff = abs(alarmtime - lstItem.alarmtime)
             if diff.days == 0 and diff.seconds <= 30:
                 conflictList.append(lstItem)
+
+        return conflictList
+
+    def identifyConflicts(self,item):
+        """
+
+        :param PlayListItem item:
+        :return: list
+        """
+        originalalarmtime=alarmtime=item.alarmtime
+        conflictList=[]
+        DbgPrint("***newItem b4 Conflict Check:{}".format(item))
+        if item.recurrenceInterval != RecurrenceOptions.ONCE:
+            conflictList = self._check4conflicts(alarmtime, conflictList)
+            self.SkipEvent(item, doNotBackup=True, simulationOn=True)
+            alarmtime = item.alarmtime
+
+        conflictList = self._check4conflicts(alarmtime, conflictList)
+
+        if item.recurrenceInterval != RecurrenceOptions.ONCE:
+            item.alarmtime = originalalarmtime
+
+        DbgPrint("***newItem after Conflict Check:{}".format(item))
 
         return conflictList
 
@@ -474,12 +503,12 @@ class PL_DataSet(list,myPickle_io,myJson_io):
             raise Exception("SkipEvent Failure: Invalid objID")
 
 
-    def SkipEvent(self, item):
+    def SkipEvent(self, item, doNotBackup=False, simulationOn=False):
         if isPlayListItem(item)==False:
             raise TypeError("Item is not a PlayListItem")
 
         self.skipOperationActive = True
-        status = self.onPLX_Event(item)
+        status = self.onPLX_Event(item, doNotBackup=doNotBackup, simulationOn=simulationOn)
         self.skipOperationActive = False
 
         return status

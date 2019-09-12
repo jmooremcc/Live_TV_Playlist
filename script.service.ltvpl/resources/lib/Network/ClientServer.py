@@ -27,7 +27,7 @@ from resources.lib.Utilities.Messaging import Cmd, MsgType
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Utilities.PythonEvent import Event
 
-__Version__ = "1.0.1"
+__Version__ = "1.0.2"
 
 def getNewSocket():
     socketObj = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,8 +41,8 @@ def getClientPort(conn):
 
 
 class Server(Thread, Utilities):
-    def __init__(self, address, maxConnections=1, dataMode=DataMode.JSON):
-        Thread.__init__(self)
+    def __init__(self, address, maxConnections=1, dataMode=DataMode.JSON, servername="LTVPL_Server"):
+        Thread.__init__(self, name=servername)
         Utilities.__init__(self)
         self.clientList = list()
         self.address = address
@@ -69,6 +69,7 @@ class Server(Thread, Utilities):
         for client in self.clientList:
             client.close()
 
+        DbgPrint("***Server Shutdown Final Stage")
         try:
             tmp = getNewSocket()
             tmp.settimeout(5)
@@ -80,6 +81,7 @@ class Server(Thread, Utilities):
         except Exception as e:
             print(e)
 
+        DbgPrint("***Server Finally Stopped.....")
 
     def __del__(self):
         self.socketObj.close()
@@ -193,7 +195,7 @@ class Server(Thread, Utilities):
                     DbgPrint("Connection Made with {}".format(address))
                     if self.maxConnections > 1:
                         DbgPrint("Dispatcher: Launch Thread")
-                        Thread(target=self.ClientHandler, args=(connection, address)).start()
+                        Thread(target=self.ClientHandler, name="Thread-Dispatcher", args=(connection, address)).start()
                     else:
                         DbgPrint("Dispatcher: Launch No Thread")
                         self.ClientHandler(connection, address)
@@ -208,11 +210,12 @@ class Server(Thread, Utilities):
 
 
 class Client(Utilities):
-    def __init__(self, address, commDataHandler=None, dataMode=DataMode.JSON):
+    def __init__(self, address, commDataHandler=None, dataMode=DataMode.JSON, servername="LTVPL_Client"):
         Utilities.__init__(self)
         self.dataMode = dataMode
         self.GoFlag = True
         self.commDataHandler = commDataHandler
+        self.servername=servername
 
         try:
             self.socketObj = getNewSocket()
@@ -305,7 +308,7 @@ class Client(Utilities):
         return rdata
 
     def start(self):
-        Thread(target=self.commMonitor).start()
+        Thread(target=self.commMonitor, name=self.servername).start()
 
     def stop(self):
         self.GoFlag = False

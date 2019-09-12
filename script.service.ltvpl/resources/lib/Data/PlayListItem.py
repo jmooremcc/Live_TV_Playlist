@@ -48,7 +48,7 @@ from resources.lib.Utilities.PythonEvent import Event
 from resources.lib.Utilities.Messaging import OpStatus
 from resources.lib.Utilities import indent
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 MODULEDEBUGMODE=True
 ALARMPADDING = 5
@@ -254,10 +254,14 @@ class PlayListItem(myPickle_io):
         else:
             changeOp = self._ChangeCh
 
-        DbgPrint("\ntype(self.alarmtime):{}".format(type(self.alarmtime)))
-        td= self.alarmtime - datetime.now() - timedelta(seconds=self.PreRollTime)
+        # DbgPrint("\ntype(self.alarmtime):{}".format(type(self.alarmtime)))
+        if self.suspendedFlag == False:
+            td= self.alarmtime - datetime.now() - timedelta(seconds=self.PreRollTime)
+        else:
+            td = self.alarmtime - datetime.now() - timedelta(seconds=self.PreRollTime) + timedelta(seconds=30)
+
         if td.days >= 0:
-            self.t=Timer(td.total_seconds() + 1, changeOp)
+            self.t=Timer(td.total_seconds() + 1, changeOp, self.ch)
             self.t.start()
             #TODO: Error Log Output
         else:

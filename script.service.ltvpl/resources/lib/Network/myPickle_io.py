@@ -20,7 +20,7 @@
 import pickle
 from resources.lib.Utilities.DebugPrint import DbgPrint
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 class myPickle_io(object):
     def __init__(self):

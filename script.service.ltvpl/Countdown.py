@@ -57,7 +57,7 @@ MINICLIENTTAG = "LTVPL_MINCLIENTDIALOG_VISIBLE"
 
 class Countdown(xbmcgui.WindowXMLDialog):
 
-    def __new__(cls, addonID, client, listitem, clockstarttime, abortChChange):
+    def __new__(cls, addonID, client=None, listitem=None, clockstarttime=15, abortChChange=None):
         return super(Countdown, cls).__new__(cls, 'countdownDialog.xml', xbmcaddon.Addon(addonID).getAddonInfo('path'))
 
     def __init__(self, addonID, client=None, listitem=None, clockstarttime=15, abortChChange=None):
@@ -126,7 +126,7 @@ class Countdown(xbmcgui.WindowXMLDialog):
 
 class miniClient(Thread):
     def __init__(self, addonID, clockstarttime, abortChChange=None):
-        super(miniClient, self).__init__()
+        super(miniClient, self).__init__(name="LTVPL_miniClient")
         self.addonID = addonID
         self.clockStartTime = clockstarttime
         self.abortChChange = abortChChange
