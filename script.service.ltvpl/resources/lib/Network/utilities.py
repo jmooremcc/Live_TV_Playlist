@@ -316,11 +316,6 @@ class Utilities(object):
         try:
             if jqueue.empty():
                 tmp=conn.recv(4096).decode()
-                if RUHERE in tmp:
-                    pos = tmp.rfind(RUHERE)
-                    if pos >= 0:
-                        pos += len(RUHERE)
-                        tmp = tmp[pos:]
 
                 if DATAEndMarker in tmp:
                     pos = 0

@@ -21,6 +21,7 @@
 import os
 import os.path
 import shutil
+from time import sleep
 import xml.etree.ElementTree as ET
 from enum import Enum
 from resources.lib.Utilities.DebugPrint import DbgPrint
@@ -69,7 +70,15 @@ class fileManager(object):
         fp.close()
 
     def removeSentinel(self):
-        os.remove(self.sentinelFile)
+        count = 5
+        while count >= 0:
+            try:
+                os.remove(self.sentinelFile)
+                break
+            except:
+                DbgPrint("Waiting on sentinel file...")
+                sleep(1)
+                count -= 1
 
     def restoreFromSentinel(self):
         fp = open(self.sentinelFile, 'r')

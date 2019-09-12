@@ -19,8 +19,8 @@
 #
 from datetime import datetime, timedelta
 import time
-from .kodiflags import KODI_ENV
-from .kodijson import Kodi, PLAYER_VIDEO
+from kodiflags import KODI_ENV
+from kodijson import Kodi, PLAYER_VIDEO
 import json
 from resources.lib.Utilities.DebugPrint import DbgPrint
 
@@ -59,7 +59,6 @@ SUBCHANNELNUMBER = 'subchannelnumber'
 ITEM = 'item'
 STATIONID = 'stationID'
 CHANNELGROUPID = 'channelgroupid'
-
 
 def getRecordings2(kodiObj,params=None):
     """

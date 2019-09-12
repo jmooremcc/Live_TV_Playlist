@@ -21,7 +21,8 @@ def TS_decorator(func):
         func(*args, **kwargs)
 
     def hook(*args,**kwargs):
-        Thread(target=stub, args=args).start()
+        threadname="Thread-{}".format(func.__name__)
+        Thread(target=stub, name=threadname, args=args).start()
 
     return hook
 

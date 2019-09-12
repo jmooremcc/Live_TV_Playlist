@@ -22,6 +22,7 @@ import os, sys
 import xbmc
 import xbmcgui
 import xbmcaddon
+import threading
 
 __Version__ = "1.0.1"
 
@@ -239,11 +240,12 @@ if __name__ == '__main__':
         server.stopServer()
         xbmc.log("vacationmode2:{}".format(ADDON.getSetting(VACATIONMODE)))
 
-        monitor = None
         del monitor
-        cdService = None
         del cdService
-        server = None
         del server
         clearDialogActive(PLSERVERTAG)
         xbmc.log("Live TV Playlist Server Stopped...")
+
+        print("***Active Threads Left Running:")
+        for t in threading.enumerate():
+            print("\t***>".format(t))

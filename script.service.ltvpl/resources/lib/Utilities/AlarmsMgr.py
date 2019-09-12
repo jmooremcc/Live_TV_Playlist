@@ -19,7 +19,7 @@
 #  http://www.gnu.org/copyleft/gpl.html
 #
 
-__Version__ = "0.9.4"
+__Version__ = "0.9.6"
 
 try:
     import Queue as Q  # ver. < 3.0
@@ -31,22 +31,16 @@ from threading import RLock
 from datetime import datetime, timedelta
 from time import sleep
 from resources.lib.Utilities.DebugPrint import DbgPrint, DEBUGMODE, myLog
+from .VirtualEvents import TS_decorator
 
 masterRlock = RLock()
+activeTimerLock = RLock()
 MODULEDEBUGMODE = True
 
 
 def cmp(a,b):
     return((a > b) - (a < b))
 
-def TS_decorator(func):
-    def stub(*args, **kwargs):
-        func(*args, **kwargs)
-
-    def hook(*args, **kwargs):
-        threading.Thread(target=stub, args=args).start()
-
-    return hook
 
 def status():
     if not (DEBUGMODE and MODULEDEBUGMODE):
@@ -55,32 +49,116 @@ def status():
     global masterRlock
     masterRlock.acquire()
     try:
-        myLog("Active:")
-        myLog(_alarms.activetimer)
+        myLog("Alarms Active:")
+        myLog("   {:>3}->{}".format(0, _alarms.mt.Activetimer))
     except:
         pass
 
-    myLog("Queued:")
-    for i in range(_alarms.pq.qsize()):
+    myLog("Alarms Queued:")
+    for n,i in enumerate(range(_alarms.pq.qsize())):
         try:
-            myLog(_alarms.pq.queue[i])
+            myLog("   {:>3}->{}".format(n+1, _alarms.pq.queue[i]))
         except:
             pass
 
-    myLog()
+    myLog("*****")
     masterRlock.release()
 
+class MasterTimer(object):
+    def __init__(self, parentstartTimer, noargs=True):
+        self.parentstartTimer = parentstartTimer
+        self._activetimer = None # type: _alarm
+        self.Timer = None
+        self.noargs = noargs
+
+    @property
+    def Activetimer(self):
+        return self._activetimer
+
+    @Activetimer.setter
+    def Activetimer(self, alarm):
+        """
+        :type alarm: _alarm
+        """
+        if alarm is not None:
+            self._activetimer = alarm
+            self._startTimer()
+        else:
+            self.stopTimer()
+            self._activetimer = None
+
+
+    def _eventHandler(self):
+        activeTimerLock.acquire()
+        DbgPrint("***ActiveTimer:{}".format(self._activetimer))
+        if self._activetimer is not None:
+            self._activetimer.active = False
+            self._launchActiveTimerFn()
+        sleep(1)
+        self.Timer = None
+        DbgPrint("***Clearing ActiveTimer:{}".format(self._activetimer))
+        self._activetimer = None
+        self.parentstartTimer(blocktimerlock=True)
+        activeTimerLock.release()
+        status()
+
+
+    def stopTimer(self):
+        if self.Timer is not None:
+            self.Timer.cancel()
+            count = 10
+            while count >= 0:
+                count -= 1
+                if self.Timer is not None and not self.Timer.is_alive():
+                    break
+
+                sleep(1)
+
+            self.Timer = None # type: threading.Timer
+
+
+    def _startTimer(self):
+        if self._activetimer is not None:
+            if self.Timer is not None:
+                self.stopTimer()
+
+            td = self._activetimer.alarmtime - datetime.now()
+            if td.days >= 0:
+                self.Timer = threading.Timer(td.total_seconds() - 2, self._eventHandler)
+                self.Timer.name = "Thread-MasterTimer"
+                self.Timer.start()
+                DbgPrint("***ActiveTimer:{}".format(self._activetimer))
+            else:
+                raise Exception("AlarmsMgr: Invalid Start Time")
+
+    @TS_decorator
+    def _launchActiveTimerFn(self):
+        DbgPrint("***ActiveTimer:{}".format(self._activetimer))
+        if self._activetimer is not None:
+            if self.noargs:
+                self._activetimer.fn()
+            else:
+                if len(self._activetimer.args) == 0:
+                    self._activetimer.fn(None)
+                else:
+                    args = self._activetimer.args[0]
+                    self._activetimer.fn(args)
+
+
+
 class _alarm(object):
-    def __init__(self, parent, alarmtime, fn, *args):
+    def __init__(self, parent, alarmtime, fn, ch, *args):
         """
 
-        :param parent: _Alarms
-        :param alarmtime: datetime
+        :param _Alarms parent:
+        :param datetime alarmtime:
         :param fn:
+        :param str ch: channel # to change to
         :param args:
         """
         self.alarmtime = alarmtime
         self.fn = fn
+        self.ch = ch
         self.args = args
         self.active = False
         self.parent = parent
@@ -103,7 +181,7 @@ class _alarm(object):
 
 
     def __repr__(self):
-        return str(self.alarmtime) + " : " + str(self.priority)
+        return "Ch:{:>4.4} : {} : {}".format(self.ch, self.alarmtime, self.priority)
 
     def __cmp__(self, other):
         if not self.active:
@@ -126,6 +204,7 @@ class _alarm(object):
     def __eq__(self, other):
         return self.priority == other.priority
 
+
 class _Alarms(object):
     START = 1
     CANCEL = 2
@@ -133,15 +212,14 @@ class _Alarms(object):
 
     def __init__(self, noargs=True):
         self.pq = Q.PriorityQueue()
-        self.Timer = None # type: threading.Timer
-        self.activetimer = None # type: _alarm
+        self.mt = MasterTimer(self._startTimer, noargs=noargs)
         self.noargs = noargs
-        self.rlock = RLock()
         self.refDate = datetime(datetime.today().year,1,1)
 
 
     def _addTimer(self, timer):
         self.pq.put(timer)
+        DbgPrint("AddTimer: {}".format(timer))
 
 
     def _findTimer(self, timer):
@@ -154,95 +232,56 @@ class _Alarms(object):
     def _removeTimer(self, timer):
         i = self._findTimer(timer)
         if i >= 0:
+            DbgPrint("RemoveTimer: {}".format(self.pq.queue[i]))
             del(self.pq.queue[i])
 
-    @TS_decorator
-    def _launchActiveTimerFn(self):
-        if self.noargs:
-            self.activetimer.fn()
+
+    def _startTimer(self, blocktimerlock=False):
+        if blocktimerlock == False:
+            activeTimerLock.acquire()
+
+        oldtimer = self.mt.Activetimer
+        if oldtimer is None:
+            try:
+                timer = self.pq.get(block=False)  # pop the top item off the queue
+                DbgPrint("***NewTimer:{}".format(timer))
+                self.mt.Activetimer = timer
+            except Exception as e:
+                DbgPrint(e)
         else:
-            if len(self.activetimer.args) == 0:
-                self.activetimer.fn(None)
-            else:
-                args = self.activetimer.args[0]
-                self.activetimer.fn(args)
-
-
-    def _eventHandler(self):
-        self.activetimer.active = False
-        self._launchActiveTimerFn()
-        sleep(1)
-        self.Timer = None
-        self.activetimer = None
-        self._StartTimer()
-        status()
-
-
-    def _stopTimer(self):
-        self.Timer.cancel()
-        count = 10
-        while count >= 0:
-            count -= 1
-            if not self.Timer.is_alive():
-                break
-
-            sleep(1)
-
-        self.Timer = None # type: threading.Timer
-
-
-    def _startTimer(self, timer):
-        if timer.active:
-            if self.Timer is not None:
-                self._stopTimer()
-
-            td = timer.alarmtime - datetime.now()
-            if td.days >= 0:
-                self.Timer = threading.Timer(td.total_seconds() - 2, self._eventHandler)
-                self.Timer.start()
-                if self.activetimer is not None:
-                    oldtimer = self.activetimer
-                    self.activetimer = timer
+            try:
+                newTimer = self.pq.get(block=False)  # pop the top item off the queue
+                if newTimer < oldtimer:
+                    DbgPrint("***NewTimer:{}".format(newTimer))
+                    self.mt.Activetimer = newTimer  # launch new timer
+                    DbgPrint("***Putting Oldtimer back in queue:{}".format(oldtimer))
                     self.pq.put(oldtimer)
                 else:
-                    self.activetimer = timer
-            else:
-                raise Exception("AlarmsMgr: Invalid Start Time")
+                    self.pq.put(newTimer)  # put timer item back in the queue
+            except Exception as e:
+                DbgPrint(e)
 
-    def _StartTimer(self):
-        if self.activetimer is None:
-            try:
-                timer = self.pq.get(block=False) #pop the top item off the queue
-                self._startTimer(timer)
-            except:
-                pass
-        else: #self.activetimer is not None
-            try:
-                newTimer = self.pq.get(block=False) #pop the top item off the queue
-                if newTimer < self.activetimer:
-                    self._startTimer(newTimer) #launch new timer
-                else:
-                    self.pq.put(newTimer) #put timer item back on the queue
-            except:
-                pass
-
+        if blocktimerlock == False:
+            activeTimerLock.release()
 
     def _cancelTimer(self, timer):
+        activeTimerLock.acquire()
         DbgPrint("Deleting Timer: {}".format(timer))
-        if self.activetimer is not None:
-            if timer == self.activetimer:
-                self._stopTimer()
-                self.activetimer = None
-            else:
-                self._removeTimer(timer)
+        DbgPrint("***Current ActiveTimer:{}".format(self.mt.Activetimer))
+        DbgPrint("timer == self.mt.Activetimer:{}".format(timer == self.mt.Activetimer))
+        if timer == self.mt.Activetimer:
+            self.mt.Activetimer = None
+        else:
+            self._removeTimer(timer)
 
-        self._StartTimer()
+        self._startTimer(blocktimerlock=True)
+        activeTimerLock.release()
 
 
 
     def update(self, timer, operation):
         if operation == self.START:
-           self._StartTimer()
+           self._startTimer()
         elif operation == self.CANCEL:
             self._cancelTimer(timer)
 
@@ -251,8 +290,8 @@ class _Alarms(object):
 
     def shutdown(self):
         DbgPrint("Stopping AlarmsMgr...")
-        if self.Timer is not None:
-            self._stopTimer()
+        self.mt.stopTimer()
+        del(self.pq)
         DbgPrint("AlarmsMgr Stopped...")
 
 _alarms = _Alarms()
@@ -265,20 +304,20 @@ def deActivateParms():
     global _alarms
     _alarms = _Alarms(noargs=True)
 
-def Timer(alarmseconds, fn, *args):
+def Timer(alarmseconds, fn, ch, *args):
     global _alarms
     alarmtime = datetime.now() + timedelta(seconds=alarmseconds - 1)
     if len(args) == 1:
         if len(args[0]) == 1:
             if type(args[0]) == list:
                 args = args[0]
-                timer = _alarm(_alarms, alarmtime, fn, *args)
+                timer = _alarm(_alarms, alarmtime, fn, ch, *args)
         else: # len(list) > 1
             if type(args[0]) == list:
                 args = args[0]
-                timer = _alarm(_alarms, alarmtime, fn, args)
+                timer = _alarm(_alarms, alarmtime, fn, ch, args)
     else:
-        timer = _alarm(_alarms, alarmtime, fn, *args)
+        timer = _alarm(_alarms, alarmtime, fn, ch, *args)
 
     _alarms._addTimer(timer)
 
