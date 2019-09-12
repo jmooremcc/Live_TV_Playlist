@@ -26,8 +26,8 @@ from resources.lib.Network.utilities import genericEncode, encodeError
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Utilities.Messaging import NotificationAction, OpStatus
 from resources.lib.Utilities.PythonEvent import Event
-from PlayListItem import PlayListItem, isPlayListItem, RecurrenceOptions, ALARMPADDING
-from fileManager import fileManager, FileManagerMode
+from .PlayListItem import PlayListItem, isPlayListItem, RecurrenceOptions, ALARMPADDING
+from .fileManager import fileManager, FileManagerMode
 from resources.lib.KodiLib.KodiUtilities import kodiObj, changeChannelByChannelNumber, playerStop, getBroadcast_startTimeList, KODI_ENV
 from resources.lib.Utilities.Messaging import Cmd, VACATIONMODE, PREROLLTIME
 from resources.lib.Utilities.AlarmsMgr import _Alarms
