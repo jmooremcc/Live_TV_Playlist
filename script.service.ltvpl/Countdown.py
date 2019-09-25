@@ -356,6 +356,7 @@ class miniClient(Thread):
             DbgPrint("****td: {}\t{}".format(td, listitem.getProperty('pgmTitle')))
             self.currentLaunchItem = listitem
             self.t = Timer(td.total_seconds() - preroll_time, self.launchCountDown, [listitem])
+            self.t.name = "Thread-CountdownLaunch"
             self.t.start()
 
     imap={True:'*', False:''}
