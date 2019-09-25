@@ -227,8 +227,8 @@ msgid "Add to Live TV Playlist"
 msgstr "Añadir a en Vivo TV Lista de Reproducion"
 
 msgctxt "#30080"
-msgid "Item conflicts with existing playlist item"
-msgstr "El artículo entra en conflicto con el artículo existente"
+msgid "Item conflicts with {}"
+msgstr "El artículo entra en conflicto con {}"
 
 msgctxt "#30081"
 msgid "Vacation Mode Active"

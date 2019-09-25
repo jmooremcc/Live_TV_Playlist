@@ -225,7 +225,8 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
     def onErrorNotification(self, opstatus, errMsg):
         xbmc.log("EPGcapture Error Message Received: {}:{}".format(str(opstatus), errMsg))
         if opstatus.value >= 30000:
-            xbmcgui.Dialog().notification(LTVPL, GETTEXT(opstatus.value), icon=xbmcgui.NOTIFICATION_ERROR)
+            msg = GETTEXT(opstatus.value).format(errMsg)
+            xbmcgui.Dialog().notification(LTVPL, msg, icon=xbmcgui.NOTIFICATION_ERROR)
         else:
             xbmcgui.Dialog().notification("Live TV Playlist Error", errMsg, icon=xbmcgui.NOTIFICATION_ERROR)
 

@@ -342,7 +342,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                 continue
 
             diff = abs(alarmtime - lstItem.alarmtime)
-            if diff.days == 0 and diff.seconds <= 30:
+            if diff.days == 0 and diff.seconds > 0 and diff.seconds <= 30:
                 conflictList.append(lstItem)
 
         return conflictList
@@ -656,11 +656,17 @@ class PL_DataSet(list,myPickle_io,myJson_io):
             self.VacationMode = True
 
 class ItemConflictError(Exception):
-    def __init__(self,item, cList):
-        self.message="Error: item conflicts with existing playlist items"
+    def __init__(self, item, cList):
+        """
+
+        :param PlayListItem item:
+        :param list[PlayListItem] cList:
+        """
+        self.message="Error: item conflicts with Ch{}-{}".format(item.ch, item.Title)
         self.conflictList=cList
-        self.item=item
-        self.errdata=encodeError(OpStatus.DuplicateItemError,"item conflicts with existing playlist items")
+        conflictItem = cList[0] # type: PlayListItem
+        self.item=item # type: PlayListItem
+        self.errdata=encodeError(OpStatus.DuplicateItemError,"Ch{}-{}".format(conflictItem.ch, conflictItem.Title))
 
     def __repr__(self):
         return str("{}->{}".format(self.message,self.item))

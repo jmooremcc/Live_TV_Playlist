@@ -219,6 +219,7 @@ class _Alarms(object):
 
     def _addTimer(self, timer):
         self.pq.put(timer)
+        self._findDuplicates()
         DbgPrint("AddTimer: {}".format(timer))
 
 
@@ -277,6 +278,41 @@ class _Alarms(object):
         self._startTimer(blocktimerlock=True)
         activeTimerLock.release()
 
+
+    def _findDuplicates(self):
+        numitems = self.pq.qsize()
+        activetimer = self.mt.Activetimer
+        if activetimer is None:
+            return
+
+        index = 0
+        dlist=[]
+        dlist.append(activetimer)
+        for i in range(numitems):
+            if activetimer == self.pq.queue[i]:
+                dlist.append(self.pq.queue[i])
+
+        dlistsize = len(dlist)
+        offset = 30
+        if dlistsize > 1:
+            for i in range(1, dlistsize):
+                alarmtime = dlist[i].alarmtime + timedelta(seconds=offset)
+                dlist[i].alarmtime = alarmtime
+                offset += 30
+
+        dlist2=[]
+        dlist2.append(self.pq.queue[0])
+        for i in range(1, numitems):
+            if dlist2[0] == self.pq.queue[i]:
+                dlist2.append(self.pq.queue[i])
+
+        dlist2sixe = len(dlist2)
+        offset = 30
+        if dlist2sixe > 1:
+            for i in range(1, dlist2sixe):
+                alarmtime = dlist[i].alarmtime + timedelta(seconds=offset)
+                dlist[i].alarmtime = alarmtime
+                offset += 30
 
 
     def update(self, timer, operation):

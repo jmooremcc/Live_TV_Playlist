@@ -215,7 +215,7 @@ msgid "Next: Ch {}  {}"
 msgstr ""
 
 msgctxt "#30080"
-msgid "Item conflicts with existing playlist item"
+msgid "Item conflicts with {}"
 msgstr ""
 
 msgctxt "#30081"

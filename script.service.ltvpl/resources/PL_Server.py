@@ -205,7 +205,7 @@ class PL_Server(object):
             DbgPrint("Disabling PlayList Item:{}".format(id))
             item = self.dataSet.SearchByID(id)
             item.SuspendedFlag = True
-            self.fileManager.Dirty = True
+            self.dataSet.fileManager.Dirty = True
             self.dataSet.fileManager.backup()
             self.ReturnData(conn, Cmd.DisablePlayListItem, item.Data)
         except Exception as e:
