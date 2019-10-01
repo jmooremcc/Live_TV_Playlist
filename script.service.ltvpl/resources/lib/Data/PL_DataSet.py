@@ -342,7 +342,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                 continue
 
             diff = abs(alarmtime - lstItem.alarmtime)
-            if diff.days == 0 and diff.seconds > 0 and diff.seconds <= 30:
+            if diff.days == 0 and diff.seconds >= 0 and diff.seconds <= 30:
                 conflictList.append(lstItem)
 
         return conflictList
