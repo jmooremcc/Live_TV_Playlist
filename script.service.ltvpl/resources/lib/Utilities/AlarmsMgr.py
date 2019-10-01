@@ -306,12 +306,12 @@ class _Alarms(object):
             if dlist2[0] == self.pq.queue[i]:
                 dlist2.append(self.pq.queue[i])
 
-        dlist2sixe = len(dlist2)
+        dlist2size = len(dlist2)
         offset = 30
-        if dlist2sixe > 1:
-            for i in range(1, dlist2sixe):
-                alarmtime = dlist[i].alarmtime + timedelta(seconds=offset)
-                dlist[i].alarmtime = alarmtime
+        if dlist2size > 1:
+            for i in range(1, dlist2size):
+                alarmtime = dlist2[i].alarmtime + timedelta(seconds=offset)
+                dlist2[i].alarmtime = alarmtime
                 offset += 30
 
 
