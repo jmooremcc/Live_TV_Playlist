@@ -196,10 +196,10 @@ class _alarm(object):
         return self.priority < other.priority
 
     def __ge__(self, other):
-        return self.priority <= other.priority
+        return self.priority >= other.priority
 
     def __gt__(self, other):
-        return self.priority < other.priority
+        return self.priority > other.priority
 
     def __eq__(self, other):
         return self.priority == other.priority
