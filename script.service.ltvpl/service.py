@@ -22,7 +22,6 @@ import os, sys
 import xbmc
 import xbmcgui
 import xbmcaddon
-import threading
 
 __Version__ = "1.0.1"
 
@@ -32,9 +31,10 @@ __Version__ = "1.0.1"
 myLog = xbmc.log
 
 from util import ADDON, ADDON_PATH, ADDONID, ADDON_USERDATA_FOLDER, BASEPATH, DATAFILE_LOCATIONFILE, ADDON_DATAFILENAME,\
-    DEFAULTPATH, DEBUGFILE_LOCATIONFILE, DEBUGFILE_LOCATIONCONTENT, ENUMPATH
+    DEFAULTPATH, DEBUGFILE_LOCATIONFILE, DEBUGFILE_LOCATIONCONTENT
 from resources.lib.Network.SecretSauce import ServerPort, ServerHost
-from resources.PL_Server import PL_Server
+from resources.PL_Server import PLSERVERTAG, PL_Server
+from utility import isDialogActive, clearDialogActive, setDialogActive
 from resources.lib.Utilities.Messaging import VACATIONMODE, PREROLLTIME, DAILYSTOPCOMMAND, DEBUGMODE, STOPCMD_ACTIVE,\
     ALARMTIME, ACTIVATIONKEY, COUNTDOWN_DURATION, TRUE, FALSE, WRITEMODE, AUTOCLEANMODE
 import Countdown
@@ -189,9 +189,6 @@ def onServerSettingsChanged(setting, value):
     # RemoteOperationFlag = False
 
 if __name__ == '__main__':
-    from resources.PL_Server import PLSERVERTAG, PL_Server
-    from utility import isDialogActive, clearDialogActive, setDialogActive
-
     cdService = None #type: Countdown.miniClient
     server = None #type: PL_Server
 
@@ -245,7 +242,3 @@ if __name__ == '__main__':
         del server
         clearDialogActive(PLSERVERTAG)
         xbmc.log("Live TV Playlist Server Stopped...")
-
-        print("***Active Threads Left Running:")
-        for t in threading.enumerate():
-            print("\t***>".format(t))
