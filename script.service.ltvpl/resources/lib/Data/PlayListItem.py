@@ -78,7 +78,7 @@ def isStr(item):
     if sys.version_info[0]==2:
         return isinstance(item,str) or type(item) == unicode
     else:
-        return type(item) == str or type(item) == unicode
+        return type(item) == str
 
 class PlayListItem(myPickle_io):
     """
