@@ -109,8 +109,11 @@ ContextMenuItems  = [(GETTEXT(30020), MENU_SKIP_ITEM, 'Skip Event'), (GETTEXT(30
 ContextMenuItems2 = [(GETTEXT(30020), MENU_SKIP_ITEM, 'Skip Event'), (GETTEXT(30024), MENU_SUSPEND_ITEM, 'Enable Event'),
                      (GETTEXT(30022), MENU_EDIT_ITEM, 'Edit Event'), (GETTEXT(30023), MENU_DELETE_ITEM, 'Delete Event')]
 
+try:
+    locale.setlocale(locale.LC_ALL, '')
+except Exception as e:
+    print(e)
 
-locale.setlocale(locale.LC_ALL, '')
 myLog("addonname: {}".format(ADDON_NAME))
 myLog("addonID: {}".format(ADDONID))
 myLog("xmlpath: {}".format(XMLPATH))

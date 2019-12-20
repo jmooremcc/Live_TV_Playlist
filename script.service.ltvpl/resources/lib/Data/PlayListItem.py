@@ -267,7 +267,7 @@ class PlayListItem(myPickle_io):
         else:
             val = "Cannot Start Item: {}".format(self.Data)
             DbgPrint(val)
-            raise PlayListItemError(OpStatus.InvalidAlarmTimeError, val)
+            # raise PlayListItemError(OpStatus.InvalidAlarmTimeError, val)
 
 
     def Cancel(self, notify=True):
