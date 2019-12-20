@@ -22,7 +22,11 @@ import locale
 
 __Version__ = "1.1.0"
 
-locale.setlocale(locale.LC_ALL, '')
+try:
+    locale.setlocale(locale.LC_ALL, '')
+except Exception as e:
+    print(e)
+
 import copy
 import xbmc
 import xbmcgui
