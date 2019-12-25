@@ -271,7 +271,7 @@ class Utilities(object):
 
     def readPKL(self,conn):
         try:
-            pdata=conn.recv(4096)
+            pdata=conn.recv(4096).decode()
             data = pickle.loads(pdata)
         except Exception as e:
             data=pdata.decode(EncodingFMT)
@@ -315,7 +315,7 @@ class Utilities(object):
 
         try:
             if jqueue.empty():
-                tmp=conn.recv(4096)
+                tmp=conn.recv(4096).decode()
 
                 if DATAEndMarker in tmp:
                     pos = 0
@@ -336,8 +336,7 @@ class Utilities(object):
                 jdata = jqueue.get_nowait()
 
                 try:
-                    data=jdata.decode(EncodingFMT)
-                    data=json.loads(data)
+                    data=json.loads(jdata)
                 except Exception as e:
                     data=jdata.decode(EncodingFMT)
                     DbgPrint("ERROR:",str(e),MODULEDEBUGMODE=MODULEDEBUGMODE)

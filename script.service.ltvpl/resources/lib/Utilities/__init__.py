@@ -1,2 +1,2 @@
-import DebugPrint, PythonEvent
-from Messaging import *
+# import DebugPrint, PythonEvent
+from .Messaging import *

@@ -19,6 +19,7 @@
 #
 import json
 import time
+from copy import copy
 from datetime import datetime, timedelta
 from resources.lib.Network.myPickle_io import myPickle_io
 from resources.lib.Network.myJson_io import myJson_io
@@ -26,8 +27,8 @@ from resources.lib.Network.utilities import genericEncode, encodeError
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Utilities.Messaging import NotificationAction, OpStatus
 from resources.lib.Utilities.PythonEvent import Event
-from PlayListItem import PlayListItem, isPlayListItem, RecurrenceOptions, ALARMPADDING
-from fileManager import fileManager, FileManagerMode
+from .PlayListItem import PlayListItem, isPlayListItem, RecurrenceOptions, ALARMPADDING
+from .fileManager import fileManager, FileManagerMode
 from resources.lib.KodiLib.KodiUtilities import kodiObj, changeChannelByChannelNumber, playerStop, getBroadcast_startTimeList, KODI_ENV
 from resources.lib.Utilities.Messaging import Cmd, VACATIONMODE, PREROLLTIME
 from resources.lib.Utilities.AlarmsMgr import _Alarms
@@ -282,6 +283,8 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                 numDays = max(1,abs(diff.days))
             if numDays < 7:
                 numDays += 7 - numDays
+            else:
+                numDays += 7
 
             newtime = alarmtime + timedelta(days=numDays)
             weekday2=newtime.isoweekday()
@@ -315,18 +318,25 @@ class PL_DataSet(list,myPickle_io,myJson_io):
 
                 DbgPrint("newtime: {}".format(newtime))
 
-                item.Start()
+                try:
+                    item.Start()
 
-                if doNotBackup == False:
-                    self.fileManager.Dirty = True
-                    self.fileManager.backup()
+                    if doNotBackup == False:
+                        self.fileManager.Dirty = True
+                        self.fileManager.backup()
 
-                if self.skipOperationActive == False:
-                    data1 = genericEncode(Cmd.UpdatePlayListItem, item.Data)
-                    data = genericEncode(NotificationAction.ItemUpdated, data1)
-                    self.ItemUpdatedEvent(data)
+                    if self.skipOperationActive == False:
+                        data1 = genericEncode(Cmd.UpdatePlayListItem, item.Data)
+                        data = genericEncode(NotificationAction.ItemUpdated, data1)
+                        self.ItemUpdatedEvent(data)
 
-                return NotificationAction.ItemUpdated
+                    return NotificationAction.ItemUpdated
+
+                except Exception as e:
+                    result = self.onPLX_Event( item, doNotBackup=doNotBackup, simulationOn=simulationOn)
+                    return result
+
+
         else: # simulationOn == True
             DbgPrint("newtime: {}".format(newtime))
             item.alarmtime = newtime
@@ -480,10 +490,19 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                 if today == item.Alarmtime.date() and item.Ch != Cmd.Stop_Player.value and self.autocleanmode:
                     DbgPrint("Updating item:{}:{}:ch {}".format(item.Title, item.Alarmtime, item.Ch))
                     startTimes = getBroadcast_startTimeList(kodiObj, item.Ch, item.Title)
+                    # Normally if we don't find the event in the EPG, we'll just skip the event to the next occurrence
                     if not item.Alarmtime in startTimes:
                         DbgPrint("Fixing {} on ch {}".format(item.Title,item.Ch))
                         status = self.SkipEvent(item)
                         self._verifyNotification(item, status)
+                        # If this has been a time resheduled event on the same day, then schedule a one time event
+                        #   for the show with the rescheduled time
+                        if startTimes[0].date() == datetime.today().date():
+                            tmp = copy(item)
+                            tmp.createNewID()
+                            tmp.alarmtime = startTimes[0]
+                            tmp.recurrenceInterval=RecurrenceOptions.ONCE
+                            self.AddPlayList(tmp)
             except:
                 pass
 

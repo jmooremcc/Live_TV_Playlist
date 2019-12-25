@@ -36,9 +36,16 @@ class myPickle_io(object):
     def ExportPKL(self,fp):
         data=self.Data.copy()
         # DbgPrint("list:{}".format(data))
-        pickle.dump(data,fp)
+        data = pickle.dumps(data)
+        fp.write(data.decode())
     
 
     def ImportPKL(self,fp):
-        data=pickle.load(fp)
-        self.Data=data
+        try:
+            data = pickle.load(fp)
+            self.Data = data.encode('utf-8')
+        except:
+            fp.seek(0,0)
+            bdata = fp.read()
+            data=pickle.loads(bdata.encode())
+            self.Data=data
