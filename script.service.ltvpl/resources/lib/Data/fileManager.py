@@ -65,9 +65,9 @@ class fileManager(object):
             os.remove(f)
 
     def addSentinel(self, dstfile):
-        fp = open(self.sentinelFile, WRITEMODE)
-        fp.write(dstfile)
-        fp.close()
+        with open(self.sentinelFile, WRITEMODE) as fp:
+            fp.write(dstfile)
+
 
     def removeSentinel(self):
         count = 5
@@ -81,9 +81,9 @@ class fileManager(object):
                 count -= 1
 
     def restoreFromSentinel(self):
-        fp = open(self.sentinelFile, 'r')
-        dstfile = fp.read()
-        fp.close()
+        with open(self.sentinelFile, 'r') as fp:
+            dstfile = fp.read()
+
         os.remove(self.filePath)
         shutil.copy(dstfile, self.filePath)
 

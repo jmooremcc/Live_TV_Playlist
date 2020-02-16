@@ -14,7 +14,7 @@ WORKING = GETTEXT(30047)
 
 class BusyDialog(xbmcgui.WindowXMLDialog):
     def __new__(cls, addonID):
-        return super(BusyDialog, cls).__new__(cls, 'BusyDialog.xml',
+        return super(BusyDialog, cls).__new__(cls, 'ltvpl-BusyDialog.xml',
                                                   xbmcaddon.Addon(addonID).getAddonInfo('path'))
 
     def __init__(self, addonID):
@@ -37,7 +37,7 @@ class BusyDialog(xbmcgui.WindowXMLDialog):
 
 class BusyDialog2(xbmcgui.WindowXMLDialog):
     def __new__(cls, addonID):
-        return super(BusyDialog2, cls).__new__(cls, 'BusyDialog2.xml',
+        return super(BusyDialog2, cls).__new__(cls, 'ltvpl-BusyDialog2.xml',
                                                   xbmcaddon.Addon(addonID).getAddonInfo('path'))
 
     def __init__(self, addonID):

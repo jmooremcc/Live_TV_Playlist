@@ -19,8 +19,8 @@
       <top>0</top>
       <width>900</width>
       <height>500</height>
-      <aspectratio>1</aspectratio>
-      <texture>DialogBgd.jpg</texture>
+      <aspectratio>stretch</aspectratio>
+      <texture>ltvpl-DialogBgd.jpg</texture>
       <visible>true</visible>
     </control>
 
@@ -50,8 +50,8 @@
         <onright>50</onright>
         <onup>50</onup>
         <ondown>50</ondown>
-        <texturefocus>DialogCloseButton-focus.png</texturefocus>
-        <texturenofocus>DialogCloseButton.png</texturenofocus>
+        <texturefocus>ltvpl-DialogCloseButton-focus.png</texturefocus>
+        <texturenofocus>ltvpl-DialogCloseButton.png</texturenofocus>
         <visible>system.getbool(input.enablemouse)</visible>
       </control>
 
@@ -69,7 +69,7 @@
           <height>28</height>
           <colordiffuse>FFAA0000</colordiffuse>
           <aspectratio>stretch</aspectratio>
-          <texture>WhiteBlank.png</texture>
+          <texture>ltvpl-WhiteBlank.png</texture>
         </control>
 
         <control type="label">
@@ -93,7 +93,7 @@
           <height>28</height>
           <colordiffuse>FFAA0000</colordiffuse>
           <aspectratio>stretch</aspectratio>
-          <texture>WhiteBlank.png</texture>
+          <texture>ltvpl-WhiteBlank.png</texture>
         </control>
 
         <control type="label">
@@ -132,7 +132,7 @@
           <height>28</height>
           <colordiffuse>FFFF00FF</colordiffuse>
           <aspectratio>stretch</aspectratio>
-          <texture>WhiteBlank.png</texture>
+          <texture>ltvpl-WhiteBlank.png</texture>
         </control>
 
         <control type="label">
@@ -155,7 +155,7 @@
           <height>28</height>
           <colordiffuse>FF5500FF</colordiffuse>
           <aspectratio>stretch</aspectratio>
-          <texture>WhiteBlank.png</texture>
+          <texture>ltvpl-WhiteBlank.png</texture>
         </control>
 
         <control type="label">

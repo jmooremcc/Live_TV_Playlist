@@ -102,7 +102,7 @@ def calstrDate2TimeStamp(tdata):
 class captureEpgItem(xbmcgui.WindowXMLDialog):
 
     def __new__(cls, addonID, shutdownCallback, stopbusydialogcallback, editData, epgData):
-        return super(captureEpgItem, cls).__new__(cls, 'captureEpgItem.xml',
+        return super(captureEpgItem, cls).__new__(cls, 'ltvpl-captureEpgItem.xml',
                                                   xbmcaddon.Addon(addonID).getAddonInfo('path'))
 
     def __init__(self, addonID, shutdownCallback=None, stopbusydialogcallback=None, editData=None, epgData=None):

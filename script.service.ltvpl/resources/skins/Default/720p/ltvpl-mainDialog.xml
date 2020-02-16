@@ -30,7 +30,7 @@
         <width>960</width>
         <height>420</height>
         <aspectratio>1</aspectratio>
-        <texture>DialogBgd.jpg</texture>
+        <texture>ltvpl-DialogBgd.jpg</texture>
         <colordiffuse>FF555555</colordiffuse>
         <visible>true</visible>
       </control>
@@ -62,8 +62,8 @@
         <onright>800</onright>
         <onup>800</onup>
         <ondown>17</ondown>
-        <texturefocus>DialogCloseButton-focus.png</texturefocus>
-        <texturenofocus>DialogCloseButton.png</texturenofocus>
+        <texturefocus>ltvpl-DialogCloseButton-focus.png</texturefocus>
+        <texturenofocus>ltvpl-DialogCloseButton.png</texturenofocus>
         <visible>system.getbool(input.enablemouse)</visible>
       </control>
       <!--Border Around Window-->
@@ -73,9 +73,9 @@
         <description>Frame Around List</description>
         <width>948</width>
         <height>350</height>
-        <texture border="10">button-focus.png</texture>
+        <texture border="10">ltvpl-button-focus.png</texture>
         <visible>Control.HasFocus(800)</visible>
-        <!--texture colordiffuse="FFAA66AA" border="5">WhiteDialogBack.png</texture-->
+        <!--texture colordiffuse="FFAA66AA" border="5">ltvpl-WhiteDialogBack.png</texture-->
       </control>
       <!--Header-->
       <control type="group">
@@ -95,7 +95,7 @@
             <height>28</height>
             <colordiffuse>FFAA0000</colordiffuse>
             <aspectratio>stretch</aspectratio>
-            <texture>WhiteBlank.png</texture>
+            <texture>ltvpl-WhiteBlank.png</texture>
           </control>
 
           <control type="label">
@@ -117,7 +117,7 @@
             <height>28</height>
             <colordiffuse>FFAA0000</colordiffuse>
             <aspectratio>stretch</aspectratio>
-            <texture>WhiteBlank.png</texture>
+            <texture>ltvpl-WhiteBlank.png</texture>
           </control>
 
           <control type="label">
@@ -139,7 +139,7 @@
             <height>28</height>
             <colordiffuse>FFAA0000</colordiffuse>
             <aspectratio>stretch</aspectratio>
-            <texture>WhiteBlank.png</texture>
+            <texture>ltvpl-WhiteBlank.png</texture>
           </control>
 
           <control type="label">
@@ -161,7 +161,7 @@
             <height>28</height>
             <colordiffuse>FFAA0000</colordiffuse>
             <aspectratio>stretch</aspectratio>
-            <texture>WhiteBlank.png</texture>
+            <texture>ltvpl-WhiteBlank.png</texture>
           </control>
 
           <control type="label">
@@ -183,7 +183,7 @@
             <height>28</height>
             <colordiffuse>FFAA0000</colordiffuse>
             <aspectratio>stretch</aspectratio>
-            <texture>WhiteBlank.png</texture>
+            <texture>ltvpl-WhiteBlank.png</texture>
           </control>
 
           <control type="label">
@@ -205,7 +205,7 @@
             <height>28</height>
             <colordiffuse>FFAA0000</colordiffuse>
             <aspectratio>stretch</aspectratio>
-            <texture>WhiteBlank.png</texture>
+            <texture>ltvpl-WhiteBlank.png</texture>
           </control>
 
           <control type="label">
@@ -243,7 +243,7 @@
             <width>924</width>
             <colordiffuse>CC110077</colordiffuse>
             <aspectratio>stretch</aspectratio>
-            <texture>WhiteBlank.png</texture>
+            <texture>ltvpl-WhiteBlank.png</texture>
           </control>
           <control type="group">
             <left>0</left>
@@ -333,7 +333,7 @@
             <height>28</height>
             <colordiffuse>CC001199</colordiffuse>
             <aspectratio>stretch</aspectratio>
-            <texture>WhiteBlank.png</texture>
+            <texture>ltvpl-WhiteBlank.png</texture>
           </control>
           <control type="group">
             <left>0</left>
@@ -436,11 +436,11 @@
         <height>300</height>
         <visible>true</visible>
 
-        <texturesliderbackground colordiffuse="DD222222" border="10,0,10,0">white.png</texturesliderbackground>
-        <texturesliderbar colordiffuse="FFAAAAAA" border="10,0,10,0">white.png</texturesliderbar>
-        <texturesliderbarfocus colordiffuse="FF5555AA">white.png</texturesliderbarfocus>
-        <!--textureslidernib colordiffuse="FF555555" border="10,0,10,0">white.png</textureslidernib>
-        <textureslidernibfocus  border="10,0,10,0">white.png</textureslidernibfocus-->
+        <texturesliderbackground colordiffuse="DD222222" border="10,0,10,0">ltvpl-white.png</texturesliderbackground>
+        <texturesliderbar colordiffuse="FFAAAAAA" border="10,0,10,0">ltvpl-white.png</texturesliderbar>
+        <texturesliderbarfocus colordiffuse="FF5555AA">ltvpl-white.png</texturesliderbarfocus>
+        <!--textureslidernib colordiffuse="FF555555" border="10,0,10,0">ltvpl-white.png</textureslidernib>
+        <textureslidernibfocus  border="10,0,10,0">ltvpl-white.png</textureslidernibfocus-->
         <pulseonselect></pulseonselect>
         <orientation>vertical</orientation>
         <showonepage>true</showonepage>

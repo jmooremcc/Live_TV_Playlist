@@ -45,7 +45,6 @@ else:
     ADDON_PATH = ADDON.getAddonInfo('path')
 
 ADDON_USERDATA_FOLDER = xbmc.translatePath("special://profile/addon_data/"+ADDONID)
-KEYMAPS_USERDATA_FOLDER = xbmc.translatePath('special://userdata/keymaps')
 BASEPATH = os.path.join(ADDON_PATH,r"resources")
 if BASEPATH not in sys.path:
     sys.path.insert(2,BASEPATH)
@@ -59,15 +58,15 @@ DEBUGFILE_LOCATIONFILE = os.path.join(BASEPATH, r"data/debugFileLocation.py")
 DEBUGFILE_DEFAULTPATH = os.path.join(BASEPATH, r"data/debugcache.json")
 DEBUGFILE_LOCATIONCONTENT = 'DEBUGCACHEFILE = r"' + DEBUGFILE_DEFAULTPATH + '"'
 XMLPATH = os.path.join(ADDON_PATH, 'resources/skins/Default/720p')
-FANART_PATH = os.path.join(ADDON_PATH, 'fanart.jpg')
-BGDIMAGE = os.path.join(ADDON_PATH, 'resources/skins/Default/media', 'WhiteBlank.png')
+FANART_PATH = os.path.join(ADDON_PATH, 'ltvpl-ltvpl-fanart.jpg')
+BGDIMAGE = os.path.join(ADDON_PATH, 'resources/skins/Default/media', 'ltvpl-WhiteBlank.png')
 
 HOME    =  ADDON_PATH
 ROOT    =  ADDON.getSetting('FOLDER')
-PROFILE =  os.path.join(ROOT, 'Super Favourites')
+PROFILE =  os.path.join(ROOT, 'ltvpl')
 VERSION = '1.0.0'
-ICON    =  os.path.join(HOME, 'icon.png')
-FANART  =  os.path.join(HOME, 'fanart.jpg')
+ICON    =  os.path.join(HOME, 'ltvpl-icon.png')
+FANART  =  os.path.join(HOME, 'ltvpl-fanart.jpg')
 SEARCH  =  os.path.join(HOME, 'resources', 'media', 'search.png')
 # GETTEXT =  ADDON.getLocalizedString
 LTVPL_HEADER = LTVPL = 'Live TV Playlist'

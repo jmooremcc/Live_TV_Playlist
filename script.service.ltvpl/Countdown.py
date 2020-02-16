@@ -27,8 +27,7 @@ from resources.PL_Client import PL_Client, genericDecode, OpStatus, Cmd, Notific
 from resources.lib.Network.SecretSauce import *
 from utility import TS_decorator, myLog, Signal, setDialogActive, isDialogActive, clearDialogActive
 from resources.lib.Utilities.DebugPrint import DbgPrint
-from util import ADDON, ACTIVATIONKEY
-from keymapper import keymapper
+from util import ADDON
 from ListItemPlus import ListItemPlus
 from util import GETTEXT
 
@@ -58,7 +57,7 @@ MINICLIENTTAG = "LTVPL_MINCLIENTDIALOG_VISIBLE"
 class Countdown(xbmcgui.WindowXMLDialog):
 
     def __new__(cls, addonID, client=None, listitem=None, clockstarttime=15, abortChChange=None):
-        return super(Countdown, cls).__new__(cls, 'countdownDialog.xml', xbmcaddon.Addon(addonID).getAddonInfo('path'))
+        return super(Countdown, cls).__new__(cls, 'ltvpl-countdownDialog.xml', xbmcaddon.Addon(addonID).getAddonInfo('path'))
 
     def __init__(self, addonID, client=None, listitem=None, clockstarttime=15, abortChChange=None):
         super(Countdown, self).__init__()
@@ -137,10 +136,6 @@ class miniClient(Thread):
         self.signal.clear()
         self.currentLaunchItem = None
         self.plList = []
-        #Get Activation key from gen.xml
-        key = keymapper.getCurrentActivationKey()
-        if key is not None:
-            ADDON.setSetting(ACTIVATIONKEY, key)
 
         setDialogActive(MINICLIENTTAG)
 

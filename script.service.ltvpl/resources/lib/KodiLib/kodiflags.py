@@ -7,5 +7,5 @@ try:
         KODI_ENV = False
     else:
         KODI_ENV = True
-except:
+except ImportError:
     KODI_ENV = False

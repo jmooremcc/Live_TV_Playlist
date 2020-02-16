@@ -43,7 +43,6 @@ from utility import myLog, TS_decorator, setDialogActive, clearDialogActive, isD
 from resources.lib.Utilities.DebugPrint import DbgPrint, DEBUGMODE, setDebugMode, getDebugMode
 import contextmenu
 from ListItemPlus import ListItemPlus
-from keymapper import setActivationKey, reloadKeyMaps
 from BusyDialog import BusyDialog, BusyDialog2
 
 __Version__ = "1.1.1"
@@ -304,7 +303,7 @@ def BuildHeader():
 
 class GUI(xbmcgui.WindowXMLDialog):
     def __new__(cls, defaultSkin, defaultRes, bDialog, queue):
-        return super(GUI, cls).__new__(cls, 'mainDialog.xml', xbmcaddon.Addon(ADDONID).getAddonInfo('path'),
+        return super(GUI, cls).__new__(cls, 'ltvpl-mainDialog.xml', xbmcaddon.Addon(ADDONID).getAddonInfo('path'),
                                        defaultSkin, defaultRes)
 
     def __init__(self, defaultSkin, defaultRes, bDialog, queue, *args, **kwargs):
@@ -851,20 +850,15 @@ if (__name__ == '__main__'):
     queue = Queue()
     DbgPrint("len(sys.argv)={}".format(len(sys.argv)))
 
-    if len(sys.argv) > 1:
-        if sys.argv[1] == 'keymap':
-            setActivationKey()
-        elif sys.argv[1] == 'reloadkeymaps':
-            reloadKeyMaps()
-    else:
-        bDialog = myBusyDialog()
-        if checkForEPG():
-            if VACATIONMODE_VALUE == False:
-                epgData = getEPG_Data()
-                bDialog.show()
-                xbmc.sleep(2000)
-                showEPGCaptureDialog(epgData, bDialog)
-            else:
-                showVacationModeDialog()
+
+    bDialog = myBusyDialog()
+    if checkForEPG():
+        if VACATIONMODE_VALUE == False:
+            epgData = getEPG_Data()
+            bDialog.show()
+            xbmc.sleep(2000)
+            showEPGCaptureDialog(epgData, bDialog)
         else:
-            showMainDialog(queue, bDialog)
+            showVacationModeDialog()
+    else:
+        showMainDialog(queue, bDialog)

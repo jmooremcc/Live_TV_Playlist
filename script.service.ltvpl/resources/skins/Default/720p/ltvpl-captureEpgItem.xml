@@ -2,11 +2,8 @@
 
 <window id="1101" type="dialog">
   <coordinates>
-    <system>1</system>
     <posx>300</posx>
     <posy>200</posy>
-    <width>350</width>
-    <height>200</height>
   </coordinates>
   <defaultcontrol>300</defaultcontrol>
   <controls>
@@ -16,7 +13,7 @@
       <posy>0</posy>
       <width>533</width>
       <height>240</height>
-      <texture border="20">DialogBack.png</texture>
+      <texture border="20">ltvpl-DialogBack.png</texture>
     </control>
     <!--Left Panel-->
     <control type="group" border="5">
@@ -31,8 +28,8 @@
         <left>8</left>
         <width>340</width>
         <height>192</height>
-        <texture border="1">DialogBack.png</texture>
-        <!--texture border="5">DialogBack.png</texture-->
+        <texture border="1">ltvpl-DialogBack.png</texture>
+        <!--texture border="5">ltvpl-DialogBack.png</texture-->
       </control>
       <!--Date Label-->
       <control type="group">
@@ -134,7 +131,7 @@
         <height>30</height>
         <!--Left Expiry Label-->
         <control type="image">
-          <texture colordiffuse="FF2222CC" border="4">WhiteDialogBack.png</texture>
+          <texture colordiffuse="FF2222CC" border="4">ltvpl-WhiteDialogBack.png</texture>
           <left>15</left>
           <top>1</top>
           <width>145</width>
@@ -161,8 +158,8 @@
           <label>$INFO[Window.Property(pgmExpiration)]</label>
           <disabledcolor>FF000000</disabledcolor>
           <invalidcolor>FFFFFFFF</invalidcolor>
-          <texturefocus>button-focus.png</texturefocus>
-          <texturenofocus>button-nofocus.png</texturenofocus>
+          <texturefocus>ltvpl-button-focus.png</texturefocus>
+          <texturenofocus>ltvpl-button-nofocus.png</texturenofocus>
           <pulseonselect>no</pulseonselect>
           <onup>3001</onup>
           <ondown>210</ondown>
@@ -188,8 +185,8 @@
           <focusedcolor>yellow</focusedcolor>
           <align>center</align>
           <textoffsety>5</textoffsety>
-          <texturefocus colordiffuse="FF2266AA" border="10">white.png</texturefocus>
-          <texturenofocus colordiffuse="FF333388" border="10">white.png</texturenofocus>
+          <texturefocus colordiffuse="FF2266AA" border="10">ltvpl-white.png</texturefocus>
+          <texturenofocus colordiffuse="FF333388" border="10">ltvpl-white.png</texturenofocus>
           <visible>system.getbool(input.enablemouse)</visible>
           <onup>400</onup>
           <ondown>3001</ondown>
@@ -207,8 +204,8 @@
           <focusedcolor>yellow</focusedcolor>
           <align>center</align>
           <textoffsety>5</textoffsety>
-          <texturefocus colordiffuse="FF2266AA" border="10">white.png</texturefocus>
-          <texturenofocus colordiffuse="FF333388" border="10">white.png</texturenofocus>
+          <texturefocus colordiffuse="FF2266AA" border="10">ltvpl-white.png</texturefocus>
+          <texturenofocus colordiffuse="FF333388" border="10">ltvpl-white.png</texturenofocus>
           <visible>system.getbool(input.enablemouse)</visible>
           <onup>400</onup>
           <ondown>3001</ondown>
@@ -239,9 +236,9 @@
           <description>Frame Around List</description>
           <width>170</width>
           <height>186</height>
-          <texture border="10">button-focus.png</texture>
+          <texture border="10">ltvpl-button-focus.png</texture>
           <visible>Control.HasFocus(300)</visible>
-          <!--texture colordiffuse="FFAA66AA" border="5">WhiteDialogBack.png</texture-->
+          <!--texture colordiffuse="FFAA66AA" border="5">ltvpl-WhiteDialogBack.png</texture-->
         </control>
 
         <control type="image">
@@ -250,7 +247,7 @@
           <description>Frequency Backcolor</description>
           <width>158</width>
           <height>30</height>
-          <texture colordiffuse="FF2222CC" border="5">WhiteDialogBack.png</texture>
+          <texture colordiffuse="FF2222CC" border="5">ltvpl-WhiteDialogBack.png</texture>
         </control>
 
         <control type="label">
@@ -282,7 +279,7 @@
               <height>28</height>
               <!--colordiffuse>FFAA0000</colordiffuse-->
               <aspectratio>stretch</aspectratio>
-              <texture border="5">DialogBack.png</texture>
+              <texture border="5">ltvpl-DialogBack.png</texture>
             </control>
 
             <control type="label">
@@ -300,7 +297,7 @@
               <height>35</height>
               <colordiffuse>FFAA0000</colordiffuse>
               <aspectratio>stretch</aspectratio>
-              <texture border="5">WhiteDialogBack.png</texture>
+              <texture border="5">ltvpl-WhiteDialogBack.png</texture>
             </control>
 
             <control type="label">
@@ -326,8 +323,8 @@
       <label>-</label>
       <font>-</font>
       <onclick>PreviousMenu</onclick>
-      <texturefocus>DialogCloseButton-focus.png</texturefocus>
-      <texturenofocus>DialogCloseButton.png</texturenofocus>
+      <texturefocus>ltvpl-DialogCloseButton-focus.png</texturefocus>
+      <texturenofocus>ltvpl-DialogCloseButton.png</texturenofocus>
       <visible>system.getbool(input.enablemouse)</visible>
       <onup>210</onup>
       <ondown>400</ondown>

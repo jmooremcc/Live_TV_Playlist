@@ -19,7 +19,7 @@
     <control type="image">
       <width>300</width>
       <height>190</height>
-      <texture>DialogBack.png</texture>
+      <texture>ltvpl-DialogBack.png</texture>
     </control>
     <!--Dialog Title-->
     <control type="group">
@@ -30,7 +30,7 @@
         <left>2</left>
         <width>285</width>
         <height>25</height>
-        <texture colordiffuse="FF0000DD">white.png</texture>
+        <texture colordiffuse="FF0000DD">ltvpl-white.png</texture>
       </control>
       <control type="label">
         <width>300</width>

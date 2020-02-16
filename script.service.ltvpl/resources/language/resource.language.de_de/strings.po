@@ -210,6 +210,10 @@ msgctxt "#30067"
 msgid "Are you sure you want to delete\n{}?"
 msgstr "Möchtest Du \n{} wirklich löschen?"
 
+msgctxt "#30068"
+msgid "Scanning Channel List..."
+msgstr "Scan-Kanalliste ..."
+
 msgctxt "#30070"
 msgid "Live TV Playlist Activation"
 msgstr "Aktivierung der TV-Wiedergabeliste"

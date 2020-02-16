@@ -21,6 +21,7 @@ import logging
 import os
 import json
 from datetime import datetime, timedelta
+import time
 import threading
 import inspect
 
@@ -203,7 +204,7 @@ def LoggerSetup(xDEBUGMODE=True):
             pass
         return NoOp
 
-import time
+
 _startTime = 0
 
 def startTimer():

@@ -43,7 +43,7 @@ from utility import TS_decorator
 class ContextMenu(xbmcgui.WindowXMLDialog):
 
     def __new__(cls, addonID, menu, shutdownCallback):
-        return super(ContextMenu, cls).__new__(cls, 'contextmenu.xml', xbmcaddon.Addon(addonID).getAddonInfo('path'))
+        return super(ContextMenu, cls).__new__(cls, 'ltvpl-contextmenu.xml', xbmcaddon.Addon(addonID).getAddonInfo('path'))
         
 
     def __init__(self, addonID, menu, shutdownCallback):
