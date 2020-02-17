@@ -435,6 +435,7 @@ class miniClient(Thread):
     def Stop(self):
         DbgPrint("*********miniClient Shutdown Started.....")
         self.stopFlag = True
+        self.signal.set()
         if self.t is not None:
             self.t.cancel()
         xbmc.sleep(100)
