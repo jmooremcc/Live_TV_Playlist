@@ -29,7 +29,7 @@ def TS_decorator(func):
 
 def CmdRouter(cmd, routedict):
     if cmd in routedict:
-        raise Exception(f"Duplicate Cmd: {cmd}")
+        raise Exception("Duplicate Cmd: {}".format(cmd))
 
     def inner(fn):
         routedict[cmd]= fn

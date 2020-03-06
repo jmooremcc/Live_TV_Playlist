@@ -30,7 +30,7 @@ from resources.lib.Network.utilities import decodeRequest, encodeResponse, encod
 from resources.lib.Utilities.DebugPrint import DbgPrint, setDebugMode, startTimer, stopTimer
 from resources.lib.Utilities.Messaging import Cmd, OpStatus, xlateCmd2Notification, DAILYSTOPCOMMAND, STOPCMD_ACTIVE, \
     NotificationAction, VACATIONMODE,DEBUGMODE, ALARMTIME, PREROLLTIME, AUTOCLEANMODE
-from resources.lib.Utilities.VirtualEvents import TS_decorator
+from resources.lib.Utilities.VirtualEvents import TS_decorator, CmdRouter
 
 
 __Version__ = "1.1.1"
@@ -42,6 +42,8 @@ PLSERVERTAG = "LTVPL_PLSERVER_ACTIVE"
 
 
 class PL_Server(object):
+    cmds = {} # dictionary for command routing
+
     def __init__(self, address, dataFileName, vacationmode=False, debugmode=False, autocleanMode=True):
         setDebugMode(debugmode)
         self.dataSet=PL_DataSet(dataFileName, vacationmode, autocleanMode)
@@ -52,25 +54,6 @@ class PL_Server(object):
         self.dailyMaintThread = None # type: Timer
         self.server=Server(address, maxConnections=5)
         self.server.addDataReceivedEventHandler(self.onServerDataReceived)
-        
-        self.cmds={Cmd.AddPlayListItem:self.AddPlayListItem,
-                   Cmd.RemovePlayListItem:self.RemovePlayListItem,
-                   Cmd.RemoveAllPlayListItems:self.RemoveAllPlayListItems,
-                   Cmd.GetChPlayListItems:self.GetChPlayListItems,
-                   Cmd.GetPlayList:self.GetPlayList,
-                   Cmd.GetChGroupList:self.GetChGroupList,
-                   Cmd.GetChannelList:self.GetChannelList,
-                   Cmd.SkipEvent:self.SkipEvent,
-                   Cmd.GetPlayListItem:self.GetPlayListItem,
-                   Cmd.UpdatePlayListItem:self.UpdatePlayListItem,
-                   Cmd.SetVacationMode:self.SetVacationMode,
-                   Cmd.GetVacationMode:self.GetVacationMode,
-                   Cmd.SetPreRollTime:self.SetPreRollTime,
-                   Cmd.GetPreRollTime:self.GetPreRollTime,
-                   Cmd.EnablePlayListItem:self.EnablePlayListItem,
-                   Cmd.GetPlayListItemState:self.GetPlayListItemState,
-                   Cmd.DisablePlayListItem:self.DisablePlayListItem,
-                   Cmd.ClearPlayList:self.ClearPlayList}
 
         DbgPrint("Server Initialized",MODULEDEBUGMODE=MODULEDEBUGMODE)
 
@@ -149,7 +132,7 @@ class PL_Server(object):
         cmd,args=decodeRequest(data)
         arg=args[1]
         DbgPrint("cmd:{}\nargs:{}".format(cmd,arg),MODULEDEBUGMODE=MODULEDEBUGMODE)
-        status=self.cmds[cmd](conn, arg) #Call the service provider
+        status=self.cmds[cmd](self, conn, arg) #Call the service provider
         DbgPrint("Exiting onServerDataReceived",MODULEDEBUGMODE=MODULEDEBUGMODE)
 
     def NotificationSend(self, cmd, data):
@@ -179,7 +162,7 @@ class PL_Server(object):
     def onChannelChange(self, PL_OBJ):
         DbgPrint("Deleting {} From List".format(PL_OBJ),MODULEDEBUGMODE=MODULEDEBUGMODE)
 
-
+    @CmdRouter(Cmd.EnablePlayListItem, cmds)
     def EnablePlayListItem(self, conn, args):
         id=args
         try:
@@ -199,6 +182,7 @@ class PL_Server(object):
         except Exception as e:
             self.ReturnError(conn, OpStatus.ItemDoesNotExist, str(e))
 
+    @CmdRouter(Cmd.DisablePlayListItem, cmds)
     def DisablePlayListItem(self, conn, args):
         id = args
         try:
@@ -211,6 +195,7 @@ class PL_Server(object):
         except Exception as e:
             self.ReturnError(conn, OpStatus.ItemDoesNotExist, str(e))
 
+    @CmdRouter(Cmd.GetPlayListItemState, cmds)
     def GetPlayListItemState(self, conn, args):
         id = args
         try:
@@ -220,6 +205,7 @@ class PL_Server(object):
         except Exception as e:
             self.ReturnError(conn, OpStatus.ItemDoesNotExist, str(e))
 
+    @CmdRouter(Cmd.SetVacationMode, cmds)
     def SetVacationMode(self, conn, args):
         """
         :param args: boolean
@@ -228,21 +214,22 @@ class PL_Server(object):
         self.dataSet.VacationMode = args
         self.ReturnData(conn,Cmd.SetVacationMode, self.dataSet.VacationMode)
 
-
+    @CmdRouter(Cmd.GetVacationMode, cmds)
     def GetVacationMode(self, conn, args):
         retvalue = self.dataSet.VacationMode
         self.ReturnData(conn,Cmd.GetVacationMode,retvalue, notify=False)
 
-
+    @CmdRouter(Cmd.SetPreRollTime, cmds)
     def SetPreRollTime(self, conn, args):
         self.dataSet.PreRollTime = int(args)
         self.ReturnData(conn, Cmd.SetPreRollTime, args)
 
+    @CmdRouter(Cmd.GetPreRollTime, cmds)
     def GetPreRollTime(self, conn, args):
         retvalue = self.dataSet.PreRollTime
         self.ReturnData(conn, Cmd.GetPreRollTime, retvalue, notify=False)
 
-
+    @CmdRouter(Cmd.SkipEvent, cmds)
     def SkipEvent(self,conn, args):
         DbgPrint("SkipEvent Called",MODULEDEBUGMODE=MODULEDEBUGMODE)
         try:
@@ -255,7 +242,7 @@ class PL_Server(object):
         except Exception as e:
             self.ReturnError(conn,OpStatus.GeneralFailure,"SkipEvent:" + str(e))
 
-
+    @CmdRouter(Cmd.GetChGroupList, cmds)
     def GetChGroupList(self,conn, args):
         try:
             grpList = getChannelGroups(kodiObj)
@@ -263,7 +250,7 @@ class PL_Server(object):
         except Exception as e:
             self.ReturnError(conn,OpStatus.GeneralFailure, "GetChGroupList:" + str(e))
 
-
+    @CmdRouter(Cmd.GetChannelList, cmds)
     def GetChannelList(self,conn, args):
         try:
             chList = getChannelInfo(kodiObj, chGroup=args, params=None)
@@ -271,7 +258,7 @@ class PL_Server(object):
         except Exception as e:
             self.ReturnError(conn, OpStatus.GeneralFailure, "GetChannelList:" + str(e))
 
-
+    @CmdRouter(Cmd.UpdatePlayListItem, cmds)
     def UpdatePlayListItem(self,conn,args):
         obj = PlayListItem()
         obj.Data=args
@@ -285,7 +272,7 @@ class PL_Server(object):
             err, errmsg = decodeError(e.errdata)
             self.ReturnError(conn, err, str(e))
 
-
+    @CmdRouter(Cmd.AddPlayListItem, cmds)
     def AddPlayListItem(self,conn, args):
         try:
             DbgPrint("Calling AddPlayListItem",MODULEDEBUGMODE=MODULEDEBUGMODE)
@@ -305,7 +292,7 @@ class PL_Server(object):
             err, errmsg = decodeError(e.errdata)
             self.ReturnError(conn, err, errmsg)
 
-
+    @CmdRouter(Cmd.RemoveAllPlayListItems, cmds)
     def RemoveAllPlayListItems(self, conn):
         try:
             DbgPrint("RemoveAllPlayListItems",MODULEDEBUGMODE=MODULEDEBUGMODE)
@@ -314,6 +301,7 @@ class PL_Server(object):
         except Exception as e:
             self.ReturnError(conn, OpStatus.GeneralFailure, "RemoveAllPlayListItems:" + str(e))
 
+    @CmdRouter(Cmd.RemovePlayListItem, cmds)
     def RemovePlayListItem(self,conn, id):
         try:
             DbgPrint("RemovePlayListItem({})".format(id),MODULEDEBUGMODE=MODULEDEBUGMODE)
@@ -322,7 +310,7 @@ class PL_Server(object):
         except Exception as e:
             self.ReturnError(conn, OpStatus.GeneralFailure, "RemovePlayListItem:" + str(e))
 
-
+    @CmdRouter(Cmd.GetChPlayListItems, cmds)
     def GetChPlayListItems(self, conn, ch):
         try:
             DbgPrint("GetPlayListItem({})".format(ch),MODULEDEBUGMODE=MODULEDEBUGMODE)
@@ -335,7 +323,7 @@ class PL_Server(object):
         except Exception as e:
             self.ReturnError(conn, OpStatus.GeneralFailure, str(e))
 
-
+    @CmdRouter(Cmd.GetPlayList, cmds)
     def GetPlayList(self,conn, args):
         try:
             DbgPrint("GetPlayList Called",MODULEDEBUGMODE=MODULEDEBUGMODE)
@@ -348,7 +336,7 @@ class PL_Server(object):
         except Exception as e:
             self.ReturnError(conn, OpStatus.GeneralFailure, "GetPlayList:" + str(e))
 
-
+    @CmdRouter(Cmd.GetPlayListItem, cmds)
     def GetPlayListItem(self,conn,args):
         try:
             DbgPrint("GetPlayListItem Called",MODULEDEBUGMODE=MODULEDEBUGMODE)
@@ -359,6 +347,7 @@ class PL_Server(object):
         except Exception as e:
             self.ReturnError(conn, OpStatus.GeneralFailure, "GetPlayListItem:" + str(e))
 
+    @CmdRouter(Cmd.ClearPlayList, cmds)
     def ClearPlayList(self,conn,args):
         DbgPrint("ClearPlayList Called", MODULEDEBUGMODE=MODULEDEBUGMODE)
         self.dataSet.clear()

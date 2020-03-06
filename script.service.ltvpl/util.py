@@ -58,7 +58,7 @@ DEBUGFILE_LOCATIONFILE = os.path.join(BASEPATH, r"data/debugFileLocation.py")
 DEBUGFILE_DEFAULTPATH = os.path.join(BASEPATH, r"data/debugcache.json")
 DEBUGFILE_LOCATIONCONTENT = 'DEBUGCACHEFILE = r"' + DEBUGFILE_DEFAULTPATH + '"'
 XMLPATH = os.path.join(ADDON_PATH, 'resources/skins/Default/720p')
-FANART_PATH = os.path.join(ADDON_PATH, 'ltvpl-ltvpl-fanart.jpg')
+FANART_PATH = os.path.join(ADDON_PATH, 'ltvpl-fanart.jpg')
 BGDIMAGE = os.path.join(ADDON_PATH, 'resources/skins/Default/media', 'ltvpl-WhiteBlank.png')
 
 HOME    =  ADDON_PATH
