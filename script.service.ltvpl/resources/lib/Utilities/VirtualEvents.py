@@ -15,6 +15,7 @@ from threading import Thread
 
 from resources.lib.Utilities.DebugPrint import DbgPrint
 
+#********** Custom Decorators***************************************
 
 def TS_decorator(func):
     def stub(*args, **kwargs):
@@ -26,6 +27,17 @@ def TS_decorator(func):
 
     return hook
 
+def CmdRouter(cmd, routedict):
+    if cmd in routedict:
+        raise Exception(f"Duplicate Cmd: {cmd}")
+
+    def inner(fn):
+        routedict[cmd]= fn
+        return fn
+
+    return inner
+
+#*******************************************************************
 
 class VirtualEvent(object):
     def __init__(self, master, virtualEvent):
