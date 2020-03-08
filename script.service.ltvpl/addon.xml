@@ -35,8 +35,8 @@
     <source>https://github.com/jmooremcc/Live_TV_Playlist</source>
     <email>jmooremcc@hotmail.com</email>
     <assets>
-      <icon>icon.png</icon>
-      <fanart>fanart.jpg</fanart>
+      <icon>ltvpl-icon.png</icon>
+      <fanart>ltvpl-fanart.jpg</fanart>
       <screenshot>resources/screenshots/screenshot001.png</screenshot>
       <screenshot>resources/screenshots/screenshot002.png</screenshot>
       <screenshot>resources/screenshots/screenshot004.png</screenshot>
