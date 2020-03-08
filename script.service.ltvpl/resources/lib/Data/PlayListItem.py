@@ -40,7 +40,11 @@ try:
 except:
     pass
 
-from enum import Enum
+try:  # Python 3
+    from enum import Enum
+except ImportError:
+    from enum34 import Enum
+
 from resources.lib.Network.myPickle_io import myPickle_io
 from resources.lib.Network.utilities import encodeError
 

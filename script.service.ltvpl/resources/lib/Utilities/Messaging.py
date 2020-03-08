@@ -18,7 +18,11 @@
 #  http://www.gnu.org/copyleft/gpl.html
 #
 
-from enum import Enum
+try:  # Python 3
+    from enum import Enum
+except ImportError:
+    from enum34 import Enum
+
 
 __Version__ = "1.0.0"
 

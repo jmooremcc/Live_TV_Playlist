@@ -19,7 +19,11 @@
 #
 import pickle
 import os, sys
-from enum import Enum
+try:  # Python 3
+    from enum import Enum
+except ImportError:
+    from enum34 import Enum
+
 from time import sleep
 
 try:

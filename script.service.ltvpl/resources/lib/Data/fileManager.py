@@ -23,7 +23,11 @@ import os.path
 import shutil
 from time import sleep
 import xml.etree.ElementTree as ET
-from enum import Enum
+try:  # Python 3
+    from enum import Enum
+except ImportError:
+    from enum34 import Enum
+
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Network.utilities import getTimeFilteredDirList
 from resources.lib.Utilities.Messaging import WRITEMODE, READMODE, WRITEBINARYMODE, READBINARYMODE
