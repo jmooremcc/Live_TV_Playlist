@@ -46,11 +46,6 @@ else:
 
 ADDON_USERDATA_FOLDER = xbmc.translatePath("special://profile/addon_data/"+ADDONID)
 BASEPATH = os.path.join(ADDON_PATH,r"resources")
-if BASEPATH not in sys.path:
-    sys.path.insert(2,BASEPATH)
-ENUMPATH = os.path.join(BASEPATH,"lib2")
-if ENUMPATH not in sys.path and PYVER < 3.0:
-    sys.path.insert(0,ENUMPATH)
 DATAFILE_LOCATIONFILE = os.path.join(BASEPATH, r"data/dataFileLocation.py")
 ADDON_DATAFILENAME = os.path.join(ADDON_USERDATA_FOLDER,"LTVPL.pkl")
 DEFAULTPATH ='dataFilePath = r"' + ADDON_DATAFILENAME + '"'
