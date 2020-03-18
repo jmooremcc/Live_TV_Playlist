@@ -17,13 +17,13 @@
 #  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #  http://www.gnu.org/copyleft/gpl.html
 #
+import inspect
+import json
 import logging
 import os
-import json
-from datetime import datetime, timedelta
-import time
 import threading
-import inspect
+import time
+from datetime import datetime
 
 try:
     from resources.data.debugFileLocation import DEBUGCACHEFILE
@@ -57,7 +57,7 @@ class _dbmm():
                 jvalue = json.loads(jvalue)
             fp.close()
 
-        except:
+        except Exception as e:
             jvalue = self.setDebugMode(True)
 
         return jvalue
@@ -80,7 +80,7 @@ class _dbmm():
             fp.close()
             DEBUGMODE = value
             return value
-        except:
+        except Exception as e:
             pass
 
     @property
@@ -92,7 +92,7 @@ dbmm = _dbmm()
 try:
     import xbmc
     XBMC_PRESENT = xbmc.getFreeMem() != long
-except:
+except Exception as e:
     XBMC_PRESENT = False
 
 if XBMC_PRESENT:
@@ -107,7 +107,7 @@ if XBMC_PRESENT:
                     fmtmsg = msg.format(*args[1:])
                 except TypeError:
                     fmtmsg = msg.format(args)
-                except:
+                except Exception as e:
                     fmtmsg = msg
 
             xbmc.log(fmtmsg)
@@ -122,7 +122,7 @@ else:
                 fmtmsg = msg.format(*args[1:])
             except TypeError:
                 fmtmsg = msg.format(args)
-            except:
+            except Exception as e:
                 fmtmsg = msg
 
         log.debug(fmtmsg)
@@ -153,18 +153,18 @@ def DbgPrint(*args, **kwargs):
         threadname = threading.current_thread().name
         try:
             className = info[0].f_locals['self'].__class__.__name__
-        except:
+        except Exception as e:
             pass
         modName=None
         try:
             modName = os.path.basename(info[1])
-        except:
+        except Exception as e:
             pass
         lineNo=info[2]
         fnName=None
         try:
             fnName = info[3]
-        except:
+        except Exception as e:
             pass
         DbgText="{}:line#{}:{}->{}->{}()".format(threadname,lineNo, modName,className, fnName)
         argCnt=len(args)

@@ -22,7 +22,6 @@ if sys.version_info[0]==2:
     from threading import Thread
 else:
     from threading import Thread
-import time
 
 __Version__ = "1.0.0"
 

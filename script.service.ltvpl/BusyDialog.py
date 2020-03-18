@@ -1,9 +1,5 @@
-import xbmc
-import xbmcgui
 import xbmcaddon
-import os
-from datetime import datetime, timedelta
-
+import xbmcgui
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from util import GETTEXT
 

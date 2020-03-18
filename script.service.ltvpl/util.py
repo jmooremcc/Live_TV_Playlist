@@ -89,7 +89,7 @@ def setUSpgmDate(obj):
         liDateTime = datetime.strptime(pgmDate, dateformat)
         USpgmDate = liDateTime.strftime("%m/%d/%Y")
         obj.setProperty('USpgmDate', USpgmDate)
-    except: pass
+    except Exception as e: pass
 
 def DialogOK(title, line1, line2='', line3=''):
     d = xbmcgui.Dialog()
@@ -111,11 +111,11 @@ def generateMD5(text):
     try:
         import hashlib
         return hashlib.md5(text).hexdigest()
-    except:
+    except Exception as e:
         try:
             import md5
             return md5.new(text).hexdigest()
-        except:
+        except Exception as e:
             pass
 
     return '0'

@@ -22,9 +22,8 @@
 #
 
 import xbmc
-import xbmcgui
 import xbmcaddon
-import os
+import xbmcgui
 
 __Version__ = "1.0.0"
 
@@ -38,7 +37,6 @@ ACTION_RIGHT = 2
 ACTION_UP    = 3
 ACTION_DOWN  = 4
 
-from utility import TS_decorator
 
 class ContextMenu(xbmcgui.WindowXMLDialog):
 
@@ -108,7 +106,7 @@ class ContextMenu(xbmcgui.WindowXMLDialog):
         if controlId != 3001:
             index = self.list.getSelectedPosition()        
             try:    self.params = self.paramList[index]
-            except: self.params = None
+            except Exception as e: self.params = None
 
         self.closeDialog()
         

@@ -51,14 +51,14 @@ def status():
     try:
         myLog("Alarms Active:")
         myLog("   {:>3}->{}".format(0, _alarms.mt.Activetimer))
-    except:
+    except Exception as e:
         pass
 
     myLog("Alarms Queued:")
     for n,i in enumerate(range(_alarms.pq.qsize())):
         try:
             myLog("   {:>3}->{}".format(n+1, _alarms.pq.queue[i]))
-        except:
+        except Exception as e:
             pass
 
     myLog("*****")
@@ -238,7 +238,7 @@ class _Alarms(object):
 
 
     def _startTimer(self, blocktimerlock=False):
-        if blocktimerlock == False:
+        if not blocktimerlock:
             activeTimerLock.acquire()
 
         oldtimer = self.mt.Activetimer
@@ -262,7 +262,7 @@ class _Alarms(object):
             except Exception as e:
                 DbgPrint(e)
 
-        if blocktimerlock == False:
+        if not blocktimerlock:
             activeTimerLock.release()
 
     def _cancelTimer(self, timer):
@@ -286,8 +286,7 @@ class _Alarms(object):
             return
 
         index = 0
-        dlist=[]
-        dlist.append(activetimer)
+        dlist= [activetimer]
         for i in range(numitems):
             if activetimer == self.pq.queue[i]:
                 dlist.append(self.pq.queue[i])
@@ -300,8 +299,7 @@ class _Alarms(object):
                 dlist[i].alarmtime = alarmtime
                 offset += 30
 
-        dlist2=[]
-        dlist2.append(self.pq.queue[0])
+        dlist2= [self.pq.queue[0]]
         for i in range(1, numitems):
             if dlist2[0] == self.pq.queue[i]:
                 dlist2.append(self.pq.queue[i])
@@ -342,6 +340,7 @@ def deActivateParms():
 
 def Timer(alarmseconds, fn, ch, *args):
     global _alarms
+    timer = None
     alarmtime = datetime.now() + timedelta(seconds=alarmseconds - 1)
     if len(args) == 1:
         if len(args[0]) == 1:

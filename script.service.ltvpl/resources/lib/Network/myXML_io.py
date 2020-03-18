@@ -41,5 +41,5 @@ class myXML_io(object):
         try:
             tree = ET.ElementTree(file=fp)
             self.XML=tree
-        except:
+        except Exception as e:
             pass

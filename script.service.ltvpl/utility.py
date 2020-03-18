@@ -17,7 +17,6 @@
 #  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #  http://www.gnu.org/copyleft/gpl.html
 #
-from threading import Thread, Event as Signal
 import xbmc
 import xbmcgui
 from resources.lib.Utilities.DebugPrint import DEBUGMODE
@@ -26,7 +25,7 @@ __Version__ = "1.0.0"
 
 try:
     from util import LTVPL_HEADER
-except: pass
+except Exception as e: pass
 
 from resources.lib.Utilities.VirtualEvents import TS_decorator
 
@@ -90,6 +89,6 @@ def deleteDialogActiveProperty(name):
 def isDialogActive(name):
     try:
         return xbmcgui.Window(10000).getProperty(name) == 'true'
-    except:
+    except Exception as e:
         return False
 

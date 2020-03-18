@@ -18,23 +18,21 @@
 #  http://www.gnu.org/copyleft/gpl.html
 #
 #
-import xbmc
-import xbmcgui
-import xbmcaddon
-import os
 from datetime import datetime, timedelta
 from threading import Event as Signal
-from addon import getEPG_Data, checkForEPG
 
+import xbmc
+import xbmcaddon
+import xbmcgui
+from addon import strTimeStamp, RECURRENCE_OPTIONS
+from util import LTVPL_HEADER
+from resources.PL_Client import PL_Client
 from resources.lib.Data.PlayListItem import PlayListItem, RecurrenceOptions
-from resources.lib.Utilities.Messaging import Cmd, OpStatus
-from resources.PL_Client import PL_Client, genericDecode
-from resources.lib.Network.utilities import decodeErrorResponse
 from resources.lib.Network.SecretSauce import *
-from addon import LTVPL_HEADER, strTimeStamp, RECURRENCE_OPTIONS
-from utility import setDialogActive, isDialogActive, clearDialogActive, myLog
-from util import GETTEXT, setUSpgmDate, getRegionDatetimeFmt
 from resources.lib.Utilities.DebugPrint import DbgPrint
+from resources.lib.Utilities.Messaging import Cmd
+from util import GETTEXT, setUSpgmDate, getRegionDatetimeFmt
+from utility import setDialogActive, isDialogActive, clearDialogActive, myLog
 
 __Version__ = "1.1.1"
 
@@ -67,7 +65,7 @@ VACATIONMODE = False
 try:
     MODULEDEBUGMODE = addon.getSetting('debugmode') == 'true'
     VACATIONMODE = addon.getSetting('vacationmode') == 'true'
-except: pass
+except Exception as e: pass
 
 # RECURRENCE_OPTIONS = [(GETTEXT(30050),'Once'), (GETTEXT(30051),'Daily'), (GETTEXT(30052),'Weekdays'), (GETTEXT(30053),'Weekends'), (GETTEXT(30054),'Weekly'), (GETTEXT(30055),'Monthly')]
 
@@ -181,7 +179,7 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
         self.setProperty('cancel', GETTEXT(30046))
         self.setProperty('frequency', GETTEXT(30033))
 
-        if self.editmode == False:
+        if not self.editmode:
             if not self.dataOkFlag:
                 myLog("*****EPG Data is Stale....")
                 xbmcgui.Dialog().notification(LTVPL_HEADER, GETTEXT(30064)) #cannot add item
@@ -218,7 +216,7 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
                 freq = self.getProperty('pgmFrequency').lower()
                 pos = [n for n, x in enumerate(RECURRENCE_OPTIONS) if freq == x[0].lower()][0]
                 self.selectctrl.selectItem(pos)
-            except: pass
+            except Exception as e: pass
 
         self.closeBusyDialog()
 
@@ -334,7 +332,7 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
 
 def showDialog(addonID, shutdownCallback=None, stopbusydialogcallback=None, editData = None, epgData=None):
     if not isDialogActive(EPG_DIALOGTAG):
-        if VACATIONMODE == False:
+        if not VACATIONMODE:
             ui = captureEpgItem(addonID, shutdownCallback, stopbusydialogcallback=stopbusydialogcallback, editData=editData, epgData=epgData)
             ui.doModal()
             xbmc.log("******captureEPG Post doModal......")

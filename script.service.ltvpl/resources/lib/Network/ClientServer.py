@@ -20,12 +20,11 @@
 
 import socket
 from threading import Thread
-from resources.lib.Network.utilities import Utilities, DataMode, decodeResponse, decodeRequest, \
-    decodeErrorResponse, decodeNotification, encodeNotification, PYVER
-from .SecretSauce import *
-from resources.lib.Utilities.Messaging import Cmd, MsgType
+
+from resources.lib.Network.utilities import Utilities, DataMode, encodeNotification, PYVER
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Utilities.PythonEvent import Event
+from .SecretSauce import *
 
 __Version__ = "1.0.2"
 
@@ -118,7 +117,7 @@ class Server(Thread, Utilities):
                 rdata = data
             else:
                 rdata = data
-        except:
+        except Exception as e:
             pass
 
         return rdata
@@ -155,7 +154,7 @@ class Server(Thread, Utilities):
                     self.clientList.remove(connection)
                     try:
                         connection.close()
-                    except:
+                    except Exception as e:
                         pass
 
                     DbgPrint("\nEnding Session\n")

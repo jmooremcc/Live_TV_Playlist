@@ -17,12 +17,13 @@
 #  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #  http://www.gnu.org/copyleft/gpl.html
 #
-from datetime import datetime, timedelta
-import time
-from .kodiflags import KODI_ENV
-from .kodijson import Kodi, PLAYER_VIDEO
 import json
+import time
+from datetime import datetime
+
 from resources.lib.Utilities.DebugPrint import DbgPrint
+from .kodiflags import KODI_ENV
+from .kodijson import Kodi
 
 __Version__ = "1.3.1"
 
@@ -77,7 +78,7 @@ def getRecordings2(kodiObj,params=None):
 
         tmp = sorted(newList, key=lambda item: (item[TVSHOW],item[EPISODE]))
         return(tmp)
-    except:
+    except Exception as e:
         raise Exception(KODI_OPERATION_FAILED + "Could Not Retrieve Recordings")
 
     
@@ -88,9 +89,9 @@ def getRecordingDetails(kodiObj, recordingID):
     :return:
     """
     try:
-        return(kodiObj.PVR.GetRecordingDetails({"recordingid":recordingID,\
-                PROPERTIES:["plot","title","runtime","directory"]})[RESULT]['recordingdetails'])
-    except:
+        return(kodiObj.PVR.GetRecordingDetails({"recordingid":recordingID,
+                                                PROPERTIES:["plot","title","runtime","directory"]})[RESULT]['recordingdetails'])
+    except Exception as e:
         raise Exception(KODI_OPERATION_FAILED + "Could Not Retrieve Recording Details")
 
 
@@ -105,7 +106,7 @@ def getRecordings(kodiObj, params=None):
             return(kodiObj.PVR.GetRecordings()[RESULT][RECORDINGS])
         else:
             return(kodiObj.PVR.GetRecordings(params)[RESULT][RECORDINGS])
-    except:
+    except Exception as e:
         raise Exception(KODI_OPERATION_FAILED + "Could Not Retrieve Recordings")
 
 
@@ -118,7 +119,7 @@ def getChannelGroups(kodiObj):
         channelGroups = kodiObj.PVR.GetChannelGroups({"channeltype":"tv"})[RESULT]['channelgroups']
         groupList = [(dItem[LABEL],dItem[CHANNELGROUPID]) for dItem in channelGroups]
         return([dict(groupList)])
-    except:
+    except Exception as e:
         raise Exception(KODI_OPERATION_FAILED + "Cannot Retrieve Channel Groups")
 
 
@@ -160,8 +161,8 @@ def getChannelInfoByChannelNumber(kodiObj,channelNumber,chGroup=1,params=None):
         if chanNums is not None:
             channelNumber, subChanneNumber = chanNums
             try:
-                p1={CHANNELGROUPID:chGroup,\
-                PROPERTIES:[CHANNEL,CHANNELNUMBER,SUBCHANNELNUMBER]}
+                p1={CHANNELGROUPID:chGroup,
+                    PROPERTIES:[CHANNEL,CHANNELNUMBER,SUBCHANNELNUMBER]}
 
                 if params is not None:
                     p1.update(params)
@@ -170,23 +171,23 @@ def getChannelInfoByChannelNumber(kodiObj,channelNumber,chGroup=1,params=None):
             [RESULT][CHANNELS]if channelNumber == item[CHANNELNUMBER]\
             and subChanneNumber == item[SUBCHANNELNUMBER]]
 
-                z1=[((STATIONID,x[LABEL]),(CHANNELID,x[CHANNELID]),\
+                z1=[((STATIONID,x[LABEL]),(CHANNELID,x[CHANNELID]),
                      (CHANNELNUMBER,float("{}.{}".format(x[CHANNELNUMBER],
                        x[SUBCHANNELNUMBER])))) for x in d1]
 
 
                 return([dict(z) for z in z1])
 
-            except:
-                d1=[item for item in (kodiObj.PVR.GetChannels({CHANNELGROUPID:chGroup,\
-                PROPERTIES:[CHANNEL]}))[RESULT][CHANNELS]\
+            except Exception as e:
+                d1=[item for item in (kodiObj.PVR.GetChannels({CHANNELGROUPID:chGroup,
+                                                               PROPERTIES:[CHANNEL]}))[RESULT][CHANNELS]\
                  if channelNumber in item[CHANNELNUMBER]]
 
                 z1=[((LABEL,x[LABEL]),(CHANNELID,x[CHANNELID])) for x in d1]
                 return([dict(z) for z in z1])
         else:
             return(None)
-    except:
+    except Exception as e:
         raise Exception(KODI_OPERATION_FAILED + "Could Not Retrieve Channel Info by Channel Number {}".format(channelNumber))
 
 
@@ -207,15 +208,15 @@ def getChannelInfoByCallSign(kodiObj,callSign,chGroup=1,params=None):
         d1=[item for item in (kodiObj.PVR.GetChannels(p1))[RESULT][CHANNELS]\
          if callSign in item[CHANNEL]]
 
-        z1=[((STATIONID,x[LABEL]),(CHANNELID,x[CHANNELID]),\
+        z1=[((STATIONID,x[LABEL]),(CHANNELID,x[CHANNELID]),
              (CHANNELNUMBER,float("{}.{}".format(x[CHANNELNUMBER],
                x[SUBCHANNELNUMBER])))) for x in d1]
         
         return([dict(z) for z in z1])
     
-    except:
-        d1=[item for item in (kodiObj.PVR.GetChannels({CHANNELGROUPID:chGroup,\
-        PROPERTIES:[CHANNEL]}))[RESULT][CHANNELS]\
+    except Exception as e:
+        d1=[item for item in (kodiObj.PVR.GetChannels({CHANNELGROUPID:chGroup,
+                                                       PROPERTIES:[CHANNEL]}))[RESULT][CHANNELS]\
          if callSign in item[CHANNEL]]
 
         z1=[((LABEL,x[LABEL]),(CHANNELID,x[CHANNELID])) for x in d1]
@@ -237,16 +238,15 @@ def getChannelInfo(kodiObj,chGroup=1,params=None):
 
         d1=[item for item in (kodiObj.PVR.GetChannels(p1))[RESULT][CHANNELS]]
             
-        z1=[((STATIONID,x[LABEL]),(CHANNELID,x[CHANNELID]),\
+        z1=[((STATIONID,x[LABEL]),(CHANNELID,x[CHANNELID]),
              (CHANNELNUMBER,float("{}.{}".format(x[CHANNELNUMBER],
                x[SUBCHANNELNUMBER])))) for x in d1]
         
         return([dict(z) for z in z1])
     
     except Exception as e:
-        d1=[item for item in (kodiObj.PVR.GetChannels({CHANNELGROUPID:chGroup,\
-        PROPERTIES:[CHANNEL]}))[RESULT][CHANNELS]\
-         if callSign in item[CHANNEL]]
+        d1=[item for item in (kodiObj.PVR.GetChannels({CHANNELGROUPID:chGroup, PROPERTIES:[CHANNEL]}))[RESULT][CHANNELS]]
+         # if callSign in item[CHANNEL]]
 
         z1=[((LABEL,x[LABEL]),(CHANNELID,x[CHANNELID])) for x in d1]
         return([dict(z) for z in z1])
@@ -336,7 +336,7 @@ def getBroadcast_startTimeList(kodiObj, channel, tvshow):
     startTimeList = []
     try:
         channelid = getChannelId(kodiObj, channel)
-    except: startTimeList
+    except Exception as e: startTimeList
 
     args = {CHANNELID: channelid}
     DbgPrint("tvshow:{}, channel:{}, args:{}".format(tvshow, channel,args))
@@ -360,7 +360,7 @@ def getBroadcastInfo(kodiObj, channel, starttime):
     offset = getUtcOffset()
     try:
         startTime = str(datetime.strptime(starttime, fmt) + offset)
-    except: return
+    except Exception as e: return
 
     channelid = getChannelId(kodiObj, channel)
     args = {CHANNELID: channelid, "properties": [STARTTIME]}
@@ -412,7 +412,7 @@ def TvGuideIsPresent(kodiObj, channel):
         broadcastdata = broadcastinfo[RESULT][BROADCASTS]
         if len(broadcastdata) > 0 and type(broadcastdata[0][BROADCASTID]) == int:
             return True
-    except: pass
+    except Exception as e: pass
 
     return False
 

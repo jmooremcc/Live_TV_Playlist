@@ -17,8 +17,8 @@
 #  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #  http://www.gnu.org/copyleft/gpl.html
 #
-from datetime import datetime, timedelta
 import locale
+from datetime import datetime
 
 __Version__ = "1.1.0"
 
@@ -36,7 +36,8 @@ from resources.lib.Utilities.DebugPrint import DbgPrint
 
 def strTimeStamp(tData, dataformat="{:%m/%d/%Y}"):
     """
-    :type alarmtime: datetime
+    :param dataformat:
+    :type tData: datetime
     :return: tuple(strDate, strTime)
     """
     try:
@@ -46,7 +47,7 @@ def strTimeStamp(tData, dataformat="{:%m/%d/%Y}"):
         strTime = "{:" + fmt + "}"
         DbgPrint("***strTime: {}".format(strTime))
         strTime = strTime.format(tData)
-    except:
+    except Exception as e:
         strDate = strTime = ''
 
     return (strDate, strTime)
@@ -92,7 +93,7 @@ class ListItemPlus(xbmcgui.ListItem):
                 DbgPrint("***tmp:{}".format(tmp))
                 values.update(tmp)
                 DbgPrint("values:{}".format(values))
-            except: pass
+            except Exception as e: pass
 
         for tag in self.dtags:
             tmp = dict([(tag,self.getProperty(tag))])

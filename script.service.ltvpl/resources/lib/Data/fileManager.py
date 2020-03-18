@@ -22,7 +22,7 @@ import os
 import os.path
 import shutil
 from time import sleep
-import xml.etree.ElementTree as ET
+
 try:  # Python 3
     from enum import Enum
 except ImportError:
@@ -30,7 +30,7 @@ except ImportError:
 
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Network.utilities import getTimeFilteredDirList
-from resources.lib.Utilities.Messaging import WRITEMODE, READMODE, WRITEBINARYMODE, READBINARYMODE
+from resources.lib.Utilities.Messaging import WRITEMODE, READMODE
 
 __Version__ = "1.0.2"
 
@@ -57,7 +57,7 @@ class fileManager(object):
 
     @Dirty.setter
     def Dirty(self, value):
-        if value == True:
+        if value:
             self.dirtyflag = value
 
     def cleanupBackupFiles(self):
@@ -79,7 +79,7 @@ class fileManager(object):
             try:
                 os.remove(self.sentinelFile)
                 break
-            except:
+            except Exception as e:
                 DbgPrint("Waiting on sentinel file...")
                 sleep(1)
                 count -= 1
@@ -106,7 +106,7 @@ class fileManager(object):
             DbgPrint(str(e))
 
     def backup(self):
-        if self.dirtyflag == False:
+        if not self.dirtyflag:
             return
 
         if not self.restoreOperationActive:
@@ -140,6 +140,10 @@ class fileManager(object):
             self.removeSentinel()
 
         if os.path.isfile(self.filePath):
+            if os.path.getsize(self.filePath) == 0:
+                DbgPrint("***Datafile is Empty***")
+                return
+
             self.restoreOperationActive = True
             fp=open(self.filePath,READMODE)
             if self.mode==FileManagerMode.JSON:

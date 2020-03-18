@@ -23,12 +23,13 @@ import xbmcaddon
 from datetime import datetime, timedelta
 from threading import Thread, Timer
 
-from resources.PL_Client import PL_Client, genericDecode, OpStatus, Cmd, NotificationAction
+from resources.PL_Client import PL_Client, Cmd
+from resources.lib.Network.utilities import genericDecode, NotificationAction
 from resources.lib.Network.SecretSauce import *
-from utility import TS_decorator, myLog, Signal, setDialogActive, isDialogActive, clearDialogActive
+from utility import TS_decorator, myLog, setDialogActive, isDialogActive, clearDialogActive
+from threading import Event as Signal
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from util import ADDON
-from ListItemPlus import ListItemPlus
 from util import GETTEXT
 
 __Version__ = "1.0.0"
@@ -40,7 +41,7 @@ LTVPL = 'Live TV Playlist'
 VACATIONMODE_VALUE = False
 try:
     VACATIONMODE_VALUE = ADDON.getSetting('vacationmode') == 'true'
-except: pass
+except Exception as e: pass
 
 ACTION_BACK = 92
 ACTION_PARENT_DIR = 9
@@ -160,7 +161,7 @@ class miniClient(Thread):
             self.client.addErrorReceivedEventHandler(self.onErrorNotification)
             self.client.addDataReceivedEventHandler(self.onResponseReceived)
             self.client.addNotificationReceivedEventHandler(self.onNotificationReceived)
-        except:
+        except Exception as e:
             pass
 
     def onErrorNotification(self, opstatus, errMsg):
@@ -204,7 +205,7 @@ class miniClient(Thread):
                 n = self.searchByID(id)
                 self.plList[n] = data
                 self.sortData()
-            except:
+            except Exception as e:
                 pass
 
         elif cmd == Cmd.RemovePlayListItem:
@@ -214,7 +215,7 @@ class miniClient(Thread):
                 n = self.searchByID(id)
                 del self.plList[n]
                 self.sortData()
-            except:
+            except Exception as e:
                 pass
 
         elif cmd == Cmd.GetChGroupList:
@@ -248,7 +249,7 @@ class miniClient(Thread):
                 cmd, data = genericDecode(data)
                 try:
                     id = data['id']
-                except:
+                except Exception as e:
                     id = data
 
                 try:
@@ -276,7 +277,7 @@ class miniClient(Thread):
                     n = self.searchByID(id)
                     self.plList[n] = data
                     self.sortData()
-                except:
+                except Exception as e:
                     pass
 
             elif cmd == NotificationAction.VacationMode:
@@ -285,10 +286,10 @@ class miniClient(Thread):
                     DbgPrint("Setting VacationMode: {}".format(data))
                     try:
                         VACATIONMODE_VALUE = data['SetVacationMode']
-                    except:
+                    except Exception as e:
                         VACATIONMODE_VALUE = data
 
-                    if VACATIONMODE_VALUE == True:
+                    if VACATIONMODE_VALUE:
                         if self.t is not None:
                             self.t.cancel()
                             self.t = None
@@ -297,7 +298,7 @@ class miniClient(Thread):
                 except Exception as e:
                     DbgPrint(str(e))
 
-        except:
+        except Exception as e:
             pass
 
     def BuildListItem(self):
@@ -306,11 +307,11 @@ class miniClient(Thread):
         try:
             # return the first non-suspended item
             for data in self.plList:
-                if data['suspendedFlag'] == False:
+                if not data['suspendedFlag']:
                     DbgPrint("****BuildListItem data: {}".format(data))
                     try:
                         item.setProperty('pgmCh', "{}".format(data['ch']))
-                    except:
+                    except Exception as e:
                         item.setProperty('pgmCh', "{:2.1f}".format(float(data['ch'])))
 
                     item.setProperty('pgmTitle', data['title'])
@@ -338,7 +339,7 @@ class miniClient(Thread):
         if listitem is None:
             return
 
-        if VACATIONMODE_VALUE == True:
+        if VACATIONMODE_VALUE:
             DbgPrint("**Vacation Mode Active...")
             return
 
@@ -358,7 +359,7 @@ class miniClient(Thread):
 
     def sortData(self):
         global VACATIONMODE_VALUE
-        if VACATIONMODE_VALUE == True:
+        if VACATIONMODE_VALUE:
             DbgPrint("**Vacation Mode Active...")
             return
 

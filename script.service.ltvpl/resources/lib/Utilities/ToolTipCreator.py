@@ -19,7 +19,7 @@ class ToolTip(object):
         self.x = self.y = 0
 
     def showtip(self, text, xOffset=0, yOffset=0):
-        "Display text in tooltip window"
+        """Display text in tooltip window"""
         self.text = text
         if self.tipwindow or not self.text:
             return

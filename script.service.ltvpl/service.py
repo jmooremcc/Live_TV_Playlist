@@ -21,7 +21,6 @@
 import os, sys
 import xbmc
 import xbmcgui
-import xbmcaddon
 
 __Version__ = "1.0.1"
 
@@ -30,9 +29,9 @@ __Version__ = "1.0.1"
 # print str(sys.path)
 myLog = xbmc.log
 
-from util import ADDON, ADDON_PATH, ADDONID, ADDON_USERDATA_FOLDER, BASEPATH, DATAFILE_LOCATIONFILE, ADDON_DATAFILENAME,\
+from util import ADDON, ADDONID, ADDON_USERDATA_FOLDER, DATAFILE_LOCATIONFILE, ADDON_DATAFILENAME,\
     DEFAULTPATH, DEBUGFILE_LOCATIONFILE, DEBUGFILE_LOCATIONCONTENT
-from resources.lib.Network.SecretSauce import ServerPort, ServerHost
+from resources.lib.Network.SecretSauce import ServerPort
 from resources.PL_Server import PLSERVERTAG, PL_Server
 from utility import isDialogActive, clearDialogActive, setDialogActive
 from resources.lib.Utilities.Messaging import VACATIONMODE, PREROLLTIME, DAILYSTOPCOMMAND, DEBUGMODE, STOPCMD_ACTIVE,\
@@ -53,7 +52,7 @@ def establishDataLocations():
         xbmc.log("LTVPL: Making addonUserDataFolder")
         try:
             os.mkdir(ADDON_USERDATA_FOLDER)
-        except:
+        except Exception as e:
             pass
     else:
         xbmc.log("LTVPL: addonUserDataFolder Exists")
@@ -207,7 +206,7 @@ if __name__ == '__main__':
         if strAlarmtime is not None:
             ADDON.setSetting(STOPCMD_ACTIVE, TRUE)
             ADDON.setSetting(ALARMTIME, strAlarmtime)
-        elif stopcmd_active == True:
+        elif stopcmd_active:
             strAlarmtime = str(ADDON.getSetting(ALARMTIME))
             if strAlarmtime is not None:
                 newValues = {}
@@ -227,7 +226,7 @@ if __name__ == '__main__':
             countdown_duration= int(ADDON.getSetting(COUNTDOWN_DURATION))
             cdService = Countdown.StartCountdownService(ADDONID, clockstarttime=countdown_duration, abortChChange=server.dataSet.AbortChannelChangeOperation)
             xbmc.log("****Mini Client Service Successfully Started....")
-        except: pass
+        except Exception as e: pass
 
         monitor = Monitor(server, cdService)
         monitor.waitForAbort()

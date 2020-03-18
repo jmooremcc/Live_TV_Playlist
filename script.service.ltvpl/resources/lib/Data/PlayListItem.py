@@ -24,20 +24,21 @@ import pickle
 import sys
 import xml.etree.ElementTree as ET
 from time import sleep
+
 from resources.lib.Utilities.DebugPrint import DbgPrint
+from resources.lib.Utilities.indent import indent
 
 try:
     from datetime import datetime, timedelta
-except:
+except Exception as e:
     DbgPrint("Nasty, Nasty ERROR: Cannot Import datetime module")
-import _strptime
 
 # from threading import Timer
 from resources.lib.Utilities.AlarmsMgr import Timer
 
 try:
     datetime.strptime("2016", "%Y") #Workaround _strptime import error
-except:
+except Exception as e:
     pass
 
 try:  # Python 3
@@ -49,7 +50,6 @@ from resources.lib.Network.myPickle_io import myPickle_io
 from resources.lib.Network.utilities import encodeError
 
 from resources.lib.Utilities.PythonEvent import Event
-from resources.lib.Utilities.Messaging import OpStatus
 from resources.lib.Utilities import indent
 
 __Version__ = "1.0.1"
@@ -204,7 +204,7 @@ class PlayListItem(myPickle_io):
     def SuspendedFlag(self, value):
         if value != self.suspendedFlag:
             self.suspendedFlag = value
-            if value == False:
+            if not value:
                 if self.isAlarmtimeLegal():
                     self.reStart()
                 else:
@@ -259,7 +259,7 @@ class PlayListItem(myPickle_io):
             changeOp = self._ChangeCh
 
         # DbgPrint("\ntype(self.alarmtime):{}".format(type(self.alarmtime)))
-        if self.suspendedFlag == False:
+        if not self.suspendedFlag:
             td= self.alarmtime - datetime.now() - timedelta(seconds=self.PreRollTime)
         else:
             td = self.alarmtime - datetime.now() - timedelta(seconds=self.PreRollTime) + timedelta(seconds=30)
@@ -291,7 +291,7 @@ class PlayListItem(myPickle_io):
         if isStr(tData):
             try:
                 tData = self.strDate2TimeStamp(tData, "%Y-%m-%d %H:%M:%S.%f")
-            except:
+            except Exception as e:
                 tData = self.strDate2TimeStamp(tData, "%Y-%m-%d %H:%M:%S")
 
         return tData
@@ -389,7 +389,7 @@ class PlayListItem(myPickle_io):
     def isActive(self):
         try:
             return self.t.isAlive()
-        except:
+        except Exception as e:
             return False
 
     @property
@@ -407,7 +407,7 @@ class PlayListItem(myPickle_io):
         try:
             self.ChChangeEvent(self.ch)
             self.PLX_Event(self)
-        except:
+        except Exception as e:
             pass #TODO: Raise Invalid EventHandler Error
 
     def isStale(self):

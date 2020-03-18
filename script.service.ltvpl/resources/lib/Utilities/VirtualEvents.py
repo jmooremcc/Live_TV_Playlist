@@ -10,10 +10,10 @@ except ImportError:
     except Exception:
         pass
 
-import time
 from threading import Thread
 
 from resources.lib.Utilities.DebugPrint import DbgPrint
+
 
 #********** Custom Decorators***************************************
 

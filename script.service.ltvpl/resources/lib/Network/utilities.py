@@ -17,14 +17,14 @@
 #  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #  http://www.gnu.org/copyleft/gpl.html
 #
+import os
 import pickle
-import os, sys
+import sys
+
 try:  # Python 3
     from enum import Enum
 except ImportError:
     from enum34 import Enum
-
-from time import sleep
 
 try:
     from Queue import Queue
@@ -32,12 +32,12 @@ except ImportError:
     from queue import Queue
 
 from glob import glob
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from resources.lib.Network.PL_json import json
 from resources.lib.Utilities.Messaging import Cmd, MsgType, NotificationAction, OpStatus
 from resources.lib.Utilities.DebugPrint import DbgPrint
-from resources.lib.Network.SecretSauce import DATAEndMarker, RUHERE
+from resources.lib.Network.SecretSauce import DATAEndMarker
 
 __Version__ = "1.0.2"
 
@@ -99,6 +99,7 @@ def getFilteredDirList(path, filter='*', sortdescending=True):
 def getTimeFilteredDirList(path, filter='*', olderfiles=True, maxdiff=3600):
     """
     This function returns a time filtered list of files.
+    :param maxdiff:
     :param path: string #parent directory
     :param filter: string # filename filter
     :param olderfiles: if True older files will be returned
@@ -126,7 +127,7 @@ def parseCmdData(data):
         cmd=getDictKey(data)#string
         args=checkForDict(data[cmd])
         cmd=Cmd[cmd] #Convert string to Cmd object
-    except:
+    except Exception as e:
         cmd=None
         args=data
 
@@ -137,10 +138,10 @@ def parseErrorData(data):
         err=getDictKey(data)#string
         args=checkForDict(data[err])
         error= OpStatus[err] #Convert string to Cmd object
-    except:
+    except Exception as e:
         try:
             error = MsgType[err]
-        except:
+        except Exception as e:
             error=None
             args=data
 
@@ -162,11 +163,11 @@ def genericDecode(encodedData):
         try:
             cmd= OpStatus[key]
             return (cmd, encodedData[key])
-        except:
+        except Exception as e:
             try:
                 cmd=MsgType[key]
                 return(cmd,encodedData[key])
-            except:
+            except Exception as e:
                 try:
                     cmd=NotificationAction[key]
                     return(cmd,encodedData[key])
@@ -200,7 +201,7 @@ def decodeNotification(data):
         key=str(MsgType.Notification)
         rData = data[key]
         return rData
-    except:
+    except Exception as e:
         DbgPrint("Not a Notification:{}".format(data),MODULEDEBUGMODE=MODULEDEBUGMODE)
         raise Exception("MsgType is Not a Notification")
 
@@ -217,7 +218,7 @@ def decodeResponse(result):
         key=str(MsgType.Response)
         data=result[key]
         cmd, rData=genericDecode(data)
-    except:
+    except Exception as e:
         raise Exception("MsgType is Result Not a Response")
 
     return parseCmdData(data)
@@ -234,7 +235,7 @@ def decodeErrorResponse(result):
     """
     try:
         cmd,rData=genericDecode(result)
-    except:
+    except Exception as e:
         DbgPrint("Not an Error Response:{}".format(result),MODULEDEBUGMODE=MODULEDEBUGMODE)
         raise Exception("MsgType is Not an Error Response")
 

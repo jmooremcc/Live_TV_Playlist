@@ -18,17 +18,16 @@
 #  http://www.gnu.org/copyleft/gpl.html
 #
 from datetime import datetime
-from threading import Event as Signal
 from time import sleep
 
 from resources.lib.Data.PlayListItem import PlayListItem, RecurrenceOptions
 from resources.lib.Network.ClientServer import Client
-from resources.lib.Network.utilities import encodeRequest, decodeResponse, Utilities, decodeErrorResponse, \
-    decodeError, decodeNotification, decodeRequest, genericDecode, genericEncode
-from resources.lib.Utilities.Messaging import Cmd, MsgType, OpStatus, NotificationAction
-from resources.lib.Utilities.DebugPrint import DbgPrint
-from resources.lib.Utilities.PythonEvent import Event
 from resources.lib.Network.SecretSauce import *
+from resources.lib.Network.utilities import encodeRequest, decodeResponse, Utilities, decodeErrorResponse, \
+    decodeNotification, decodeRequest
+from resources.lib.Utilities.DebugPrint import DbgPrint
+from resources.lib.Utilities.Messaging import Cmd, MsgType, OpStatus
+from resources.lib.Utilities.PythonEvent import Event
 
 __Version__ = "1.0.0"
 
@@ -97,7 +96,7 @@ class PL_Client(object):
             else:
                 self.fireDataReceivedEvent(cmd,data)
                 self.RemoteDSEvent(cmd,data)
-        except:
+        except Exception as e:
             pass
 
 
@@ -117,7 +116,7 @@ class PL_Client(object):
             try:
                 cmd, rData = decodeResponse(pData)
                 self.onDataReceived(cmd, rData)
-            except:
+            except Exception as e:
                 try:
                     cmd, rData = decodeRequest(pData)
                     if cmd in Cmd:
@@ -125,18 +124,18 @@ class PL_Client(object):
                     else:
                         DbgPrint("ERROR:Unknown Data Type Received:{}".format((cmd,rData)))
                         raise Exception("Unknown Data Type Received")
-                except:
+                except Exception as e:
                     try:
                         notice = decodeNotification(pData)
                         self.onNotificationReceived(notice)
-                    except:
+                    except Exception as e:
                         try:
                             cmd,errMsg = decodeErrorResponse(pData)
                             if cmd in OpStatus:
                                 DbgPrint("ERROR:{}:{}".format(cmd,errMsg))
                                 self.fireErrorReceivedEvent(cmd, errMsg)
 
-                        except:
+                        except Exception as e:
                             self.onDataReceived(cmd, pData)
 
         else:  # Assuming str type

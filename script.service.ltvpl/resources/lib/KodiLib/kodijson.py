@@ -22,7 +22,6 @@
 #
 """XBMC/Kodi jsonclient library module."""
 import json
-from resources.lib.Utilities.DebugPrint import DbgPrint
 
 MODULEDEBUGMODE=True
 from . kodiflags import KODI_ENV

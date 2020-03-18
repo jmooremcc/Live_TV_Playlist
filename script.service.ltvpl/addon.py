@@ -18,12 +18,12 @@
 #  http://www.gnu.org/copyleft/gpl.html
 #
 
-import os, sys
-from threading import Event as Signal, Thread
-from datetime import datetime as dt, timedelta
-import locale
 import copy
+import locale
+import os
 import sys
+from datetime import datetime as dt
+from threading import Event as Signal
 
 try:
     from Queue import Queue
@@ -34,16 +34,16 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 
-from util import ADDON, ADDONID, ADDON_PATH, ADDON_NAME, XMLPATH, FANART_PATH, BGDIMAGE, LTVPL_HEADER, GETTEXT, setUSpgmDate, getRegionDatetimeFmt
-from resources.lib.Data.PlayListItem import PlayListItem
-from resources.PL_Client import PL_Client, genericDecode
-from resources.lib.Utilities.Messaging import Cmd, NotificationAction,DEBUGMODE,TRUE,VACATIONMODE
+from util import ADDON, ADDONID, ADDON_PATH, ADDON_NAME, XMLPATH, BGDIMAGE, GETTEXT, setUSpgmDate, getRegionDatetimeFmt
+from resources.PL_Client import PL_Client
+from resources.lib.Network.utilities import genericDecode
+from resources.lib.Utilities.Messaging import Cmd, NotificationAction, DEBUGMODE, TRUE, VACATIONMODE
 from resources.lib.Network.SecretSauce import *
 from utility import myLog, TS_decorator, setDialogActive, clearDialogActive, isDialogActive
-from resources.lib.Utilities.DebugPrint import DbgPrint, DEBUGMODE, setDebugMode, getDebugMode
+from resources.lib.Utilities.DebugPrint import DbgPrint, DEBUGMODE
 import contextmenu
 from ListItemPlus import ListItemPlus
-from BusyDialog import BusyDialog, BusyDialog2
+from BusyDialog import BusyDialog2
 
 __Version__ = "1.1.1"
 
@@ -53,59 +53,63 @@ VACATIONMODE_VALUE = False
 try:
     MODULEDEBUGMODE = ADDON.getSetting(DEBUGMODE) == TRUE
     VACATIONMODE_VALUE = ADDON.getSetting(VACATIONMODE) == TRUE
-except: pass
+except Exception as e:
+    pass
 
-RECURRENCE_OPTIONS = [(GETTEXT(30050),'Once'), (GETTEXT(30051),'Daily'), (GETTEXT(30052),'Weekdays'), (GETTEXT(30053),'Weekends'), (GETTEXT(30054),'Weekly'), (GETTEXT(30055),'Monthly')]
+RECURRENCE_OPTIONS = [(GETTEXT(30050), 'Once'), (GETTEXT(30051), 'Daily'), (GETTEXT(30052), 'Weekdays'),
+                      (GETTEXT(30053), 'Weekends'), (GETTEXT(30054), 'Weekly'), (GETTEXT(30055), 'Monthly')]
 
-YELLOW              =   'FFBBBB00'
-ORANGE              =   'FFBB6600'
-ITEM_BGDCOLOR       =   '33FF00FF'
-HDR_BGDCOLOR        =   'FFAA0000'
-LTVPL               =   'Live TV Playlist'
+YELLOW = 'FFBBBB00'
+ORANGE = 'FFBB6600'
+ITEM_BGDCOLOR = '33FF00FF'
+HDR_BGDCOLOR = 'FFAA0000'
+LTVPL = 'Live TV Playlist'
 
-#Control IDs
-PAGE_SIZE                   = 10
-CLOSE_BUTTON                = 20
-SCROLL_BAR                  = 17
-MAIN_LIST                   = 800
+# Control IDs
+PAGE_SIZE = 10
+CLOSE_BUTTON = 20
+SCROLL_BAR = 17
+MAIN_LIST = 800
 
-ACTION_MOVE_LEFT            = 1
-ACTION_MOVE_RIGHT           = 2
-ACTION_MOVE_UP              = 3
-ACTION_MOVE_DOWN            = 4
-ACTION_PAGE_UP              = 5
-ACTION_PAGE_DOWN            = 6
-ACTION_SELECT_ITEM          = 7
-ACTION_PREVIOUS_MENU        = 10
-ACTION_NAV_BACK             = 92
-ACTION_CONTEXT_MENU         = 117
-ACTION_MOUSE_LEFT_CLICK     = 100
-ACTION_MOUSE_RIGHT_CLICK    = 101
+ACTION_MOVE_LEFT = 1
+ACTION_MOVE_RIGHT = 2
+ACTION_MOVE_UP = 3
+ACTION_MOVE_DOWN = 4
+ACTION_PAGE_UP = 5
+ACTION_PAGE_DOWN = 6
+ACTION_SELECT_ITEM = 7
+ACTION_PREVIOUS_MENU = 10
+ACTION_NAV_BACK = 92
+ACTION_CONTEXT_MENU = 117
+ACTION_MOUSE_LEFT_CLICK = 100
+ACTION_MOUSE_RIGHT_CLICK = 101
 
-JUSTIFY_LEFT                = 0
-JUSTIFY_CENTER              = 2
-JUSTIFY_RIGHT               = 1
+JUSTIFY_LEFT = 0
+JUSTIFY_CENTER = 2
+JUSTIFY_RIGHT = 1
 
-MENU_DELETE_ITEM            = 0
-MENU_SKIP_ITEM              = 1
-MENU_SUSPEND_ITEM           = 2
-MENU_EDIT_ITEM              = 3
+MENU_DELETE_ITEM = 0
+MENU_SKIP_ITEM = 1
+MENU_SUSPEND_ITEM = 2
+MENU_EDIT_ITEM = 3
 
-WINDOW_TV_GUIDE             = 10702
+WINDOW_TV_GUIDE = 10702
 
-BUSYDIALOG_SLEEPTIME        = 330 #time in miliseconds
-BUSYDIALOG_TIMEOUT          = 3 #time in seconds
+BUSYDIALOG_SLEEPTIME = 330  # time in miliseconds
+BUSYDIALOG_TIMEOUT = 3  # time in seconds
 
 HDR_FORMAT = [(GETTEXT(30030), 100, JUSTIFY_CENTER, 'Date'), (GETTEXT(30031), 100, JUSTIFY_CENTER, 'Time'),
               (GETTEXT(30032), 100, JUSTIFY_CENTER, 'Ch'), (GETTEXT(30033), 120, JUSTIFY_CENTER, 'Frequency'),
               (GETTEXT(30034), 200, JUSTIFY_LEFT, 'Description'), (GETTEXT(30035), 120, JUSTIFY_CENTER, 'Expires On'),
               (GETTEXT(30036), 100, JUSTIFY_CENTER, 'suspendedFlag')]
 
-HDR_FORMAT_EXTENDED = HDR_FORMAT +[('alarmtime',0,0,'alarmtime')]
+HDR_FORMAT_EXTENDED = HDR_FORMAT + [('alarmtime', 0, 0, 'alarmtime')]
 
-ContextMenuItems  = [(GETTEXT(30020), MENU_SKIP_ITEM, 'Skip Event'), (GETTEXT(30021), MENU_SUSPEND_ITEM, 'Suspend Event'),
-                     (GETTEXT(30022), MENU_EDIT_ITEM, 'Edit Event'), (GETTEXT(30023), MENU_DELETE_ITEM, 'Delete Event')]
-ContextMenuItems2 = [(GETTEXT(30020), MENU_SKIP_ITEM, 'Skip Event'), (GETTEXT(30024), MENU_SUSPEND_ITEM, 'Enable Event'),
+ContextMenuItems = [(GETTEXT(30020), MENU_SKIP_ITEM, 'Skip Event'),
+                    (GETTEXT(30021), MENU_SUSPEND_ITEM, 'Suspend Event'),
+                    (GETTEXT(30022), MENU_EDIT_ITEM, 'Edit Event'), (GETTEXT(30023), MENU_DELETE_ITEM, 'Delete Event')]
+ContextMenuItems2 = [(GETTEXT(30020), MENU_SKIP_ITEM, 'Skip Event'),
+                     (GETTEXT(30024), MENU_SUSPEND_ITEM, 'Enable Event'),
                      (GETTEXT(30022), MENU_EDIT_ITEM, 'Edit Event'), (GETTEXT(30023), MENU_DELETE_ITEM, 'Delete Event')]
 
 try:
@@ -121,7 +125,7 @@ myLog("bgdimage: {}".format(BGDIMAGE))
 
 
 class myBusyDialog(object):
-    def __init__(self, startPct = 0):
+    def __init__(self, startPct=0):
         self.stopFlag = False
         self.dialog = BusyDialog2(ADDONID)
         self.percent = startPct
@@ -164,7 +168,7 @@ class myBusyDialog(object):
 
 def strTimeStamp(tData):
     """
-    :type alarmtime: datetime
+    :type tData: datetime
     :return: tuple(strDate, strTime)
     """
     # TODO customize date per regional value
@@ -172,10 +176,11 @@ def strTimeStamp(tData):
         dateformat = "{:" + getRegionDatetimeFmt() + "}"
         strDate = dateformat.format(tData)
         strTime = "{:%I:%M %p}".format(tData)
-    except:
+    except Exception as e:
         strDate = strTime = ''
 
     return (strDate, strTime)
+
 
 def _germanAM_PM_Fix(data):
     pos = data.lower().find('vormittags')
@@ -191,14 +196,14 @@ def _germanAM_PM_Fix(data):
 
 def getEPG_Data(win=None):
     dateformat = getRegionDatetimeFmt()
-    DbgPrint("***DateFormat: {}". format(dateformat))
+    DbgPrint("***DateFormat: {}".format(dateformat))
 
     pgmTitle = xbmc.getInfoLabel('Listitem.Title')
     DbgPrint("***pgmTitle: {}".format(pgmTitle))
     fullPgmDate = xbmc.getInfoLabel('Listitem.Date')
     DbgPrint("***fullPgmDate: {}".format(fullPgmDate))
     pgmDate = copy.copy(fullPgmDate)
-    pos=pgmDate.find(' ')
+    pos = pgmDate.find(' ')
     if pos > 0:
         pgmDate = pgmDate[:pos]
     DbgPrint("***pgmDate: {}".format(pgmDate))
@@ -208,7 +213,7 @@ def getEPG_Data(win=None):
     DbgPrint("Locale: {}".format(locale.getlocale()))
     DbgPrint("Default Locale: {}".format(locale.getdefaultlocale()))
 
-    #Initially try a 12 hour clock
+    # Initially try a 12 hour clock
     try:
         liDateTime = dt.strptime(fullPgmDate, dateformat)
     except Exception as e:
@@ -225,8 +230,8 @@ def getEPG_Data(win=None):
         try:
             liDateTime = dt.strptime(fullPgmDate, dateformat)
         except Exception as e2:
-            #Now try a 24 hour clock
-            DbgPrint("Error Msg: {}".format(e2.message))
+            # Now try a 24 hour clock
+            DbgPrint("Error Msg: {}".format(str(e2)))
             dateformat = getRegionDatetimeFmt()
             dateformat = dateformat.replace('-', '')
             liDateTime = dt.strptime(fullPgmDate, dateformat)
@@ -256,19 +261,10 @@ def getEPG_Data(win=None):
         win.setProperty('pgmExpiration', '')
         return diff.days >= 0 and diff.seconds > 60
     else:
-        data = {}
-        data['pgmTitle']        = pgmTitle
-        data['pgmDate']         = pgmDate
-        data['USpgmDate']       = USpgmDate
-        data['pgmTime']         = pgmTime
-        data['pgmCh']           = pgmCh
-        data['pgmIcon']         = pgmIcon
-        data['pgmExpiration']   = ''
+        data = {'pgmTitle': pgmTitle, 'pgmDate': pgmDate, 'USpgmDate': USpgmDate, 'pgmTime': pgmTime, 'pgmCh': pgmCh,
+                'pgmIcon': pgmIcon, 'pgmExpiration': ''}
         status = diff.days >= 0 and diff.seconds > 60
-        return(status, data)
-
-
-
+        return (status, data)
 
 
 def checkForEPG():
@@ -278,16 +274,17 @@ def checkForEPG():
     return bEPGflag or bTvSearchflag
 
 
-
 def getHdrKeys():
     keys = [w[0].split()[0] for w in HDR_FORMAT]
     return keys
+
 
 def getHdrKeysExtended():
     DbgPrint("***HDR_FORMAT_EXTENDED:{}".format(HDR_FORMAT_EXTENDED))
     keys = [w[3].split()[0] for w in HDR_FORMAT_EXTENDED]
     DbgPrint("***keys:{}".format(keys))
     return keys
+
 
 def BuildHeader():
     item = xbmcgui.ListItem()
@@ -298,7 +295,6 @@ def BuildHeader():
         item.setProperty(label, val[0])
 
     return item
-
 
 
 class GUI(xbmcgui.WindowXMLDialog):
@@ -335,7 +331,6 @@ class GUI(xbmcgui.WindowXMLDialog):
         self.bDialog.Stop()
         del self.bDialog
 
-
     def connectToServer(self):
         try:
             address = (ServerHost, ServerPort)
@@ -343,7 +338,8 @@ class GUI(xbmcgui.WindowXMLDialog):
             myLog("**Client Connected")
             self.client.addDataReceivedEventHandler(self.onResponseReceived)
             self.client.addNotificationReceivedEventHandler(self.onNotificationReceived)
-        except: pass
+        except Exception as e:
+            pass
 
     def BuildHeader(self):
         for val in HDR_FORMAT:
@@ -353,7 +349,7 @@ class GUI(xbmcgui.WindowXMLDialog):
     def onInit(self):
         global VACATIONMODE_VALUE
         super(GUI, self).onInit()
-        self.list = self.getControl(MAIN_LIST) # type: xbmcgui.ControlList
+        self.list = self.getControl(MAIN_LIST)  # type: xbmcgui.ControlList
         # now we are going to add all the items we have defined to the list control
         # Wait for data to come from the server before proceeding
         self.signal.clear()
@@ -386,14 +382,13 @@ class GUI(xbmcgui.WindowXMLDialog):
         self.closeBusyDialog()
 
     def setVacationModeProperty(self):
-        if VACATIONMODE_VALUE == True:
+        if VACATIONMODE_VALUE:
             val = GETTEXT(30037)
         else:
             val = GETTEXT(30038)
         DbgPrint("val: {}".format(val))
         self.setProperty('vacationMode', val)
         ADDON.setSetting(VACATIONMODE, str(VACATIONMODE_VALUE).lower())
-
 
     def onClick(self, controlId):
         DbgPrint("***onClick ctl: {}".format(controlId))
@@ -408,7 +403,6 @@ class GUI(xbmcgui.WindowXMLDialog):
         self.shutdown = True
         self.close()
         xbmc.sleep(100)
-
 
     def ShutdownState(self):
         myLog("******ShutdownState: {}".format(self.shutdown))
@@ -434,7 +428,6 @@ class GUI(xbmcgui.WindowXMLDialog):
             myLog("***Main onAction actionID: {:d}".format(actionID))
         else:
             myLog("****Main onAction actionID: {:d}".format(actionID.getId()))
-
 
         if actionID == ACTION_MOVE_LEFT or actionID == ACTION_MOVE_RIGHT:
             pass
@@ -466,7 +459,7 @@ class GUI(xbmcgui.WindowXMLDialog):
             myLog("***********>Item Selected: {} at {}".format(item.getProperty('Description'), self.currentPos))
             suspendedFlag = item.getProperty('suspendedFlag') == 'True'
 
-            if VACATIONMODE_VALUE == False:
+            if not VACATIONMODE_VALUE:
                 if not suspendedFlag:
                     cmd = contextmenu.showMenu(ADDONID, ContextMenuItems, self.ShutdownState)
                 else:
@@ -484,9 +477,10 @@ class GUI(xbmcgui.WindowXMLDialog):
                             xbmc.sleep(250)
                             self.client.RemovePlayListItem(id)
                             self.sortItemListByDate()
-                            dialog.notification(LTVPL, GETTEXT(30060)) #"Delete Operation Successful"
+                            dialog.notification(LTVPL, GETTEXT(30060))  # "Delete Operation Successful"
                         else:
-                            dialog.notification(LTVPL, GETTEXT(30061), xbmcgui.NOTIFICATION_INFO) #"Delete Operation Cancelled!"
+                            dialog.notification(LTVPL, GETTEXT(30061),
+                                                xbmcgui.NOTIFICATION_INFO)  # "Delete Operation Cancelled!"
 
                     elif cmd == MENU_SKIP_ITEM:
                         myLog("******Skip Event Selected")
@@ -505,7 +499,6 @@ class GUI(xbmcgui.WindowXMLDialog):
                         self.launchEditor(item.Data)
             else:
                 self.showVacationModeDialog()
-
 
     def onFocus(self, ctrlID):
         if ctrlID == MAIN_LIST:
@@ -526,7 +519,6 @@ class GUI(xbmcgui.WindowXMLDialog):
             self.list.reset()
             self.list.addItems(newlist)
             # self.list_items = newlist
-
 
     def findItemByID(self, id):
         maxitems = self.list.size()
@@ -553,7 +545,6 @@ class GUI(xbmcgui.WindowXMLDialog):
                 setUSpgmDate(self)
                 self.xlateFrequencyValue(data, update)
 
-
                 SF = 'suspendedFlag'
                 DESC = 'Description'
                 suspendFlag = update.getProperty(SF)
@@ -566,10 +557,10 @@ class GUI(xbmcgui.WindowXMLDialog):
                     if title[0] == "*":
                         update.setProperty(DESC, title[1:])
 
-
                 DbgPrint("****update item: {}".format(update.Data))
                 for key in hdrkeys:
-                    DbgPrint("***CompareProperties: {}\n1 {}\n2 {}".format(key, item.getProperty(key),update.getProperty(key)))
+                    DbgPrint("***CompareProperties: {}\n1 {}\n2 {}".format(key, item.getProperty(key),
+                                                                           update.getProperty(key)))
                     if item.getProperty(key) != update.getProperty(key):
                         DbgPrint("*******ChangedProperty:{}:{}".format(key, update.getProperty(key)))
                         item.setProperty(key, update.getProperty(key))
@@ -592,7 +583,6 @@ class GUI(xbmcgui.WindowXMLDialog):
         except Exception as e:
             myLog(str(e))
 
-
     def addNewItem(self, data):
         try:
             dateformat = xbmc.getRegion('dateshort')
@@ -603,7 +593,8 @@ class GUI(xbmcgui.WindowXMLDialog):
             self.list.addItem(item)
             self.list_items.append(item)
             self.sortItemListByDate()
-        except: pass
+        except Exception as e:
+            pass
 
     def clearItems(self):
         self.clearList()
@@ -627,12 +618,11 @@ class GUI(xbmcgui.WindowXMLDialog):
             cmd, data = genericDecode(msg)
             DbgPrint("****cmd:{}\tdata:{}\n".format(cmd, data))
 
-
             if cmd == NotificationAction.ItemRemoved:
                 cmd, data = genericDecode(data)
                 try:
                     id = data['id']
-                except:
+                except Exception as e:
                     id = data
                 DbgPrint("****self.removeItemByID({})".format(id))
                 self.removeItemByID(id)
@@ -646,7 +636,7 @@ class GUI(xbmcgui.WindowXMLDialog):
                 cmd, data = genericDecode(data)
                 try:
                     id = data['id']
-                except:
+                except Exception as e:
                     id = data
                 DbgPrint("****self.updateItemByID({},{})".format(id, data))
                 self.updateItemByID(id, data)
@@ -657,7 +647,7 @@ class GUI(xbmcgui.WindowXMLDialog):
                 DbgPrint("VacationMode: {}".format(data))
                 try:
                     VACATIONMODE_VALUE = data['SetVacationMode']
-                except:
+                except Exception as e:
                     VACATIONMODE_VALUE = data
 
                 self.setVacationModeProperty()
@@ -669,13 +659,11 @@ class GUI(xbmcgui.WindowXMLDialog):
         except Exception as e:
             DbgPrint("onNotification Error Message:{}".format(str(e)))
 
-
     def xlateFrequencyValue(self, data, obj):
         # translate recurrenceinterval to current language
         recurrenceIntervalValue = data['recurrenceInterval'].capitalize()
         recurrenceIntervalValue = self.xlateRecurrenceOptions(recurrenceIntervalValue)
         obj.setProperty('Frequency', recurrenceIntervalValue)
-
 
     def onResponseReceived(self, cmd, data):
         myLog("**DataResponse Received: {}".format(data))
@@ -740,8 +728,8 @@ class GUI(xbmcgui.WindowXMLDialog):
             pass
 
     def suspendPlayListItem(self, item):
-        SF='suspendedFlag'
-        DESC='Description'
+        SF = 'suspendedFlag'
+        DESC = 'Description'
 
         suspendFlag = item.getProperty(SF)
         id = item.getProperty('ID')
@@ -750,7 +738,7 @@ class GUI(xbmcgui.WindowXMLDialog):
         DbgPrint("********SuspendFlag: {}".format(suspendFlag))
 
         if suspendFlag == 'True':
-            item.setProperty(SF,'False')
+            item.setProperty(SF, 'False')
             self.client.enablePlayListItem(id)
             if title[0] == "*":
                 item.setProperty(DESC, title[1:])
@@ -760,12 +748,12 @@ class GUI(xbmcgui.WindowXMLDialog):
             if title[0] != "*":
                 item.setProperty(DESC, "*" + title)
 
-
     def openSettingsDialog(self):
         xbmc.executebuiltin("Addon.OpenSettings({})".format(ADDONID))
 
     def showVacationModeDialog(self):
-        xbmcgui.Dialog().notification(LTVPL, GETTEXT(30062)) #"Vacation Mode is Active..."
+        xbmcgui.Dialog().notification(LTVPL, GETTEXT(30062))  # "Vacation Mode is Active..."
+
 
 @TS_decorator
 def showMainDialog(queue, bDialog):
@@ -778,7 +766,6 @@ def showMainDialog(queue, bDialog):
         clearDialogActive(MAIN_DIALOGTAG)
         del ui
         del bDialog
-
 
 
 @TS_decorator
@@ -798,7 +785,7 @@ def ShowBusyDialog(bDialog, queue, tmpBD):
 
 
 def showVacationModeDialog():
-    xbmcgui.Dialog().notification(LTVPL, GETTEXT(30062)) #Vacation Mode Active
+    xbmcgui.Dialog().notification(LTVPL, GETTEXT(30062))  # Vacation Mode Active
 
 
 class doSettings(object):
@@ -808,9 +795,7 @@ class doSettings(object):
         self.client = None
 
     def __call__(self):
-        from time import sleep
         global VACATIONMODE_VALUE
-
 
         VACATIONMODE_VALUE = ADDON.getSetting(VACATIONMODE) == TRUE
         dbgmode = ADDON.getSetting(DEBUGMODE) == TRUE
@@ -845,15 +830,16 @@ class doSettings(object):
 
         self.signal.set()
 
+
 if (__name__ == '__main__'):
     import EPGcapture
+
     queue = Queue()
     DbgPrint("len(sys.argv)={}".format(len(sys.argv)))
 
-
     bDialog = myBusyDialog()
     if checkForEPG():
-        if VACATIONMODE_VALUE == False:
+        if not VACATIONMODE_VALUE:
             epgData = getEPG_Data()
             bDialog.show()
             xbmc.sleep(2000)

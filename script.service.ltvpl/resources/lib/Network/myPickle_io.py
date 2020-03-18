@@ -18,7 +18,6 @@
 #  http://www.gnu.org/copyleft/gpl.html
 #
 import pickle
-from resources.lib.Utilities.DebugPrint import DbgPrint
 
 __Version__ = "1.0.1"
 
@@ -44,7 +43,7 @@ class myPickle_io(object):
         try:
             data = pickle.load(fp)
             self.Data = data.encode('utf-8')
-        except:
+        except Exception as e:
             fp.seek(0,0)
             bdata = fp.read()
             data=pickle.loads(bdata.encode())

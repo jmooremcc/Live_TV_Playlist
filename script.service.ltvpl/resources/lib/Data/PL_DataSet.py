@@ -17,25 +17,26 @@
 #  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #  http://www.gnu.org/copyleft/gpl.html
 #
-import json
 import time
 from copy import copy
 from datetime import datetime, timedelta
-from resources.lib.Network.myPickle_io import myPickle_io
+
+from resources.lib.KodiLib.KodiUtilities import kodiObj, changeChannelByChannelNumber, playerStop, \
+    getBroadcast_startTimeList, KODI_ENV
 from resources.lib.Network.myJson_io import myJson_io
+from resources.lib.Network.myPickle_io import myPickle_io
 from resources.lib.Network.utilities import genericEncode, encodeError
+from resources.lib.Utilities.AlarmsMgr import _Alarms
 from resources.lib.Utilities.DebugPrint import DbgPrint
+from resources.lib.Utilities.Messaging import Cmd, VACATIONMODE, PREROLLTIME
 from resources.lib.Utilities.Messaging import NotificationAction, OpStatus
 from resources.lib.Utilities.PythonEvent import Event
+from resources.lib.Utilities.VirtualEvents import TS_decorator
 from .PlayListItem import PlayListItem, isPlayListItem, RecurrenceOptions, ALARMPADDING
 from .fileManager import fileManager, FileManagerMode
-from resources.lib.KodiLib.KodiUtilities import kodiObj, changeChannelByChannelNumber, playerStop, getBroadcast_startTimeList, KODI_ENV
-from resources.lib.Utilities.Messaging import Cmd, VACATIONMODE, PREROLLTIME
-from resources.lib.Utilities.AlarmsMgr import _Alarms
-from resources.lib.Utilities.VirtualEvents import TS_decorator
+
 if KODI_ENV:
     import xbmcgui
-    import xbmc
     import xbmcaddon
 
     ADDON = xbmcaddon.Addon()
@@ -86,7 +87,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
 
     @TS_decorator
     def _processVacationMode(self, mode):
-        if mode == True:
+        if mode:
             self.CancelAll(notify=False)
         else:
             self.verifyDataset()
@@ -235,6 +236,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
 
     def onPLX_Event(self, item, doNotBackup=False, simulationOn=False):
         """
+        :param simulationOn:
         :param PlayListItem item:
         :param doNotBackup:
         :return:
@@ -251,7 +253,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                 self.Remove(item)
                 DbgPrint("Item Removed from list!!!",MODULEDEBUGMODE=MODULEDEBUGMODE)
                 return NotificationAction.ItemRemoved
-            except:
+            except Exception as e:
                 raise Exception("Item has expired")
         elif recurrenceInterval==RecurrenceOptions.DAILY:
             diff=alarmtime - datetime.now()
@@ -310,7 +312,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
 
             newtime=one_month_later
 
-        if simulationOn == False:
+        if not simulationOn:
             #Restart item with new alarmtime
             if newtime is not None:
                 item.Cancel()
@@ -327,11 +329,11 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                 try:
                     item.Start()
 
-                    if doNotBackup == False:
+                    if not doNotBackup:
                         self.fileManager.Dirty = True
                         self.fileManager.backup()
 
-                    if self.skipOperationActive == False:
+                    if not self.skipOperationActive:
                         data1 = genericEncode(Cmd.UpdatePlayListItem, item.Data)
                         data = genericEncode(NotificationAction.ItemUpdated, data1)
                         self.ItemUpdatedEvent(data)
@@ -358,7 +360,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                 continue
 
             diff = abs(alarmtime - lstItem.alarmtime)
-            if diff.days == 0 and diff.seconds >= 0 and diff.seconds <= 30:
+            if diff.days == 0 and 0 <= diff.seconds <= 30:
                 conflictList.append(lstItem)
 
         return conflictList
@@ -408,13 +410,13 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         item.AddPLX_EventHandler(self.onPLX_Event)
         item.AddChChangeEventHandler(self.onChannelChange_Event)
         self.FireItemAddedEvent(item)
-        if doNotStartFlag == False:
+        if not doNotStartFlag:
             item.Start()
             self.fileManager.Dirty = True
             self.fileManager.backup()
 
     def AddPlayList(self, item):
-        if self.vacationmode==True:
+        if self.vacationmode:
             raise DataSetError(OpStatus.VacationModeActive, "Vacation Mode Active")
 
         if not isPlayListItem(item):
@@ -424,11 +426,11 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         if len(conflicts)> 0:
             raise ItemConflictError(item,conflicts)
 
-        if self.isItemInList(item) == False:
+        if not self.isItemInList(item):
             if item.isStale():
                 try:
                     self.onPLX_Event(item,doNotBackup=True)
-                    if self.isItemInList(item) == False:
+                    if not self.isItemInList(item):
                         self._addPlayList(item,doNotStartFlag=True)
                         self.fileManager.Dirty = True
                         self.fileManager.backup()
@@ -509,7 +511,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                             tmp.alarmtime = startTimes[0]
                             tmp.recurrenceInterval=RecurrenceOptions.ONCE
                             self.AddPlayList(tmp)
-            except:
+            except Exception as e:
                 pass
 
     def GetPlayList(self):
@@ -529,7 +531,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
 
 
     def SkipEvent(self, item, doNotBackup=False, simulationOn=False):
-        if isPlayListItem(item)==False:
+        if not isPlayListItem(item):
             raise TypeError("Item is not a PlayListItem")
 
         self.skipOperationActive = True
@@ -549,7 +551,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         """
         :type item: PlayListItem
         """
-        if isPlayListItem(item)==False:
+        if not isPlayListItem(item):
             raise TypeError("Item is not a PlayListItem")
 
         try:
@@ -558,7 +560,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
             self.FireItemRemovedEvent(item)
             self.fileManager.Dirty = True
             self.fileManager.backup()
-        except:
+        except Exception as e:
             raise Exception("Problem deleting {}".format(item))
 
 
@@ -603,7 +605,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         return None
 
     def Start(self):
-        if self.vacationmode==True:
+        if self.vacationmode:
             DbgPrint("Cannot Start Playlist Items: Vacation Mode is Active",MODULEDEBUGMODE=MODULEDEBUGMODE)
             return
 
@@ -612,7 +614,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
             item.Start()
             flag=True
 
-        if flag == False:
+        if not flag:
             DbgPrint("NOthing to Start!!",MODULEDEBUGMODE=MODULEDEBUGMODE)
             pass
 
@@ -667,11 +669,11 @@ class PL_DataSet(list,myPickle_io,myJson_io):
             del items['vacationmode']
             self.lastChannel = items['lastChNumber']
             del items['lastChNumber']
-        except: pass
+        except Exception as e: pass
 
         for v in items.values():
             item=self.CreatePlayListItem(v)
-            if item.isStale() == False:
+            if not item.isStale():
                 self._addPlayList(item)
             elif item.recurrenceInterval != RecurrenceOptions.ONCE:
                 self._addPlayList(item, doNotStartFlag=True)

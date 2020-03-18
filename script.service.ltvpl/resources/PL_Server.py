@@ -23,15 +23,16 @@ from threading import Timer
 
 from resources.lib.Data.PL_DataSet import PL_DataSet, DataSetError, ItemConflictError
 from resources.lib.Data.PlayListItem import PlayListItem, PlayListItemError, RecurrenceOptions
-from resources.lib.KodiLib.KodiUtilities import kodiObj, getChannelGroups, getChannelInfo, getLastChannelInfo, TvGuideIsPresent
+from resources.lib.KodiLib.KodiUtilities import kodiObj, getChannelGroups, getChannelInfo, getLastChannelInfo, \
+    TvGuideIsPresent
 from resources.lib.Network.ClientServer import Server
 from resources.lib.Network.SecretSauce import *
-from resources.lib.Network.utilities import decodeRequest, encodeResponse, encodeErrorResponse, decodeError, genericEncode
+from resources.lib.Network.utilities import decodeRequest, encodeResponse, encodeErrorResponse, decodeError, \
+    genericEncode
 from resources.lib.Utilities.DebugPrint import DbgPrint, setDebugMode, startTimer, stopTimer
 from resources.lib.Utilities.Messaging import Cmd, OpStatus, xlateCmd2Notification, DAILYSTOPCOMMAND, STOPCMD_ACTIVE, \
-    NotificationAction, VACATIONMODE,DEBUGMODE, ALARMTIME, PREROLLTIME, AUTOCLEANMODE
+    VACATIONMODE, DEBUGMODE, ALARMTIME, PREROLLTIME, AUTOCLEANMODE
 from resources.lib.Utilities.VirtualEvents import TS_decorator, CmdRouter
-
 
 __Version__ = "1.1.1"
 
@@ -85,7 +86,7 @@ class PL_Server(object):
                     DbgPrint("Got Last Channel & Tv Guide...")
                     self.dataSet.verifyDataset()
                     break
-            except: pass
+            except Exception as e: pass
 
             sleep(5)
             count -= 1
@@ -208,6 +209,7 @@ class PL_Server(object):
     @CmdRouter(Cmd.SetVacationMode, cmds)
     def SetVacationMode(self, conn, args):
         """
+        :param conn:
         :param args: boolean
         :return:
         """
@@ -330,7 +332,7 @@ class PL_Server(object):
             data = self.dataSet.Data
             try:
                 del data['lastChNumber']
-            except: pass
+            except Exception as e: pass
 
             self.ReturnData(conn, Cmd.GetPlayList,data, notify=False)
         except Exception as e:
@@ -402,7 +404,7 @@ class PL_Server(object):
             self.dataSet.FireSettingsChangedEvent(DAILYSTOPCOMMAND, {STOPCMD_ACTIVE: False, 'alarmtime': None})
 
         elif dailyStopCmdActive and strStopCmdAlarmtime is not None:
-            if dailyStopCmdActive == False:
+            if not dailyStopCmdActive:
                 return
 
             if len(strStopCmdAlarmtime) <= 0:
