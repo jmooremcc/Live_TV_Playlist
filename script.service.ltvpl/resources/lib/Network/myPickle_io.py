@@ -18,6 +18,7 @@
 #  http://www.gnu.org/copyleft/gpl.html
 #
 import pickle
+import codecs
 
 __Version__ = "1.0.1"
 
@@ -34,15 +35,15 @@ class myPickle_io(object):
 
     def ExportPKL(self,fp):
         data=self.Data.copy()
-        # DbgPrint("list:{}".format(data))
-        data = pickle.dumps(data)
-        fp.write(data.decode())
+        pickledData = codecs.encode(pickle.dumps(data), "base64").decode()
+        fp.write(pickledData)
     
 
     def ImportPKL(self,fp):
         try:
-            data = pickle.load(fp)
-            self.Data = data.encode('utf-8')
+            pickledData = fp.read().encode()
+            data = pickle.loads(codecs.decode(pickledData,"base64"))
+            self.Data = data
         except Exception as e:
             fp.seek(0,0)
             bdata = fp.read()

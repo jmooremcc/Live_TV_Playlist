@@ -36,7 +36,7 @@ from utility import setDialogActive, isDialogActive, clearDialogActive, myLog
 
 __Version__ = "1.1.1"
 
-ACTION_BACK = 92
+ACTION_NAV_BACK = 92
 ACTION_PARENT_DIR = 9
 ACTION_PREVIOUS_MENU = 10
 ACTION_CONTEXT_MENU = 117
@@ -47,6 +47,9 @@ ACTION_UP = 3
 ACTION_DOWN = 4
 ACTION_SELECT_ITEM = 7
 ACTION_MOUSE_LEFT_CLICK = 100
+ACTION_MOUSE_RIGHT_CLICK = 101
+ACTION_MOUSE_DOUBLE_CLICK = 103
+ACTION_MOUSE_MOVE = 107
 
 CLOSE_BUTTON = 3001
 IMAGE_CONTROL = 200
@@ -106,6 +109,7 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
     def __init__(self, addonID, shutdownCallback=None, stopbusydialogcallback=None, editData=None, epgData=None):
         super(captureEpgItem, self).__init__()
         self.addonID = addonID
+        self.freqSelect = None
 
         if shutdownCallback is not None:
             DbgPrint("***shutdonwcallback set")
@@ -244,8 +248,8 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
 
     def onAction(self, action):
         actionId = action.getId()
-        #
-        if actionId in [ACTION_CONTEXT_MENU, ACTION_PARENT_DIR, ACTION_PREVIOUS_MENU, ACTION_BACK]:
+
+        if actionId in [ACTION_CONTEXT_MENU, ACTION_PARENT_DIR, ACTION_PREVIOUS_MENU, ACTION_NAV_BACK]:
             return self.closeDialog()
         elif actionId == ACTION_SELECT_ITEM or actionId == ACTION_MOUSE_LEFT_CLICK:
             ctrl = self.getControl(SUBMIT_BUTTON)
@@ -262,10 +266,14 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
         alarmtime = getDateItem(self.getProperty('pgmDate'), self.getProperty('pgmTime'))
         ch = self.getProperty('pgmCh')
         title = self.getProperty('pgmTitle')
-        selectctrl = self.getControl(FREQ_SELECTOR)
-        tmp = selectctrl.getSelectedItem().getLabel().upper()
-        DbgPrint("***tmpvalue:{}".format(tmp))
-        selectedFreq = self.xlateRecurrenceOptions(tmp).upper()
+        if self.freqSelect is None:
+            selectctrl = self.getControl(FREQ_SELECTOR)
+            tmp = selectctrl.getSelectedItem().getLabel().upper()
+            DbgPrint("***tmpvalue:{}".format(tmp))
+            selectedFreq = self.xlateRecurrenceOptions(tmp).upper()
+        else:
+            selectedFreq = self.freqSelect
+
         DbgPrint("selectedFreq:{}".format(selectedFreq))
         freq = RecurrenceOptions[selectedFreq]
         expDate = self.getProperty('pgmExpiration')
@@ -327,6 +335,22 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
                 DbgPrint("***Exception:{}".format(str(e)))
                 DbgPrint("***USpgmDate Property: {}".format(self.getProperty('USpgmDate')))
                 xbmcgui.Dialog().notification(LTVPL_HEADER, str(e), xbmcgui.NOTIFICATION_ERROR)
+            self.closeDialog()
+
+        elif controlId == FREQ_SELECTOR:
+            selectctrl = self.getControl(FREQ_SELECTOR)
+            tmp = selectctrl.getSelectedItem().getLabel().upper()
+            self.freqSelect = self.xlateRecurrenceOptions(tmp).upper()
+            selectctrl.setEnabled(False)
+
+    def onAction(self, action):
+        actionId = action.getId()
+        #
+        if actionId == ACTION_MOUSE_RIGHT_CLICK:
+            ctrl = self.getControl(FREQ_SELECTOR)
+            ctrl.setEnabled(True)
+
+        elif actionId in [ACTION_NAV_BACK, ACTION_PREVIOUS_MENU]:
             self.closeDialog()
 
 

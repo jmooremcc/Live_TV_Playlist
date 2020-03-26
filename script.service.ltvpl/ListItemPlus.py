@@ -108,8 +108,7 @@ class ListItemPlus(xbmcgui.ListItem):
         #
         DbgPrint("Data.Setter Input Values:{}".format(values))
         try:
-            keys = copy.copy(values.keys())
-            keys.sort()
+            keys = copy.copy(sorted(list(values.keys())))
             for n, key in enumerate(keys):
                 if key not in self.dtags:
                     myLog("****key:{} value:{}".format(key,values[key]))

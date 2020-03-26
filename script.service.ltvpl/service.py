@@ -231,13 +231,11 @@ if __name__ == '__main__':
         monitor = Monitor(server, cdService)
         monitor.waitForAbort()
 
-        xbmc.log("vacationmode1:{}".format(ADDON.getSetting(VACATIONMODE)))
         cdService.Stop()
         server.stopServer()
-        xbmc.log("vacationmode2:{}".format(ADDON.getSetting(VACATIONMODE)))
 
         del monitor
         del cdService
         del server
         clearDialogActive(PLSERVERTAG)
-        xbmc.log("Live TV Playlist Server Stopped...")
+        xbmc.log("Live TV Playlist Server Stopped...", level=xbmc.LOGNOTICE)

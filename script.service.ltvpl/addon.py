@@ -442,7 +442,7 @@ class GUI(xbmcgui.WindowXMLDialog):
             index = self.list.getSelectedPosition()
             myLog("***Main ActionDown: {:d}".format(index))
             if index == self.list.size():
-                self.setCurrentListPosition(0)
+                pass
 
         elif actionID == ACTION_MOVE_UP and self.getFocusId() == MAIN_LIST:
             index = self.list.getSelectedPosition()
@@ -452,7 +452,8 @@ class GUI(xbmcgui.WindowXMLDialog):
 
         elif actionID == ACTION_SELECT_ITEM or actionID == ACTION_MOUSE_LEFT_CLICK:
             pos = self.list.getSelectedPosition()
-            if pos < 0:
+            ctrlId = self.getFocusId()
+            if pos < 0 or ctrlId != MAIN_LIST:
                 return
 
             item = ListItemPlus(self.list.getListItem(pos))

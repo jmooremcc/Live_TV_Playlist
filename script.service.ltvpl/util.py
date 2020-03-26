@@ -69,7 +69,7 @@ LTVPL_HEADER = LTVPL = 'Live TV Playlist'
 ACTIVATIONKEY = 'activationkey'
 
 def GETTEXT(id):
-    return ADDON.getLocalizedString(id).encode('utf-8')
+    return ADDON.getLocalizedString(id)
 
 def getRegionDatetimeFmt():
     timefmt = xbmc.getRegion('time')
