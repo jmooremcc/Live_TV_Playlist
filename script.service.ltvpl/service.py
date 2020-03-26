@@ -22,7 +22,7 @@ import os, sys
 import xbmc
 import xbmcgui
 
-__Version__ = "1.0.1"
+__Version__ = "1.0.2"
 
 #from logger import logxbmc.log("***path")
 
@@ -86,7 +86,7 @@ class Monitor(xbmc.Monitor):
         self.stopcmd_active=str(ADDON.getSetting(STOPCMD_ACTIVE)).lower() == TRUE
         self.strAlarmtime=str(ADDON.getSetting(ALARMTIME))
         self.preroll_time=int(ADDON.getSetting(PREROLLTIME))
-        self.activationkey=ADDON.getSetting(ACTIVATIONKEY)
+        # self.activationkey=ADDON.getSetting(ACTIVATIONKEY)
         self.autocleanMode=ADDON.getSetting(AUTOCLEANMODE)
 
     def onSettingsChanged(self):
@@ -106,11 +106,6 @@ class Monitor(xbmc.Monitor):
         if self.countdown_duration != countdown_duration:
             self.countdown_duration=countdown_duration
             self.cdService.CountDownDuration = countdown_duration
-
-        # Activation Key
-        activationkey=ADDON.getSetting(ACTIVATIONKEY)
-        if self.activationkey != activationkey:
-            self.activationkey=activationkey
 
         #Debug_Mode
         LocalOperationFlag=True
