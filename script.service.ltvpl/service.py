@@ -86,7 +86,6 @@ class Monitor(xbmc.Monitor):
         self.stopcmd_active=str(ADDON.getSetting(STOPCMD_ACTIVE)).lower() == TRUE
         self.strAlarmtime=str(ADDON.getSetting(ALARMTIME))
         self.preroll_time=int(ADDON.getSetting(PREROLLTIME))
-        # self.activationkey=ADDON.getSetting(ACTIVATIONKEY)
         self.autocleanMode=ADDON.getSetting(AUTOCLEANMODE)
 
     def onSettingsChanged(self):
