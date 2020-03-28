@@ -305,7 +305,6 @@ class GUI(xbmcgui.WindowXMLDialog):
     def __init__(self, defaultSkin, defaultRes, bDialog, queue, *args, **kwargs):
         super(GUI, self).__init__(*args, **kwargs)
 
-        address = ('localhost', ServerPort)
         self.client = None
         self.signal = Signal()
         self.blockNotification = False
@@ -339,7 +338,7 @@ class GUI(xbmcgui.WindowXMLDialog):
             self.client.addDataReceivedEventHandler(self.onResponseReceived)
             self.client.addNotificationReceivedEventHandler(self.onNotificationReceived)
         except Exception as e:
-            pass
+            DbgPrint(e)
 
     def BuildHeader(self):
         for val in HDR_FORMAT:
@@ -396,7 +395,7 @@ class GUI(xbmcgui.WindowXMLDialog):
             self.closeDialog()
 
     def closeDialog(self):
-        window_id = xbmcgui.getCurrentWindowId()
+        # window_id = xbmcgui.getCurrentWindowId()
         if self.client is not None:
             self.client.closeConnection()
 
@@ -595,7 +594,7 @@ class GUI(xbmcgui.WindowXMLDialog):
             self.list_items.append(item)
             self.sortItemListByDate()
         except Exception as e:
-            pass
+            DbgPrint(e)
 
     def clearItems(self):
         self.clearList()
@@ -624,7 +623,9 @@ class GUI(xbmcgui.WindowXMLDialog):
                 try:
                     id = data['id']
                 except Exception as e:
+                    DbgPrint(e)
                     id = data
+
                 DbgPrint("****self.removeItemByID({})".format(id))
                 self.removeItemByID(id)
 
@@ -638,7 +639,9 @@ class GUI(xbmcgui.WindowXMLDialog):
                 try:
                     id = data['id']
                 except Exception as e:
+                    DbgPrint(e)
                     id = data
+
                 DbgPrint("****self.updateItemByID({},{})".format(id, data))
                 self.updateItemByID(id, data)
 
@@ -649,6 +652,7 @@ class GUI(xbmcgui.WindowXMLDialog):
                 try:
                     VACATIONMODE_VALUE = data['SetVacationMode']
                 except Exception as e:
+                    DbgPrint(e)
                     VACATIONMODE_VALUE = data
 
                 self.setVacationModeProperty()
@@ -680,7 +684,7 @@ class GUI(xbmcgui.WindowXMLDialog):
                 dataSetData[VACATIONMODE]
                 del dataSetData[VACATIONMODE]
             except Exception as e:
-                pass
+                DbgPrint(e)
 
             for key in dataSetData:
                 myLog("**Data: {}".format(dataSetData[key]))
@@ -776,13 +780,11 @@ def showEPGCaptureDialog(epgData, bDialog):
 
 
 @TS_decorator
-def ShowBusyDialog(bDialog, queue, tmpBD):
+def ShowBusyDialog(queue, tmpBD):
     winID = queue.get(True, None)
     myLog("****Activating Busy Dialog...: {}".format(winID))
     tmpBD.Stop()
-    # bDialog.show()
     myLog("****Main winID: {}".format(winID))
-    # bDialog.show()
 
 
 def showVacationModeDialog():
@@ -799,7 +801,7 @@ class doSettings(object):
         global VACATIONMODE_VALUE
 
         VACATIONMODE_VALUE = ADDON.getSetting(VACATIONMODE) == TRUE
-        dbgmode = ADDON.getSetting(DEBUGMODE) == TRUE
+        # dbgmode = ADDON.getSetting(DEBUGMODE) == TRUE
 
         try:
             self.connectToServer()

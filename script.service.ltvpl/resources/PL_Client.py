@@ -175,7 +175,7 @@ class PL_Client(object):
         :type recurrenceInterval: RecurrenceOptions
         """
 
-        obj=PlayListItem(alarmtime=alarmTime,chID=0,ch=ch, title=title,recurrenceInterval=recurrenceInterval)
+        obj=PlayListItem(alarmtime=alarmTime, ch=ch, title=title, recurrenceInterval=recurrenceInterval)
 
         request = encodeRequest(Cmd.AddPlayListItem, obj.Data)
         self.sendRequest(request)
@@ -244,7 +244,7 @@ class PL_Client(object):
 if __name__=='__main__':
     address = ('localhost', ServerPort)
     c = PL_Client(address)
-    glist=c.GetChGroupList()
+    c.GetChGroupList()
     sleep(10)
     c.c.ServerShutDown()
     pass

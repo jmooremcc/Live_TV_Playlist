@@ -350,8 +350,7 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
             ctrl = self.getControl(FREQ_SELECTOR)
             ctrl.setEnabled(True)
 
-        elif actionId in [ACTION_NAV_BACK, ACTION_PREVIOUS_MENU]:
-            self.closeDialog()
+        super(captureEpgItem, self).onAction(action)
 
 
 def showDialog(addonID, shutdownCallback=None, stopbusydialogcallback=None, editData = None, epgData=None):

@@ -336,7 +336,8 @@ def getBroadcast_startTimeList(kodiObj, channel, tvshow):
     startTimeList = []
     try:
         channelid = getChannelId(kodiObj, channel)
-    except Exception as e: startTimeList
+    except Exception as e:
+        DbgPrint(e)
 
     args = {CHANNELID: channelid}
     DbgPrint("tvshow:{}, channel:{}, args:{}".format(tvshow, channel,args))

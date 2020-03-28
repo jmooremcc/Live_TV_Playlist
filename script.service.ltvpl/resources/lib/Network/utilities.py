@@ -288,8 +288,6 @@ class Utilities(object):
     def toStr(self, item):
         if type(item)==str:
             return item
-        elif type(item)==unicode:
-            return str(item)
         else:
             return str(item)
 

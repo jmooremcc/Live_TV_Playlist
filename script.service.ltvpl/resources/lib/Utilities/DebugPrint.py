@@ -91,7 +91,7 @@ dbmm = _dbmm()
 
 try:
     import xbmc
-    XBMC_PRESENT = xbmc.getFreeMem() != long
+    XBMC_PRESENT = xbmc.getFreeMem() != int
 except Exception as e:
     XBMC_PRESENT = False
 

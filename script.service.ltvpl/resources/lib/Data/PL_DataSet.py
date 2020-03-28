@@ -499,13 +499,13 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                     DbgPrint("Updating item:{}:{}:ch {}".format(item.Title, item.Alarmtime, item.Ch))
                     startTimes = getBroadcast_startTimeList(kodiObj, item.Ch, item.Title)
                     # Normally if we don't find the event in the EPG, we'll just skip the event to the next occurrence
-                    if not item.Alarmtime in startTimes and len(startTimes) > 0:
+                    if not item.Alarmtime in startTimes and len(startTimes) >= 0:
                         DbgPrint("Fixing {} on ch {}".format(item.Title,item.Ch))
                         status = self.SkipEvent(item)
                         self._verifyNotification(item, status)
                         # If this has been a time resheduled event on the same day, then schedule a one time event
                         #   for the show with the rescheduled time
-                        if startTimes[0].date() == datetime.today().date():
+                        if len(startTimes) > 0 and startTimes[0].date() == datetime.today().date():
                             tmp = copy(item)
                             tmp.createNewID()
                             tmp.alarmtime = startTimes[0]

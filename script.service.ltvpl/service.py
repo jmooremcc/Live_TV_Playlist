@@ -18,7 +18,9 @@
 #  http://www.gnu.org/copyleft/gpl.html
 #
 
-import os, sys
+import os
+import sys
+
 import xbmc
 import xbmcgui
 
@@ -35,7 +37,7 @@ from resources.lib.Network.SecretSauce import ServerPort
 from resources.PL_Server import PLSERVERTAG, PL_Server
 from utility import isDialogActive, clearDialogActive, setDialogActive
 from resources.lib.Utilities.Messaging import VACATIONMODE, PREROLLTIME, DAILYSTOPCOMMAND, DEBUGMODE, STOPCMD_ACTIVE,\
-    ALARMTIME, ACTIVATIONKEY, COUNTDOWN_DURATION, TRUE, FALSE, WRITEMODE, AUTOCLEANMODE
+    ALARMTIME, COUNTDOWN_DURATION, TRUE, FALSE, WRITEMODE, AUTOCLEANMODE
 import Countdown
 
 
