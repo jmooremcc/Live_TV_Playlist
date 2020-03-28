@@ -19,7 +19,7 @@
 #  http://www.gnu.org/copyleft/gpl.html
 #
 
-__Version__ = "0.9.6"
+__Version__ = "1.0.0"
 
 try:
     import Queue as Q  # ver. < 3.0
@@ -52,14 +52,14 @@ def status():
         myLog("Alarms Active:")
         myLog("   {:>3}->{}".format(0, _alarms.mt.Activetimer))
     except Exception as e:
-        pass
+        DbgPrint(e)
 
     myLog("Alarms Queued:")
     for n,i in enumerate(range(_alarms.pq.qsize())):
         try:
             myLog("   {:>3}->{}".format(n+1, _alarms.pq.queue[i]))
         except Exception as e:
-            pass
+            DbgPrint(e)
 
     myLog("*****")
     masterRlock.release()

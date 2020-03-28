@@ -20,7 +20,7 @@
 import locale
 from datetime import datetime
 
-__Version__ = "1.1.0"
+__Version__ = "1.1.1"
 
 try:
     locale.setlocale(locale.LC_ALL, '')
@@ -49,6 +49,7 @@ def strTimeStamp(tData, dataformat="{:%m/%d/%Y}"):
         strTime = strTime.format(tData)
     except Exception as e:
         strDate = strTime = ''
+        DbgPrint(e)
 
     return (strDate, strTime)
 
@@ -93,7 +94,8 @@ class ListItemPlus(xbmcgui.ListItem):
                 DbgPrint("***tmp:{}".format(tmp))
                 values.update(tmp)
                 DbgPrint("values:{}".format(values))
-            except Exception as e: pass
+            except Exception as e:
+                DbgPrint(e)
 
         for tag in self.dtags:
             tmp = dict([(tag,self.getProperty(tag))])
@@ -137,6 +139,4 @@ class ListItemPlus(xbmcgui.ListItem):
             self.setProperty('Expires', strDate)
 
         except Exception as e:
-            #
             DbgPrint("Data.Setter Error:{}".format(str(e)))
-            pass

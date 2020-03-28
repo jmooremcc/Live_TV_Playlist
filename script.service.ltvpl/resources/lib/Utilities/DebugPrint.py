@@ -32,7 +32,7 @@ except ImportError:
     from util import DEBUGFILE_DEFAULTPATH as DEBUGCACHEFILE
 
 
-__Version__ = "1.0.3"
+__Version__ = "1.0.4"
 
 """
     Place MODULEDEBUGMODE=value at the top of a module to control DebugMode
@@ -142,7 +142,7 @@ def DbgPrint(*args, **kwargs):
         # DebugFlag=kwargs['MODULEDEBUGMODE'] and DEBUGMODE
         del kwargs['MODULEDEBUGMODE']
         DebugFlag = DEBUGMODE
-    except Exception as e:
+    except:
         DebugFlag=DEBUGMODE
 
     if DebugFlag:

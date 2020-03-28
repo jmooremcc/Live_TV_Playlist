@@ -20,7 +20,10 @@
 import xml.etree.ElementTree as ET
 from resources.lib.Utilities.indent import indent2
 
-__Version__ = "1.0.0"
+from resources.lib.Utilities.DebugPrint import DbgPrint
+
+
+__Version__ = "1.0.1"
 
 class myXML_io(object):
     def __init__(self):
@@ -34,7 +37,7 @@ class myXML_io(object):
             indent2(elem)
             tree = ET.ElementTree(elem)
         except Exception as e:
-            pass
+            DbgPrint(e)
         tree.write(fp)
 
     def ImportXML(self, fp):
@@ -42,4 +45,4 @@ class myXML_io(object):
             tree = ET.ElementTree(file=fp)
             self.XML=tree
         except Exception as e:
-            pass
+            DbgPrint(e)

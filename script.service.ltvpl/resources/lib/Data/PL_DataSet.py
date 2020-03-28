@@ -44,7 +44,7 @@ if KODI_ENV:
     def GETTEXT(id):
         return ADDON.getLocalizedString(id).encode('utf-8')
 
-__Version__ = "1.1.2"
+__Version__ = "1.1.3"
 
 DELETE_WAIT_TIME=1
 MODULEDEBUGMODE=True
@@ -230,7 +230,8 @@ class PL_DataSet(list,myPickle_io,myJson_io):
 
             self.abortOperation = False
 
-    def StopVideoPlayer(self):
+    @staticmethod
+    def StopVideoPlayer():
         playerStop(kodiObj)
 
 
@@ -349,7 +350,8 @@ class PL_DataSet(list,myPickle_io,myJson_io):
             DbgPrint("newtime: {}".format(newtime))
             item.alarmtime = newtime
 
-    def CreatePlayListItem(self,data):
+    @staticmethod
+    def CreatePlayListItem(data):
         obj=PlayListItem()
         obj.Data=data
         return obj
@@ -512,7 +514,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                             tmp.recurrenceInterval=RecurrenceOptions.ONCE
                             self.AddPlayList(tmp)
             except Exception as e:
-                pass
+                DbgPrint(e)
 
     def GetPlayList(self):
         plList=[]
@@ -561,9 +563,8 @@ class PL_DataSet(list,myPickle_io,myJson_io):
             self.fileManager.Dirty = True
             self.fileManager.backup()
         except Exception as e:
+            DbgPrint(e)
             raise Exception("Problem deleting {}".format(item))
-
-
 
 
     def clear(self):
@@ -616,14 +617,11 @@ class PL_DataSet(list,myPickle_io,myJson_io):
 
         if not flag:
             DbgPrint("NOthing to Start!!",MODULEDEBUGMODE=MODULEDEBUGMODE)
-            pass
+
 
     def CancelAll(self, notify=True):
         self.StopAllPlaylistItems(notify=notify)
-        # if notify:
-        #     self.FireItemCancelledEvent(item)
 
-        # self.fileManager.backup()
 
     def Cancel(self, index, notify=True):
         if index < 0 or index >= len(self):
@@ -669,7 +667,8 @@ class PL_DataSet(list,myPickle_io,myJson_io):
             del items['vacationmode']
             self.lastChannel = items['lastChNumber']
             del items['lastChNumber']
-        except Exception as e: pass
+        except Exception as e:
+            DbgPrint(e)
 
         for v in items.values():
             item=self.CreatePlayListItem(v)
@@ -681,6 +680,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
 
         if vacationmode:
             self.VacationMode = True
+
 
 class ItemConflictError(Exception):
     def __init__(self, item, cList):

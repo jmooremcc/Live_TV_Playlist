@@ -31,7 +31,9 @@ if KODI_ENV:
 else:
     import requests
 
-__Version__ = "1.0.2"
+from resources.lib.Utilities.DebugPrint import DbgPrint
+
+__Version__ = "1.0.3"
 
 # this list will be extended with types dynamically defined
 __all__ = ["PLAYER_VIDEO",
@@ -104,11 +106,12 @@ class KodiJsonTransport(KodiTransport):
                 tmp = xbmc.executeJSONRPC(values.encode('utf-8'))
                 status = json.loads(tmp)
             except Exception as e:
+                DbgPrint(e)
                 try:
                     tmp = xbmc.executeJSONRPC(values)
                     status = json.loads(tmp)
                 except Exception as e:
-                    pass
+                    DbgPrint(e)
 
             # DbgPrint("JSONRPC Return Value: {}".format(status))
             return status

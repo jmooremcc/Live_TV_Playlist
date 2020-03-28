@@ -25,7 +25,9 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 
-__Version__ = "1.0.0"
+from resources.lib.Utilities.DebugPrint import DbgPrint
+
+__Version__ = "1.0.1"
 
 ACTION_BACK          = 92
 ACTION_PARENT_DIR    = 9
@@ -66,9 +68,9 @@ class ContextMenu(xbmcgui.WindowXMLDialog):
         for i in range(4):
             self.getControl(5001+i).setVisible(False)
             
-        nItem = len(self.menu)  
+        nItem = len(self.menu)
         if nItem > 4:
-            nItem = 4      
+            nItem = 4
         id = 5000 + nItem
         self.getControl(id).setVisible(True)
             
@@ -95,7 +97,7 @@ class ContextMenu(xbmcgui.WindowXMLDialog):
         #xbmc.executebuiltin("Action(Back)")
 
            
-    def onAction(self, action):        
+    def onAction(self, action):
         actionId = action.getId()
 
         if actionId in [ACTION_CONTEXT_MENU, ACTION_PARENT_DIR, ACTION_PREVIOUS_MENU, ACTION_BACK]:
@@ -104,9 +106,12 @@ class ContextMenu(xbmcgui.WindowXMLDialog):
 
     def onClick(self, controlId):
         if controlId != 3001:
-            index = self.list.getSelectedPosition()        
-            try:    self.params = self.paramList[index]
-            except Exception as e: self.params = None
+            index = self.list.getSelectedPosition()
+            try:
+                self.params = self.paramList[index]
+            except Exception as e:
+                self.params = None
+                DbgPrint(e)
 
         self.closeDialog()
         

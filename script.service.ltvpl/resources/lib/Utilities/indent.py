@@ -18,7 +18,7 @@
 #  http://www.gnu.org/copyleft/gpl.html
 #
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 def indent(elem, level=0):
     TabSpace = "  "

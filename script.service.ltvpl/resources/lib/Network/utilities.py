@@ -39,7 +39,7 @@ from resources.lib.Utilities.Messaging import Cmd, MsgType, NotificationAction, 
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Network.SecretSauce import DATAEndMarker
 
-__Version__ = "1.0.2"
+__Version__ = "1.0.3"
 
 MODULEDEBUGMODE=False
 PYVER = float('{}.{}'.format(*sys.version_info[:2]))
@@ -237,6 +237,7 @@ def decodeErrorResponse(result):
         cmd,rData=genericDecode(result)
     except Exception as e:
         DbgPrint("Not an Error Response:{}".format(result),MODULEDEBUGMODE=MODULEDEBUGMODE)
+        DbgPrint(e)
         raise Exception("MsgType is Not an Error Response")
 
     return (parseErrorData(rData))
@@ -258,10 +259,12 @@ class Utilities(object):
     def __init__(self):
         pass
 
-    def rawWritePKL(self,data):
+    @staticmethod
+    def rawWritePKL(data):
         return pickle.dumps(data, protocol=2)
-     
-    def writePKL(self,conn,data):
+
+    @staticmethod
+    def writePKL(conn,data):
         try:
             pdata=pickle.dumps(data, protocol=2)
         except Exception as e:
@@ -270,11 +273,12 @@ class Utilities(object):
         
         conn.sendall(pdata)
 
-
-    def rawReadPKL(self, data):
+    @staticmethod
+    def rawReadPKL(data):
         return pickle.loads(data)
 
-    def readPKL(self,conn):
+    @staticmethod
+    def readPKL(conn):
         try:
             pdata=conn.recv(4096).decode()
             data = pickle.loads(pdata)
@@ -284,18 +288,19 @@ class Utilities(object):
                 
         return data
 
-
-    def toStr(self, item):
+    @staticmethod
+    def toStr(item):
         if type(item)==str:
             return item
         else:
             return str(item)
 
-    def rawWriteJSON(self, data):
+    @staticmethod
+    def rawWriteJSON(data):
         return json.dumps(data)
 
-
-    def writeJSON(self,conn,data):
+    @staticmethod
+    def writeJSON(conn,data):
         # DbgPrint("writeJSON Called",MODULEDEBUGMODE=MODULEDEBUGMODE)
         try:
             if PYVER < 3.0:
@@ -309,11 +314,12 @@ class Utilities(object):
             DbgPrint("ERROR:",str(e),MODULEDEBUGMODE=MODULEDEBUGMODE)
             raise e
 
-    def rawReadJSON(self,data):
+    @staticmethod
+    def rawReadJSON(data):
         return json.loads(data)
 
-
-    def readJSON(self,conn):
+    @staticmethod
+    def readJSON(conn):
         data=None
 
         try:

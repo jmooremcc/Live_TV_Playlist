@@ -34,7 +34,7 @@ from resources.lib.Utilities.Messaging import Cmd, OpStatus, xlateCmd2Notificati
     VACATIONMODE, DEBUGMODE, ALARMTIME, PREROLLTIME, AUTOCLEANMODE
 from resources.lib.Utilities.VirtualEvents import TS_decorator, CmdRouter
 
-__Version__ = "1.1.1"
+__Version__ = "1.1.2"
 
 MODULEDEBUGMODE=True
 
@@ -133,7 +133,7 @@ class PL_Server(object):
         cmd,args=decodeRequest(data)
         arg=args[1]
         DbgPrint("cmd:{}\nargs:{}".format(cmd,arg),MODULEDEBUGMODE=MODULEDEBUGMODE)
-        status=self.cmds[cmd](self, conn, arg) #Call the service provider
+        self.cmds[cmd](self, conn, arg) #Call the service provider
         DbgPrint("Exiting onServerDataReceived",MODULEDEBUGMODE=MODULEDEBUGMODE)
 
     def NotificationSend(self, cmd, data):
@@ -160,7 +160,8 @@ class PL_Server(object):
         rData2 = self.server._processData(rData) + DATAEndMarker
         conn.send(rData2.encode())
 
-    def onChannelChange(self, PL_OBJ):
+    @staticmethod
+    def onChannelChange(PL_OBJ):
         DbgPrint("Deleting {} From List".format(PL_OBJ),MODULEDEBUGMODE=MODULEDEBUGMODE)
 
     @CmdRouter(Cmd.EnablePlayListItem, cmds)
@@ -418,7 +419,8 @@ class PL_Server(object):
 
                 self.enableDailyStopCmd(alarmtime)
                 self.dataSet.FireSettingsChangedEvent(DAILYSTOPCOMMAND,{'stopcmd_active': True, 'alarmtime': strStopCmdAlarmtime})
-            except Exception as e: pass
+            except Exception as e:
+                DbgPrint(e)
 
     def enableDailyStopCmd(self, alarmtime):
         itemlist = self.dataSet.FindCh(Cmd.Stop_Player.value)

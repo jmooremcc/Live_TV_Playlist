@@ -32,7 +32,7 @@ from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Network.utilities import getTimeFilteredDirList
 from resources.lib.Utilities.Messaging import WRITEMODE, READMODE
 
-__Version__ = "1.0.2"
+__Version__ = "1.0.3"
 
 class FileManagerMode(Enum):
     JSON=1
@@ -81,6 +81,7 @@ class fileManager(object):
                 break
             except Exception as e:
                 DbgPrint("Waiting on sentinel file...")
+                DbgPrint(e)
                 sleep(1)
                 count -= 1
 

@@ -25,7 +25,7 @@ from resources.lib.Utilities.DebugPrint import DbgPrint
 from .kodiflags import KODI_ENV
 from .kodijson import Kodi
 
-__Version__ = "1.3.1"
+__Version__ = "1.3.2"
 
 def GetOE2():
     """
@@ -245,6 +245,7 @@ def getChannelInfo(kodiObj,chGroup=1,params=None):
         return([dict(z) for z in z1])
     
     except Exception as e:
+        DbgPrint(e)
         d1=[item for item in (kodiObj.PVR.GetChannels({CHANNELGROUPID:chGroup, PROPERTIES:[CHANNEL]}))[RESULT][CHANNELS]]
          # if callSign in item[CHANNEL]]
 
@@ -361,7 +362,9 @@ def getBroadcastInfo(kodiObj, channel, starttime):
     offset = getUtcOffset()
     try:
         startTime = str(datetime.strptime(starttime, fmt) + offset)
-    except Exception as e: return
+    except Exception as e:
+        DbgPrint(e)
+        return
 
     channelid = getChannelId(kodiObj, channel)
     args = {CHANNELID: channelid, "properties": [STARTTIME]}
@@ -413,7 +416,8 @@ def TvGuideIsPresent(kodiObj, channel):
         broadcastdata = broadcastinfo[RESULT][BROADCASTS]
         if len(broadcastdata) > 0 and type(broadcastdata[0][BROADCASTID]) == int:
             return True
-    except Exception as e: pass
+    except Exception as e:
+        DbgPrint(e)
 
     return False
 

@@ -34,7 +34,7 @@ from resources.lib.Utilities.Messaging import Cmd
 from util import GETTEXT, setUSpgmDate, getRegionDatetimeFmt
 from utility import setDialogActive, isDialogActive, clearDialogActive, myLog
 
-__Version__ = "1.1.1"
+__Version__ = "1.1.2"
 
 ACTION_NAV_BACK = 92
 ACTION_PARENT_DIR = 9
@@ -164,7 +164,7 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
 
             self.setProperty('pgmExpiration', strDate)
         except Exception as e:
-            pass
+            DbgPrint(e)
 
         self.setProperty('pgmFrequency', data['Frequency'])
 
@@ -220,11 +220,13 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
                 freq = self.getProperty('pgmFrequency').lower()
                 pos = [n for n, x in enumerate(RECURRENCE_OPTIONS) if freq == x[0].lower()][0]
                 self.selectctrl.selectItem(pos)
-            except Exception as e: pass
+            except Exception as e:
+                DbgPrint(e)
 
         self.closeBusyDialog()
 
-    def onErrorNotification(self, opstatus, errMsg):
+    @staticmethod
+    def onErrorNotification(opstatus, errMsg):
         xbmc.log("EPGcapture Error Message Received: {}:{}".format(str(opstatus), errMsg))
         if opstatus.value >= 30000:
             msg = GETTEXT(opstatus.value).format(errMsg)
@@ -251,10 +253,18 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
 
         if actionId in [ACTION_CONTEXT_MENU, ACTION_PARENT_DIR, ACTION_PREVIOUS_MENU, ACTION_NAV_BACK]:
             return self.closeDialog()
+
         elif actionId == ACTION_SELECT_ITEM or actionId == ACTION_MOUSE_LEFT_CLICK:
             ctrl = self.getControl(SUBMIT_BUTTON)
             myLog("***Frequency Selected")
             self.setFocus(ctrl)
+
+        elif actionId == ACTION_MOUSE_RIGHT_CLICK:
+            ctrl = self.getControl(FREQ_SELECTOR)
+            ctrl.setEnabled(True)
+
+        super(captureEpgItem, self).onAction(action)
+
 
     def xlateRecurrenceOptions(self, optvalue):
         for opt in RECURRENCE_OPTIONS:
@@ -343,14 +353,6 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
             self.freqSelect = self.xlateRecurrenceOptions(tmp).upper()
             selectctrl.setEnabled(False)
 
-    def onAction(self, action):
-        actionId = action.getId()
-        #
-        if actionId == ACTION_MOUSE_RIGHT_CLICK:
-            ctrl = self.getControl(FREQ_SELECTOR)
-            ctrl.setEnabled(True)
-
-        super(captureEpgItem, self).onAction(action)
 
 
 def showDialog(addonID, shutdownCallback=None, stopbusydialogcallback=None, editData = None, epgData=None):

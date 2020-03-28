@@ -7,7 +7,7 @@ except ImportError:
     try:
         from tkinter import *
         from tkinter import messagebox
-    except Exception:
+    except:
         pass
 
 class ToolTip(object):

@@ -19,7 +19,7 @@
 #
 import json
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 class myJson_io(object):
     def __init__(self):

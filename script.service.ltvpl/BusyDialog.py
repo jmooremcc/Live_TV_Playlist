@@ -3,7 +3,7 @@ import xbmcgui
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from util import GETTEXT
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 PROGRESSBARID = 10
 WORKING = GETTEXT(30047)
@@ -25,10 +25,9 @@ class BusyDialog(xbmcgui.WindowXMLDialog):
         DbgPrint("***progressCtrl: {}->pct:{}".format(pb, pct))
         pb.setPercent(pct)
 
-
-    def iscanceled(self):
+    @staticmethod
+    def iscanceled():
         return False
-
 
 
 class BusyDialog2(xbmcgui.WindowXMLDialog):

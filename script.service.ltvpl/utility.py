@@ -19,13 +19,14 @@
 #
 import xbmc
 import xbmcgui
-from resources.lib.Utilities.DebugPrint import DEBUGMODE
+from resources.lib.Utilities.DebugPrint import DEBUGMODE, DbgPrint
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 try:
     from util import LTVPL_HEADER
-except Exception as e: pass
+except Exception as e:
+    DbgPrint(e)
 
 from resources.lib.Utilities.VirtualEvents import TS_decorator
 
@@ -90,5 +91,6 @@ def isDialogActive(name):
     try:
         return xbmcgui.Window(10000).getProperty(name) == 'true'
     except Exception as e:
+        DbgPrint(e)
         return False
 

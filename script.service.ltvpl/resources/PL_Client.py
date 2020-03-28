@@ -29,7 +29,7 @@ from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Utilities.Messaging import Cmd, MsgType, OpStatus
 from resources.lib.Utilities.PythonEvent import Event
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 MODULEDEBUGMODE=False
 util=Utilities()
@@ -97,7 +97,7 @@ class PL_Client(object):
                 self.fireDataReceivedEvent(cmd,data)
                 self.RemoteDSEvent(cmd,data)
         except Exception as e:
-            pass
+            DbgPrint(e)
 
 
 
@@ -117,6 +117,7 @@ class PL_Client(object):
                 cmd, rData = decodeResponse(pData)
                 self.onDataReceived(cmd, rData)
             except Exception as e:
+                DbgPrint(e)
                 try:
                     cmd, rData = decodeRequest(pData)
                     if cmd in Cmd:
@@ -247,4 +248,4 @@ if __name__=='__main__':
     c.GetChGroupList()
     sleep(10)
     c.c.ServerShutDown()
-    pass
+

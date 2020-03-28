@@ -25,7 +25,9 @@ import os
 import sys
 from datetime import datetime
 
-__Version__ = "1.1.2"
+from resources.lib.Utilities.DebugPrint import DbgPrint
+
+__Version__ = "1.1.3"
 
 PYVER = float('{}.{}'.format(*sys.version_info[:2]))
 
@@ -89,7 +91,8 @@ def setUSpgmDate(obj):
         liDateTime = datetime.strptime(pgmDate, dateformat)
         USpgmDate = liDateTime.strftime("%m/%d/%Y")
         obj.setProperty('USpgmDate', USpgmDate)
-    except Exception as e: pass
+    except Exception as e:
+        DbgPrint(e)
 
 def DialogOK(title, line1, line2='', line3=''):
     d = xbmcgui.Dialog()
@@ -112,6 +115,7 @@ def generateMD5(text):
         import hashlib
         return hashlib.md5(text).hexdigest()
     except Exception as e:
+        DbgPrint(e)
         try:
             import md5
             return md5.new(text).hexdigest()

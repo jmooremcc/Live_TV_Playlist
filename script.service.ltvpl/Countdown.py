@@ -32,7 +32,7 @@ from resources.lib.Utilities.DebugPrint import DbgPrint
 from util import ADDON
 from util import GETTEXT
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 def IdCmd(obj):
     return id(obj)
@@ -41,7 +41,8 @@ LTVPL = 'Live TV Playlist'
 VACATIONMODE_VALUE = False
 try:
     VACATIONMODE_VALUE = ADDON.getSetting('vacationmode') == 'true'
-except Exception as e: pass
+except Exception as e:
+    DbgPrint(e)
 
 ACTION_BACK = 92
 ACTION_PARENT_DIR = 9
@@ -162,9 +163,10 @@ class miniClient(Thread):
             self.client.addDataReceivedEventHandler(self.onResponseReceived)
             self.client.addNotificationReceivedEventHandler(self.onNotificationReceived)
         except Exception as e:
-            pass
+            DbgPrint(e)
 
-    def onErrorNotification(self, opstatus, errMsg):
+    @staticmethod
+    def onErrorNotification(opstatus, errMsg):
         xbmc.log("*****onErrorNotification {}:{}".format(opstatus, errMsg))
         if opstatus.value >= 30000:
             xbmcgui.Dialog().notification(LTVPL, "{}:\n{}".format(str(opstatus), GETTEXT(opstatus.value)), icon=xbmcgui.NOTIFICATION_ERROR)
@@ -313,6 +315,7 @@ class miniClient(Thread):
                         item.setProperty('pgmCh', "{}".format(data['ch']))
                     except Exception as e:
                         item.setProperty('pgmCh', "{:2.1f}".format(float(data['ch'])))
+                        DbgPrint(e)
 
                     item.setProperty('pgmTitle', data['title'])
                     item.setProperty('pgmAlarmtime', data['alarmtime'])
@@ -320,7 +323,7 @@ class miniClient(Thread):
                     DbgPrint("***Returning item: {}".format(data['title']))
                     return item
         except Exception as e:
-            pass
+            DbgPrint(e)
 
     def killThread(self):
         count = 10
@@ -451,7 +454,8 @@ class miniClient(Thread):
             clearDialogActive(COUNTDOWNTAG)
             del ui
 
-    def strDate2TimeStamp(self, tdata):
+    @staticmethod
+    def strDate2TimeStamp(tdata):
         fmt = "%Y-%m-%d %H:%M:%S"
         import time
         ts = datetime(*(time.strptime(tdata, fmt)[0: 6]))

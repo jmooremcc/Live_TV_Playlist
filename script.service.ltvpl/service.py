@@ -24,7 +24,7 @@ import sys
 import xbmc
 import xbmcgui
 
-__Version__ = "1.0.2"
+__Version__ = "1.0.3"
 
 #from logger import logxbmc.log("***path")
 
@@ -39,6 +39,7 @@ from utility import isDialogActive, clearDialogActive, setDialogActive
 from resources.lib.Utilities.Messaging import VACATIONMODE, PREROLLTIME, DAILYSTOPCOMMAND, DEBUGMODE, STOPCMD_ACTIVE,\
     ALARMTIME, COUNTDOWN_DURATION, TRUE, FALSE, WRITEMODE, AUTOCLEANMODE
 import Countdown
+from resources.lib.Utilities.DebugPrint import DbgPrint
 
 
 xbmc.log("***sys.path: "+str(sys.path))
@@ -55,7 +56,7 @@ def establishDataLocations():
         try:
             os.mkdir(ADDON_USERDATA_FOLDER)
         except Exception as e:
-            pass
+            DbgPrint(e)
     else:
         xbmc.log("LTVPL: addonUserDataFolder Exists")
 

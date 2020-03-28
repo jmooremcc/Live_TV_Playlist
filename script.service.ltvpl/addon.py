@@ -37,7 +37,7 @@ import xbmcgui
 from util import ADDON, ADDONID, ADDON_PATH, ADDON_NAME, XMLPATH, BGDIMAGE, GETTEXT, setUSpgmDate, getRegionDatetimeFmt
 from resources.PL_Client import PL_Client
 from resources.lib.Network.utilities import genericDecode
-from resources.lib.Utilities.Messaging import Cmd, NotificationAction, DEBUGMODE, TRUE, VACATIONMODE
+from resources.lib.Utilities.Messaging import Cmd, NotificationAction, TRUE, VACATIONMODE
 from resources.lib.Network.SecretSauce import *
 from utility import myLog, TS_decorator, setDialogActive, clearDialogActive, isDialogActive
 from resources.lib.Utilities.DebugPrint import DbgPrint, DEBUGMODE
@@ -45,7 +45,7 @@ import contextmenu
 from ListItemPlus import ListItemPlus
 from BusyDialog import BusyDialog2
 
-__Version__ = "1.1.1"
+__Version__ = "1.1.2"
 
 MAIN_DIALOGTAG = "LTVPL_MAINDIALOG_VISIBLE"
 MODULEDEBUGMODE = True
@@ -54,7 +54,7 @@ try:
     MODULEDEBUGMODE = ADDON.getSetting(DEBUGMODE) == TRUE
     VACATIONMODE_VALUE = ADDON.getSetting(VACATIONMODE) == TRUE
 except Exception as e:
-    pass
+    DbgPrint(e)
 
 RECURRENCE_OPTIONS = [(GETTEXT(30050), 'Once'), (GETTEXT(30051), 'Daily'), (GETTEXT(30052), 'Weekdays'),
                       (GETTEXT(30053), 'Weekends'), (GETTEXT(30054), 'Weekly'), (GETTEXT(30055), 'Monthly')]
@@ -178,6 +178,7 @@ def strTimeStamp(tData):
         strTime = "{:%I:%M %p}".format(tData)
     except Exception as e:
         strDate = strTime = ''
+        DbgPrint(e)
 
     return (strDate, strTime)
 
@@ -320,7 +321,8 @@ class GUI(xbmcgui.WindowXMLDialog):
 
         setDialogActive(MAIN_DIALOGTAG)
 
-    def xlateRecurrenceOptions(self, optEng):
+    @staticmethod
+    def xlateRecurrenceOptions(optEng):
         for opt in RECURRENCE_OPTIONS:
             if optEng == opt[1]:
                 return opt[0]
@@ -407,11 +409,13 @@ class GUI(xbmcgui.WindowXMLDialog):
         myLog("******ShutdownState: {}".format(self.shutdown))
         return self.shutdown
 
-    def launchEditor(self, data):
+    @staticmethod
+    def launchEditor(data):
         import EPGcapture
         EPGcapture.showDialog(ADDONID, editData=data)
 
-    def extractData(self, item):
+    @staticmethod
+    def extractData(item):
         data = {}
         for tag in ListItemPlus.tags:
             value = item.getProperty(tag)
@@ -753,10 +757,12 @@ class GUI(xbmcgui.WindowXMLDialog):
             if title[0] != "*":
                 item.setProperty(DESC, "*" + title)
 
-    def openSettingsDialog(self):
+    @staticmethod
+    def openSettingsDialog():
         xbmc.executebuiltin("Addon.OpenSettings({})".format(ADDONID))
 
-    def showVacationModeDialog(self):
+    @staticmethod
+    def showVacationModeDialog():
         xbmcgui.Dialog().notification(LTVPL, GETTEXT(30062))  # "Vacation Mode is Active..."
 
 

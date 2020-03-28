@@ -20,7 +20,9 @@
 import pickle
 import codecs
 
-__Version__ = "1.0.1"
+from resources.lib.Utilities.DebugPrint import DbgPrint
+
+__Version__ = "1.0.2"
 
 class myPickle_io(object):
     def __init__(self):
@@ -44,7 +46,10 @@ class myPickle_io(object):
             pickledData = fp.read().encode()
             data = pickle.loads(codecs.decode(pickledData,"base64"))
             self.Data = data
+        except pickle.UnpicklingError as e:
+            raise Exception("Invalid Data File Error: {}".format(e))
         except Exception as e:
+            DbgPrint(e)
             fp.seek(0,0)
             bdata = fp.read()
             data=pickle.loads(bdata.encode())

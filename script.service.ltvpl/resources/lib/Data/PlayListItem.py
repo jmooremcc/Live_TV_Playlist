@@ -50,9 +50,8 @@ from resources.lib.Network.myPickle_io import myPickle_io
 from resources.lib.Network.utilities import encodeError
 
 from resources.lib.Utilities.PythonEvent import Event
-from resources.lib.Utilities import indent
 
-__Version__ = "1.0.1"
+__Version__ = "1.0.2"
 
 MODULEDEBUGMODE=True
 ALARMPADDING = 5
@@ -282,7 +281,8 @@ class PlayListItem(myPickle_io):
             if notify:
                 DbgPrint("Cancelling PlayList Item: {}".format(self))
 
-    def strDate2TimeStamp(self, tdata, fmt):
+    @staticmethod
+    def strDate2TimeStamp(tdata, fmt):
         import time
         ts=datetime (* (time.strptime (tdata, fmt) [0: 6]))
         return ts
@@ -408,6 +408,7 @@ class PlayListItem(myPickle_io):
             self.ChChangeEvent(self.ch)
             self.PLX_Event(self)
         except Exception as e:
+            DbgPrint(e)
             pass #TODO: Raise Invalid EventHandler Error
 
     def isStale(self):

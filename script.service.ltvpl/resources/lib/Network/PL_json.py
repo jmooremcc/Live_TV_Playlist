@@ -23,7 +23,7 @@ from datetime import datetime, date
 
 from resources.lib.Utilities.Messaging import Cmd
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 """
 This module uses decorators to serialize date objects using json

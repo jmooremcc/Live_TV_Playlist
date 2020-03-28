@@ -26,7 +26,7 @@ from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Utilities.PythonEvent import Event
 from .SecretSauce import *
 
-__Version__ = "1.0.2"
+__Version__ = "1.0.3"
 
 def getNewSocket():
     socketObj = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -202,7 +202,7 @@ class Server(Thread, Utilities):
                     connection.close()
                     DbgPrint("Server Exiting...")
             except Exception as e:
-                pass
+                DbgPrint(e)
 
         # self.stop()
         DbgPrint("Server Stopped...")
@@ -231,8 +231,8 @@ class Client(Utilities):
         self.ConnectionCheck(self.socketObj)
 
 
-
-    def ConnectionCheck(self, conn):
+    @staticmethod
+    def ConnectionCheck(conn):
         countdown = 6
         DbgPrint("ConnectionCheck Started")
         while countdown > 0:
@@ -245,6 +245,7 @@ class Client(Utilities):
                     return
 
             except Exception as e:
+                DbgPrint(e)
                 countdown -= 1
 
         DbgPrint("Client: Connection Test Has Failed!!!")
@@ -373,13 +374,13 @@ class Client(Utilities):
 
 
     def writePKL(self, data):
-        Utilities.writePKL(self, self.socketObj, data)
+        Utilities.writePKL(self.socketObj, data)
 
     def readPKL(self):
-        return Utilities.readPKL(self, self.socketObj)
+        return Utilities.readPKL(self.socketObj)
 
     def writeJSON(self, data):
-        Utilities.writeJSON(self, self.socketObj, data)
+        Utilities.writeJSON(self.socketObj, data)
 
     def readJSON(self):
-        return Utilities.readJSON(self, self.socketObj)
+        return Utilities.readJSON(self.socketObj)
