@@ -86,7 +86,8 @@ class PL_Server(object):
                     DbgPrint("Got Last Channel & Tv Guide...")
                     self.dataSet.verifyDataset()
                     break
-            except Exception as e: pass
+            except Exception as e:
+                DbgPrint(e)
 
             sleep(5)
             count -= 1
@@ -127,7 +128,7 @@ class PL_Server(object):
 
     def sendNotification(self, msg):
         self.server.sendNotification(msg)
-        
+
     def onServerDataReceived(self,conn, data):
         DbgPrint("Calling onServerDataReceived",MODULEDEBUGMODE=MODULEDEBUGMODE)
         cmd,args=decodeRequest(data)
@@ -269,10 +270,10 @@ class PL_Server(object):
             self.dataSet.updatePlayListItem(obj)
             self.ReturnData(conn, Cmd.UpdatePlayListItem, obj.Data) #Send Display Request
         except DataSetError as e:
-            err,errmsg=decodeError(e.errdata)
+            err, _ =decodeError(e.errdata)
             self.ReturnError(conn, err, str(e))
         except PlayListItemError as e:
-            err, errmsg = decodeError(e.errdata)
+            err, _ = decodeError(e.errdata)
             self.ReturnError(conn, err, str(e))
 
     @CmdRouter(Cmd.AddPlayListItem, cmds)
@@ -333,7 +334,8 @@ class PL_Server(object):
             data = self.dataSet.Data
             try:
                 del data['lastChNumber']
-            except Exception as e: pass
+            except Exception as e:
+                DbgPrint(e)
 
             self.ReturnData(conn, Cmd.GetPlayList,data, notify=False)
         except Exception as e:
@@ -446,7 +448,6 @@ class PL_Server(object):
         itemlist = self.dataSet.FindCh(Cmd.Stop_Player.value)
         if len(itemlist) > 0:
             item = itemlist[0]
-            id = item.ID
             self.dataSet.Remove(itemlist[0])
             self.NotificationSend(Cmd.RemovePlayListItem, item.Data)
 

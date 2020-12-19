@@ -223,7 +223,8 @@ if __name__ == '__main__':
             countdown_duration= int(ADDON.getSetting(COUNTDOWN_DURATION))
             cdService = Countdown.StartCountdownService(ADDONID, clockstarttime=countdown_duration, abortChChange=server.dataSet.AbortChannelChangeOperation)
             xbmc.log("****Mini Client Service Successfully Started....")
-        except Exception as e: pass
+        except Exception as e:
+            DbgPrint(e)
 
         monitor = Monitor(server, cdService)
         monitor.waitForAbort()

@@ -47,6 +47,6 @@ class BusyDialog2(xbmcgui.WindowXMLDialog):
         DbgPrint("***progressCtrl: {}->pct:{}".format(pb, pct))
         pb.setPercent(pct)
 
-
-    def iscanceled(self):
+    @staticmethod
+    def iscanceled():
         return False

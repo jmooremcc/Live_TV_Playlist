@@ -217,8 +217,9 @@ def decodeResponse(result):
     try:
         key=str(MsgType.Response)
         data=result[key]
-        cmd, rData=genericDecode(data)
+        cmd, _ = genericDecode(data)
     except Exception as e:
+        DbgPrint(e)
         raise Exception("MsgType is Result Not a Response")
 
     return parseCmdData(data)
@@ -234,7 +235,7 @@ def decodeErrorResponse(result):
     :type result: dict
     """
     try:
-        cmd,rData=genericDecode(result)
+        _, rData = genericDecode(result)
     except Exception as e:
         DbgPrint("Not an Error Response:{}".format(result),MODULEDEBUGMODE=MODULEDEBUGMODE)
         DbgPrint(e)

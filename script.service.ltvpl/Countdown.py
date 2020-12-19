@@ -167,7 +167,7 @@ class miniClient(Thread):
 
     @staticmethod
     def onErrorNotification(opstatus, errMsg):
-        xbmc.log("*****onErrorNotification {}:{}".format(opstatus, errMsg))
+        DbgPrint("*****onErrorNotification {}:{}".format(opstatus, errMsg))
         if opstatus.value >= 30000:
             xbmcgui.Dialog().notification(LTVPL, "{}:\n{}".format(str(opstatus), GETTEXT(opstatus.value)), icon=xbmcgui.NOTIFICATION_ERROR)
         else:
@@ -185,7 +185,7 @@ class miniClient(Thread):
                 dataSetData['vacationmode']
                 del dataSetData['vacationmode']
             except Exception as e:
-                pass
+                DbgPrint(e)
 
             for key in dataSetData:
                 myLog("**Data: {}".format(dataSetData[key]))
@@ -301,7 +301,7 @@ class miniClient(Thread):
                     DbgPrint(str(e))
 
         except Exception as e:
-            pass
+            DbgPrint(e)
 
     def BuildListItem(self):
         DbgPrint("len(plList): {}".format(len(self.plList)))

@@ -68,7 +68,8 @@ VACATIONMODE = False
 try:
     MODULEDEBUGMODE = addon.getSetting('debugmode') == 'true'
     VACATIONMODE = addon.getSetting('vacationmode') == 'true'
-except Exception as e: pass
+except Exception as e:
+    DbgPrint(e)
 
 # RECURRENCE_OPTIONS = [(GETTEXT(30050),'Once'), (GETTEXT(30051),'Daily'), (GETTEXT(30052),'Weekdays'), (GETTEXT(30053),'Weekends'), (GETTEXT(30054),'Weekly'), (GETTEXT(30055),'Monthly')]
 
@@ -81,6 +82,7 @@ def getDateItem(strDate, strTime):
     try:
         retval = datetime.strptime(dateval, fmt)
     except Exception as e:
+        DbgPrint(e)
         fmt = fmt.replace('-','')
         retval = datetime.strptime(dateval, fmt)
 
@@ -265,8 +267,8 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
 
         super(captureEpgItem, self).onAction(action)
 
-
-    def xlateRecurrenceOptions(self, optvalue):
+    @staticmethod
+    def xlateRecurrenceOptions(optvalue):
         for opt in RECURRENCE_OPTIONS:
             DbgPrint("***opt:{}".format(opt))
             if optvalue == opt[0].upper():
@@ -317,7 +319,8 @@ class captureEpgItem(xbmcgui.WindowXMLDialog):
                 else:
                     xbmc.log("******Update Item Error")
 
-    def activateDateDialog(self):
+    @staticmethod
+    def activateDateDialog():
         # TODO customize date per regional value
         today = datetime.today().strftime("%d/%m/%Y")
         retval = xbmcgui.Dialog().numeric(ShowAndGetDate, 'Expiration Date (DD/MM/YYYY)', today)

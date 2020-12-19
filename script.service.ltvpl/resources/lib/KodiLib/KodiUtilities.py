@@ -25,20 +25,12 @@ from resources.lib.Utilities.DebugPrint import DbgPrint
 from .kodiflags import KODI_ENV
 from .kodijson import Kodi
 
-__Version__ = "1.3.2"
-
-def GetOE2():
-    """
-    :rtype Kodi
-    :return:
-    """
-    return(Kodi("http://192.168.3.107:8080/jsonrpc"))
+__Version__ = "1.3.3"
 
 
 if KODI_ENV:
     kodiObj=Kodi('')
-else:
-    kodiObj=GetOE2()
+
 
 KODI_OPERATION_FAILED = "Kodi Operation Failed: "
 RESULT = 'result'
@@ -215,6 +207,7 @@ def getChannelInfoByCallSign(kodiObj,callSign,chGroup=1,params=None):
         return([dict(z) for z in z1])
     
     except Exception as e:
+        DbgPrint(e)
         d1=[item for item in (kodiObj.PVR.GetChannels({CHANNELGROUPID:chGroup,
                                                        PROPERTIES:[CHANNEL]}))[RESULT][CHANNELS]\
          if callSign in item[CHANNEL]]

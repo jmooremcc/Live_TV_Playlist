@@ -285,7 +285,6 @@ class _Alarms(object):
         if activetimer is None:
             return
 
-        index = 0
         dlist= [activetimer]
         for i in range(numitems):
             if activetimer == self.pq.queue[i]:

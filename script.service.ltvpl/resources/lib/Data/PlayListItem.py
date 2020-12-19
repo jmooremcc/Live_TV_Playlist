@@ -39,7 +39,7 @@ from resources.lib.Utilities.AlarmsMgr import Timer
 try:
     datetime.strptime("2016", "%Y") #Workaround _strptime import error
 except Exception as e:
-    pass
+    DbgPrint(e)
 
 try:  # Python 3
     from enum import Enum
@@ -390,6 +390,7 @@ class PlayListItem(myPickle_io):
         try:
             return self.t.isAlive()
         except Exception as e:
+            DbgPrint(e)
             return False
 
     @property
@@ -409,7 +410,7 @@ class PlayListItem(myPickle_io):
             self.PLX_Event(self)
         except Exception as e:
             DbgPrint(e)
-            pass #TODO: Raise Invalid EventHandler Error
+
 
     def isStale(self):
         if self.alarmtime < datetime.now():

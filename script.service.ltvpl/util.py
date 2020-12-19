@@ -120,7 +120,7 @@ def generateMD5(text):
             import md5
             return md5.new(text).hexdigest()
         except Exception as e:
-            pass
+            DbgPrint(e)
 
     return '0'
 

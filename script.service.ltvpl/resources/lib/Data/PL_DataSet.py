@@ -41,8 +41,8 @@ if KODI_ENV:
 
     ADDON = xbmcaddon.Addon()
 
-    def GETTEXT(id):
-        return ADDON.getLocalizedString(id).encode('utf-8')
+    def GETTEXT(txtId):
+        return ADDON.getLocalizedString(txtId)
 
 __Version__ = "1.1.3"
 
@@ -255,6 +255,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                 DbgPrint("Item Removed from list!!!",MODULEDEBUGMODE=MODULEDEBUGMODE)
                 return NotificationAction.ItemRemoved
             except Exception as e:
+                DbgPrint(e)
                 raise Exception("Item has expired")
         elif recurrenceInterval==RecurrenceOptions.DAILY:
             diff=alarmtime - datetime.now()

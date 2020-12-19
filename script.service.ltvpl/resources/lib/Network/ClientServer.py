@@ -85,7 +85,8 @@ class Server(Thread, Utilities):
     def __del__(self):
         self.socketObj.close()
 
-    def ConnectionCheck(self, conn):
+    @staticmethod
+    def ConnectionCheck(conn):
         data = None
         countdown = 60
         while countdown > 0:
@@ -118,7 +119,7 @@ class Server(Thread, Utilities):
             else:
                 rdata = data
         except Exception as e:
-            pass
+            DbgPrint(e)
 
         return rdata
 
@@ -155,7 +156,7 @@ class Server(Thread, Utilities):
                     try:
                         connection.close()
                     except Exception as e:
-                        pass
+                        DbgPrint(e)
 
                     DbgPrint("\nEnding Session\n")
                     return

@@ -153,7 +153,7 @@ def DbgPrint(*args, **kwargs):
         threadname = threading.current_thread().name
         try:
             className = info[0].f_locals['self'].__class__.__name__
-        except Exception as e:
+        except:
             pass
         modName=None
         try:
