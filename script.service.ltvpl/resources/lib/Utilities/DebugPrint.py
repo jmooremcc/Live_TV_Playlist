@@ -32,7 +32,7 @@ except ImportError:
     from util import DEBUGFILE_DEFAULTPATH as DEBUGCACHEFILE
 
 
-__Version__ = "1.0.4"
+__Version__ = "1.0.5"
 
 """
     Place MODULEDEBUGMODE=value at the top of a module to control DebugMode
@@ -209,11 +209,11 @@ _startTime = 0
 
 def startTimer():
     global _startTime
-    _startTime = time.clock()
+    _startTime = time.time()
 
 def stopTimer():
     global _startTime
-    duration = time.clock() - _startTime
+    duration = time.time() - _startTime
     return duration
 
 

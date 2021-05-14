@@ -37,17 +37,13 @@ class myPickle_io(object):
 
     def ExportPKL(self,fp):
         data=self.Data.copy()
-        pickledData = codecs.encode(pickle.dumps(data), "base64").decode()
-        fp.write(pickledData)
+        pickle.dump(data, fp)
     
 
     def ImportPKL(self,fp):
         try:
-            pickledData = fp.read().encode()
-            data = pickle.loads(codecs.decode(pickledData,"base64"))
+            data = pickle.load(fp, encoding="latin1")
             self.Data = data
-        except pickle.UnpicklingError as e:
-            raise Exception("Invalid Data File Error: {}".format(e))
         except Exception as e:
             DbgPrint(e)
             fp.seek(0,0)

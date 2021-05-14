@@ -215,7 +215,7 @@ if __name__ == '__main__':
         server.addSettingsChangedEventHandler(onServerSettingsChanged)
         xbmc.log("Live TV Playlist Server Started...")
 
-        while not server.server.isAlive():
+        while not server.server.is_alive():
             xbmc.sleep(500)
 
         # import Countdown
@@ -236,4 +236,4 @@ if __name__ == '__main__':
         del cdService
         del server
         clearDialogActive(PLSERVERTAG)
-        xbmc.log("Live TV Playlist Server Stopped...", level=xbmc.LOGNOTICE)
+        xbmc.log("Live TV Playlist Server Stopped...", level=xbmc.LOGINFO)

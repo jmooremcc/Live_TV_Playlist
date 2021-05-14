@@ -31,6 +31,8 @@ if KODI_ENV:
 else:
     import requests
 
+
+
 from resources.lib.Utilities.DebugPrint import DbgPrint
 
 __Version__ = "1.0.3"
@@ -103,7 +105,7 @@ class KodiJsonTransport(KodiTransport):
 
             # DbgPrint("Calling executeJSONRPC: {}".format(values))
             try:
-                tmp = xbmc.executeJSONRPC(values.encode('utf-8'))
+                tmp = xbmc.executeJSONRPC(values)
                 status = json.loads(tmp)
             except Exception as e:
                 DbgPrint(e)
@@ -117,6 +119,7 @@ class KodiJsonTransport(KodiTransport):
             return status
         else:
             import requests
+
             resp = requests.post(self.url,
                                  values.encode('utf-8'),
                                  headers=headers,

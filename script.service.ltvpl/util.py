@@ -29,7 +29,6 @@ from resources.lib.Utilities.DebugPrint import DbgPrint
 
 __Version__ = "1.1.3"
 
-PYVER = float('{}.{}'.format(*sys.version_info[:2]))
 
 def GetXBMCVersion():
     version = xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')
@@ -41,11 +40,7 @@ def GetXBMCVersion():
 ADDON   =  xbmcaddon.Addon()
 ADDONID = ADDON.getAddonInfo('id')
 ADDON_NAME = ADDON.getAddonInfo('name')
-if PYVER < 3.0:
-    ADDON_PATH = ADDON.getAddonInfo('path').decode('utf-8')
-else:
-    ADDON_PATH = ADDON.getAddonInfo('path')
-
+ADDON_PATH = ADDON.getAddonInfo('path')
 ADDON_USERDATA_FOLDER = xbmc.translatePath("special://profile/addon_data/"+ADDONID)
 BASEPATH = os.path.join(ADDON_PATH,r"resources")
 DATAFILE_LOCATIONFILE = os.path.join(BASEPATH, r"data/dataFileLocation.py")

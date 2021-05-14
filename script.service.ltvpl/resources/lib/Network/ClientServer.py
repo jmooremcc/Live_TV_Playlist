@@ -21,7 +21,7 @@
 import socket
 from threading import Thread
 
-from resources.lib.Network.utilities import Utilities, DataMode, encodeNotification, PYVER
+from resources.lib.Network.utilities import Utilities, DataMode, encodeNotification
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Utilities.PythonEvent import Event
 from .SecretSauce import *
@@ -315,12 +315,7 @@ class Client(Utilities):
         self.GoFlag = False
 
     def readSocketData(self):
-        # self.socketObj.settimeout(30)
-
-        if PYVER < 3.0:
-            data = self.socketObj.recv(2048)
-        else:
-            data = self.socketObj.recv(2048).decode()
+        data = self.socketObj.recv(2048).decode()
 
         return data
 

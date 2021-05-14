@@ -2,6 +2,7 @@
   <extension library="service.py" point="xbmc.service" />
   <requires>
     <import addon="xbmc.python" version="3.0.0" />
+    <import addon="script.module.web-pdb" />
   </requires>
   <extension library="resources" point="xbmc.python.module" />
   <extension library="addon.py" point="xbmc.python.script">

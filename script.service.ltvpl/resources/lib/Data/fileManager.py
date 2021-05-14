@@ -30,7 +30,7 @@ except ImportError:
 
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Network.utilities import getTimeFilteredDirList
-from resources.lib.Utilities.Messaging import WRITEMODE, READMODE
+from resources.lib.Utilities.Messaging import WRITEMODE, READMODE, READBINARYMODE, WRITEBINARYMODE
 
 __Version__ = "1.0.3"
 
@@ -114,7 +114,7 @@ class fileManager(object):
             fp = None
             try:
                 self.renameSrcFile(self.filePath)
-                fp = open(self.filePath, WRITEMODE)
+                fp = open(self.filePath, WRITEBINARYMODE)
                 if self.mode == FileManagerMode.JSON:
                     self.dataSet.ExportJSON(fp)
                 elif self.mode == FileManagerMode.PICKLE:
@@ -146,7 +146,7 @@ class fileManager(object):
                 return
 
             self.restoreOperationActive = True
-            fp=open(self.filePath,READMODE)
+            fp=open(self.filePath,READBINARYMODE)
             if self.mode==FileManagerMode.JSON:
                 self.dataSet.ImportJSON(fp)
             elif self.mode == FileManagerMode.PICKLE:

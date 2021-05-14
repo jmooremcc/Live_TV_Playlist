@@ -39,10 +39,9 @@ from resources.lib.Utilities.Messaging import Cmd, MsgType, NotificationAction, 
 from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Network.SecretSauce import DATAEndMarker
 
-__Version__ = "1.0.3"
+__Version__ = "1.0.4"
 
 MODULEDEBUGMODE=False
-PYVER = float('{}.{}'.format(*sys.version_info[:2]))
 
 jqueue = Queue()
 
@@ -54,10 +53,7 @@ class DataMode(Enum):
 EncodingFMT='utf-8'
 
 def getDictKey(dict):
-    if PYVER < 3.0:
-        keyslist = dict.keys()
-    else:
-        keyslist = list(dict.keys())
+    keyslist = list(dict.keys())
 
     return keyslist[0]
 
@@ -304,13 +300,9 @@ class Utilities(object):
     def writeJSON(conn,data):
         # DbgPrint("writeJSON Called",MODULEDEBUGMODE=MODULEDEBUGMODE)
         try:
-            if PYVER < 3.0:
-                jdata=json.dumps(data) + DATAEndMarker.decode()
-            else:
-                jdata = json.dumps(data) + DATAEndMarker
-
-            conn.sendall(jdata.encode(EncodingFMT))
-
+            # import web_pdb; web_pdb.set_trace()
+            jdata = json.dumps(data) + DATAEndMarker
+            conn.sendall(jdata.encode())
         except Exception as e:
             DbgPrint("ERROR:",str(e),MODULEDEBUGMODE=MODULEDEBUGMODE)
             raise e
@@ -348,7 +340,6 @@ class Utilities(object):
                 try:
                     data=json.loads(jdata)
                 except Exception as e:
-                    data=jdata.decode(EncodingFMT)
                     DbgPrint("ERROR:",str(e),MODULEDEBUGMODE=MODULEDEBUGMODE)
         except Exception as e:
             DbgPrint(e,MODULEDEBUGMODE=MODULEDEBUGMODE)
