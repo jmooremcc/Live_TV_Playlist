@@ -180,6 +180,7 @@ def getChannelInfoByChannelNumber(kodiObj,channelNumber,chGroup=1,params=None):
         else:
             return(None)
     except Exception as e:
+        DbgPrint(e)
         raise Exception(KODI_OPERATION_FAILED + "Could Not Retrieve Channel Info by Channel Number {}".format(channelNumber))
 
 

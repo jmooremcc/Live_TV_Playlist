@@ -26,7 +26,7 @@ from resources.lib.Utilities.DebugPrint import DbgPrint
 from resources.lib.Utilities.PythonEvent import Event
 from .SecretSauce import *
 
-__Version__ = "1.0.3"
+__Version__ = "1.0.4"
 
 def getNewSocket():
     socketObj = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -203,7 +203,8 @@ class Server(Thread, Utilities):
                     connection.close()
                     DbgPrint("Server Exiting...")
             except Exception as e:
-                DbgPrint(e)
+                pass
+                # DbgPrint(e)
 
         # self.stop()
         DbgPrint("Server Stopped...")
