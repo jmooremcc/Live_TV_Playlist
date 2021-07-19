@@ -44,7 +44,7 @@ if KODI_ENV:
     def GETTEXT(txtId):
         return ADDON.getLocalizedString(txtId)
 
-__Version__ = "1.1.3"
+__Version__ = "1.1.4"
 
 DELETE_WAIT_TIME=1
 MODULEDEBUGMODE=True
@@ -402,7 +402,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
 
         return False
 
-    def _addPlayList(self, item, doNotStartFlag=False):
+    def _addPlayList(self, item, doNotStartFlag=False, notify=False):
         if item.PreRollTime != self.PreRollTime: # type: PlayListItem
             item.PreRollTime = self.PreRollTime
 
@@ -412,13 +412,15 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         self.append(item)
         item.AddPLX_EventHandler(self.onPLX_Event)
         item.AddChChangeEventHandler(self.onChannelChange_Event)
-        self.FireItemAddedEvent(item)
+        if notify:
+            self.FireItemAddedEvent(item)
+
         if not doNotStartFlag:
             item.Start()
             self.fileManager.Dirty = True
             self.fileManager.backup()
 
-    def AddPlayList(self, item):
+    def AddPlayList(self, item, notify=False):
         if self.vacationmode:
             raise DataSetError(OpStatus.VacationModeActive, "Vacation Mode Active")
 
@@ -434,13 +436,13 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                 try:
                     self.onPLX_Event(item,doNotBackup=True)
                     if not self.isItemInList(item):
-                        self._addPlayList(item,doNotStartFlag=True)
+                        self._addPlayList(item,doNotStartFlag=True,notify=notify)
                         self.fileManager.Dirty = True
                         self.fileManager.backup()
                 except Exception as e:
                     raise DataSetError(OpStatus.InvalidAlarmTimeError,str(e) + ":{}".format(item))
             else:
-                self._addPlayList(item)
+                self._addPlayList(item, notify=notify)
         else:
             DbgPrint("ERROR: {} is already in the database".format(item),MODULEDEBUGMODE=MODULEDEBUGMODE)
             raise DataSetError(OpStatus.DuplicateItemError,"{} is already in the database".format(item))
@@ -504,16 +506,20 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                     # Normally if we don't find the event in the EPG, we'll just skip the event to the next occurrence
                     if not item.Alarmtime in startTimes and len(startTimes) >= 0:
                         DbgPrint("Fixing {} on ch {}".format(item.Title,item.Ch))
+                        alarmtime = item.Alarmtime
+                        newStartTimes = [t for t in startTimes if alarmtime <= t]
+                        newStartTimes.sort()
                         status = self.SkipEvent(item)
                         self._verifyNotification(item, status)
                         # If this has been a time resheduled event on the same day, then schedule a one time event
                         #   for the show with the rescheduled time
-                        if len(startTimes) > 0 and startTimes[0].date() == datetime.today().date():
-                            tmp = copy(item)
+                        if len(newStartTimes) > 0:
+                            tmp = copy(item) # type: PlayListItem
                             tmp.createNewID()
-                            tmp.alarmtime = startTimes[0]
+                            tmp.alarmtime = newStartTimes[0]
                             tmp.recurrenceInterval=RecurrenceOptions.ONCE
-                            self.AddPlayList(tmp)
+                            DbgPrint("***Creating temporary {} item on {} @ {} {}".format(tmp.Title, tmp.Ch, tmp.alarmtime, tmp.recurrenceInterval))
+                            self.AddPlayList(tmp, notify=True)
             except Exception as e:
                 DbgPrint(e)
 

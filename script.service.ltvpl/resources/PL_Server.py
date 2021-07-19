@@ -34,7 +34,7 @@ from resources.lib.Utilities.Messaging import Cmd, OpStatus, xlateCmd2Notificati
     VACATIONMODE, DEBUGMODE, ALARMTIME, PREROLLTIME, AUTOCLEANMODE
 from resources.lib.Utilities.VirtualEvents import TS_decorator, CmdRouter
 
-__Version__ = "1.1.2"
+__Version__ = "1.1.3"
 
 MODULEDEBUGMODE=True
 
@@ -51,6 +51,7 @@ class PL_Server(object):
         self.dataSet.AddItemRemovedEventHandler(self.onDataSetEvent)
         self.dataSet.AddItemCancelledEventHandler(self.onDataSetEvent)
         self.dataSet.AddItemUpdatedEventHandler(self.onDataSetEvent)
+        self.dataSet.AddItemAddedEventHandler(self.onDataSetEvent)
         self.dailyMaintenanceFlag = False
         self.dailyMaintThread = None # type: Timer
         self.server=Server(address, maxConnections=5)
@@ -97,7 +98,7 @@ class PL_Server(object):
 
         while self.dailyMaintenanceFlag:
             today = datetime.today().date()
-            tomorrow = datetime.combine(today, datetime.min.time()) + timedelta(days=1, seconds=60)
+            tomorrow = datetime.combine(today, datetime.min.time()) + timedelta(days=1, seconds=12600)
             seconds = tomorrow - datetime.now()
             self.dailyMaintThread = Timer(seconds.total_seconds(), self.dataSet.verifyDataset)
             self.dailyMaintThread.start()

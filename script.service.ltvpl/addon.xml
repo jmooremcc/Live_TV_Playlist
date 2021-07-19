@@ -1,8 +1,7 @@
-<addon id="script.service.ltvpl" name="Live TV Playlist" provider-name="jmooremcc" version="2.0.0">
+<addon id="script.service.ltvpl" name="Live TV Playlist" provider-name="jmooremcc" version="2.0.01">
   <extension library="service.py" point="xbmc.service" />
   <requires>
     <import addon="xbmc.python" version="3.0.0" />
-    <import addon="script.module.web-pdb" />
   </requires>
   <extension library="resources" point="xbmc.python.module" />
   <extension library="addon.py" point="xbmc.python.script">
@@ -43,4 +42,7 @@
       <screenshot>resources/screenshots/screenshot005.png</screenshot>
     </assets>
   </extension>
+  <news>
+    2.0.01  July 19, 2021 - Fixed updting based on EPG changes
+  </news>
 </addon>
