@@ -252,7 +252,7 @@ class PlayListItem(myPickle_io):
             return
 
         if self.SuspendedFlag:
-            DbgPrint("Playlist has been suspended")
+            DbgPrint("Playlist item has been suspended")
             changeOp = self._suspendedPLX_Op
         else:
             changeOp = self._ChangeCh

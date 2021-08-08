@@ -19,7 +19,7 @@
 #  http://www.gnu.org/copyleft/gpl.html
 #
 
-__Version__ = "1.0.0"
+__Version__ = "1.0.1"
 
 try:
     import Queue as Q  # ver. < 3.0
@@ -36,7 +36,7 @@ from .VirtualEvents import TS_decorator
 masterRlock = RLock()
 activeTimerLock = RLock()
 MODULEDEBUGMODE = True
-
+ALARMTIMEOFFSET = 2
 
 def cmp(a,b):
     return((a > b) - (a < b))
@@ -55,9 +55,9 @@ def status():
         DbgPrint(e)
 
     myLog("Alarms Queued:")
-    for n,i in enumerate(range(_alarms.pq.qsize())):
+    for n, q in enumerate(sorted(_alarms.pq.queue)):
         try:
-            myLog("   {:>3}->{}".format(n+1, _alarms.pq.queue[i]))
+            myLog("   {:>3}->{}".format(n + 1, q))
         except Exception as e:
             DbgPrint(e)
 
@@ -124,7 +124,8 @@ class MasterTimer(object):
 
             td = self._activetimer.alarmtime - datetime.now()
             if td.days >= 0:
-                self.Timer = threading.Timer(td.total_seconds() - 2, self._eventHandler)
+                DbgPrint(f"***Alarm Timer total_seconds:{td.total_seconds() - ALARMTIMEOFFSET}")
+                self.Timer = threading.Timer(td.total_seconds() - ALARMTIMEOFFSET, self._eventHandler)
                 self.Timer.name = "Thread-MasterTimer"
                 self.Timer.start()
                 DbgPrint("***ActiveTimer:{}".format(self._activetimer))
@@ -224,10 +225,16 @@ class _Alarms(object):
 
 
     def _findTimer(self, timer):
+        """
+        Finds the timer in the queue and returns the index
+        :param timer: _alarm
+        :return: int
+        """
         for i in range(self.pq.qsize()):
-            a=self.pq.queue[i]
+            a=self.pq.queue[i] # type: _alarm
             if a == timer:
-                return i
+                if a.ch == timer.ch:
+                    return i
         return -1
 
     def _removeTimer(self, timer):
@@ -294,8 +301,8 @@ class _Alarms(object):
         offset = 30
         if dlistsize > 1:
             for i in range(1, dlistsize):
-                alarmtime = dlist[i].alarmtime + timedelta(seconds=offset)
-                dlist[i].alarmtime = alarmtime
+                newalarmtime = dlist[i].alarmtime + timedelta(seconds=offset)
+                dlist[i].alarmtime = newalarmtime
                 offset += 30
 
         dlist2= [self.pq.queue[0]]
@@ -307,8 +314,8 @@ class _Alarms(object):
         offset = 30
         if dlist2size > 1:
             for i in range(1, dlist2size):
-                alarmtime = dlist2[i].alarmtime + timedelta(seconds=offset)
-                dlist2[i].alarmtime = alarmtime
+                newalarmtime = dlist2[i].alarmtime + timedelta(seconds=offset)
+                dlist2[i].alarmtime = newalarmtime
                 offset += 30
 
 
