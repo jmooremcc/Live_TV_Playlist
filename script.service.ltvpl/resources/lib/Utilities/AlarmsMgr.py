@@ -38,9 +38,9 @@ activeTimerLock = RLock()
 MODULEDEBUGMODE = True
 ALARMTIMEOFFSET = 2
 
+
 def cmp(a,b):
     return((a > b) - (a < b))
-
 
 def status():
     if not (DEBUGMODE and MODULEDEBUGMODE):

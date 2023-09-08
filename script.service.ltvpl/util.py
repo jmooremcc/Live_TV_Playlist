@@ -19,6 +19,7 @@
 #
 
 import xbmc
+import xbmcvfs
 import xbmcaddon
 import xbmcgui
 import os
@@ -27,7 +28,7 @@ from datetime import datetime
 
 from resources.lib.Utilities.DebugPrint import DbgPrint
 
-__Version__ = "1.1.3"
+__Version__ = "1.1.4"
 
 
 def GetXBMCVersion():
@@ -41,7 +42,7 @@ ADDON   =  xbmcaddon.Addon()
 ADDONID = ADDON.getAddonInfo('id')
 ADDON_NAME = ADDON.getAddonInfo('name')
 ADDON_PATH = ADDON.getAddonInfo('path')
-ADDON_USERDATA_FOLDER = xbmc.translatePath("special://profile/addon_data/"+ADDONID)
+ADDON_USERDATA_FOLDER = xbmcvfs.translatePath("special://profile/addon_data/"+ADDONID)
 BASEPATH = os.path.join(ADDON_PATH,r"resources")
 DATAFILE_LOCATIONFILE = os.path.join(BASEPATH, r"data/dataFileLocation.py")
 ADDON_DATAFILENAME = os.path.join(ADDON_USERDATA_FOLDER,"LTVPL.pkl")
@@ -121,7 +122,7 @@ def generateMD5(text):
 
 def GetFolder(title):
     default = ROOT #ADDON.getAddonInfo('profile')
-    folder  = xbmc.translatePath(PROFILE)
+    folder  = xbmcvfs.translatePath(PROFILE)
 
     if not os.path.isdir(folder):
         os.makedirs(folder)
@@ -130,4 +131,4 @@ def GetFolder(title):
     if folder == default:
         return None
 
-    return xbmc.translatePath(folder)
+    return xbmcvfs.translatePath(folder)

@@ -413,6 +413,8 @@ class PL_Server(object):
 
             if len(strStopCmdAlarmtime) <= 0:
                 return
+
+            #TODO stopcmd alarmtime is 1 minute early on RPi
             try:
                 tmp = strStopCmdAlarmtime.split(':')
                 seconds = int(tmp[0]) * 3600 + int(tmp[1]) * 60
