@@ -19,13 +19,14 @@
 #  http://www.gnu.org/copyleft/gpl.html
 #
 
-__Version__ = "1.0.1"
+__Version__ = "1.0.2"
 
 try:
     import Queue as Q  # ver. < 3.0
 except ImportError:
     import queue as Q
 
+from heapq import heapify
 import threading
 from threading import RLock
 from datetime import datetime, timedelta
@@ -148,6 +149,8 @@ class MasterTimer(object):
 
 
 class _alarm(object):
+    count = 0 # count of the number of instances created
+
     def __init__(self, parent, alarmtime, fn, ch, *args):
         """
 
@@ -164,6 +167,8 @@ class _alarm(object):
         self.active = False
         self.parent = parent
         self.refDate = parent.refDate
+        _alarm.count += 1
+        self.ID = _alarm.count
 
     def start(self):
         self.active = True
@@ -178,7 +183,8 @@ class _alarm(object):
 
     @property
     def priority(self):
-        return int((self.alarmtime - self.refDate).total_seconds())
+        v = (int((self.alarmtime - self.refDate).total_seconds()),self.ID)
+        return v
 
 
     def __repr__(self):
@@ -242,32 +248,38 @@ class _Alarms(object):
         if i >= 0:
             DbgPrint("RemoveTimer: {}".format(self.pq.queue[i]))
             del(self.pq.queue[i])
+            heapify(self.pq.queue)
 
 
     def _startTimer(self, blocktimerlock=False):
         if not blocktimerlock:
             activeTimerLock.acquire()
 
-        oldtimer = self.mt.Activetimer
-        if oldtimer is None:
-            try:
-                timer = self.pq.get(block=False)  # pop the top item off the queue
-                DbgPrint("***NewTimer:{}".format(timer))
-                self.mt.Activetimer = timer
-            except Exception as e:
-                DbgPrint(e)
-        else:
-            try:
-                newTimer = self.pq.get(block=False)  # pop the top item off the queue
-                if newTimer < oldtimer:
-                    DbgPrint("***NewTimer:{}".format(newTimer))
-                    self.mt.Activetimer = newTimer  # launch new timer
-                    DbgPrint("***Putting Oldtimer back in queue:{}".format(oldtimer))
-                    self.pq.put(oldtimer)
-                else:
-                    self.pq.put(newTimer)  # put timer item back in the queue
-            except Exception as e:
-                DbgPrint(e)
+        while True:
+            oldtimer = self.mt.Activetimer
+            if oldtimer is None:
+                try:
+                    timer = self.pq.get(block=False)  # pop the top item off the queue
+                    DbgPrint("***NewTimer:{}".format(timer))
+                    self.mt.Activetimer = timer
+                    break
+                except Exception as e:
+                    DbgPrint(e)
+                    self.mt.Activetimer = None
+            else:
+                try:
+                    newTimer = self.pq.get(block=False)  # pop the top item off the queue
+                    if newTimer < oldtimer:
+                        DbgPrint("***NewTimer:{}".format(newTimer))
+                        self.mt.Activetimer = newTimer  # launch new timer
+                        DbgPrint("***Putting Oldtimer back in queue:{}".format(oldtimer))
+                        self.pq.put(oldtimer)
+                    else:
+                        self.pq.put(newTimer)  # put timer item back in the queue
+                    break
+                except Exception as e:
+                    DbgPrint(e)
+                    self.mt.Activetimer = None
 
         if not blocktimerlock:
             activeTimerLock.release()
