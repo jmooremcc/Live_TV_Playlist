@@ -44,14 +44,14 @@ if KODI_ENV:
     def GETTEXT(txtId):
         return ADDON.getLocalizedString(txtId)
 
-__Version__ = "1.1.4"
+__Version__ = "1.1.5"
 
 DELETE_WAIT_TIME=1
 MODULEDEBUGMODE=True
 LTVPL = 'Live TV Playlist'
 #DbgPrint=LoggerSetup("PL_DataSet")
 
-        
+
 class PL_DataSet(list,myPickle_io,myJson_io):
     """
         Events:
@@ -160,6 +160,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         item.SuspendedFlag=True
         self.fileManager.Dirty = True
         self.fileManager.backup()
+        return item
 
     def EnableItem(self, id):
         item = self.SearchByID(id)
@@ -170,6 +171,8 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         item.SuspendedFlag=False
         self.fileManager.Dirty = True
         self.fileManager.backup()
+
+        return item
 
     def AddItemRemovedEventHandler(self, handler):
         self.ItemRemovedEvent.AddHandler(handler)
@@ -242,6 +245,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         :param doNotBackup:
         :return:
         """
+        TODAY = datetime.now()
         time.sleep(DELETE_WAIT_TIME) #Sleep 30 seconds
         recurrenceInterval=item.recurrenceInterval
         alarmtime=item.alarmtime
@@ -258,14 +262,14 @@ class PL_DataSet(list,myPickle_io,myJson_io):
                 DbgPrint(e)
                 raise Exception("Item has expired")
         elif recurrenceInterval==RecurrenceOptions.DAILY:
-            diff=alarmtime - datetime.now()
+            diff=alarmtime - TODAY
             if diff.days > 0:
                 numDays=1
             else:
                 numDays = max(1,abs(diff.days))
             newtime=alarmtime + timedelta(days=numDays)
         elif recurrenceInterval == RecurrenceOptions.WEEKDAYS:
-            diff = alarmtime - datetime.now()
+            diff = alarmtime - TODAY
             if diff.days > 0:
                 numDays=1
             else:
@@ -275,7 +279,7 @@ class PL_DataSet(list,myPickle_io,myJson_io):
             if weekday > 5:
                 newtime += timedelta(days = (8 - weekday)) #set to Monday
         elif recurrenceInterval == RecurrenceOptions.WEEKENDS:
-            diff = alarmtime - datetime.now()
+            diff = alarmtime - TODAY
             if diff.days > 0:
                 numDays=1
             else:
@@ -285,16 +289,17 @@ class PL_DataSet(list,myPickle_io,myJson_io):
             if weekday < 6:
                 newtime += timedelta(days = (6 - weekday)) #set to Saturday
         elif recurrenceInterval == RecurrenceOptions.WEEKLY:
-            diff = alarmtime - datetime.now()
+            diff = alarmtime - TODAY
             weekday1 = alarmtime.isoweekday()
             if diff.days > 0:
                 numDays=7
             else:
                 numDays = max(1,abs(diff.days))
+
             if numDays < 7:
                 numDays += 7 - numDays
-            else:
-                numDays += 7
+            # else:
+            #     numDays += 7
 
             newtime = alarmtime + timedelta(days=numDays)
             weekday2=newtime.isoweekday()
@@ -460,10 +465,13 @@ class PL_DataSet(list,myPickle_io,myJson_io):
         if item is not None:
             item.Cancel()
             item.Data=obj.Data
-            item.Start()
-            self.fileManager.Dirty = True
-            self.fileManager.backup()
-            self.FireItemUpdatedEvent(item)
+            try:
+                item.Start()
+                self.fileManager.Dirty = True
+                self.fileManager.backup()
+                self.FireItemUpdatedEvent(item)
+            except Exception as e:
+                raise Exception(str(e))
         else:
             raise DataSetError(OpStatus.ItemUpdateFailed,str(OpStatus.ItemDoesNotExist))
 
@@ -619,8 +627,10 @@ class PL_DataSet(list,myPickle_io,myJson_io):
 
         flag=False
         for item in self: # type: PlayListItem
-            item.Start()
-            flag=True
+            try:
+                item.Start()
+                flag=True
+            except: pass
 
         if not flag:
             DbgPrint("NOthing to Start!!",MODULEDEBUGMODE=MODULEDEBUGMODE)

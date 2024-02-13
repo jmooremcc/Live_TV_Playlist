@@ -34,7 +34,7 @@ from resources.lib.Utilities.Messaging import Cmd, OpStatus, xlateCmd2Notificati
     VACATIONMODE, DEBUGMODE, ALARMTIME, PREROLLTIME, AUTOCLEANMODE
 from resources.lib.Utilities.VirtualEvents import TS_decorator, CmdRouter
 
-__Version__ = "1.1.3"
+__Version__ = "1.1.4"
 
 MODULEDEBUGMODE=True
 
@@ -171,30 +171,23 @@ class PL_Server(object):
         id=args
         try:
             DbgPrint("Enabling PlayList Item:{}".format(id))
-            item = self.dataSet.SearchByID(id)
+            item = self.dataSet.EnableItem(id)
+            self.ReturnData(conn, Cmd.EnablePlayListItem, item.Data)
+        except Exception as e:
             if item is None:
                 self.ReturnError(conn,OpStatus.ItemDoesNotExist,"Item.ID {} Does Not Exist".format(id))
-            try:
-                item.SuspendedFlag=False
-                self.dataSet.fileManager.Dirty = True
-                self.dataSet.fileManager.backup()
-                self.ReturnData(conn, Cmd.EnablePlayListItem, item.Data)
-            except Exception as e:
+            else:
                 self.dataSet.SkipEventByID(item.ID)
                 self.ReturnData(conn, Cmd.SkipEvent,item.Data)
 
-        except Exception as e:
-            self.ReturnError(conn, OpStatus.ItemDoesNotExist, str(e))
+
 
     @CmdRouter(Cmd.DisablePlayListItem, cmds)
     def DisablePlayListItem(self, conn, args):
         id = args
         try:
             DbgPrint("Disabling PlayList Item:{}".format(id))
-            item = self.dataSet.SearchByID(id)
-            item.SuspendedFlag = True
-            self.dataSet.fileManager.Dirty = True
-            self.dataSet.fileManager.backup()
+            item = self.dataSet.SuspendItem(id)
             self.ReturnData(conn, Cmd.DisablePlayListItem, item.Data)
         except Exception as e:
             self.ReturnError(conn, OpStatus.ItemDoesNotExist, str(e))

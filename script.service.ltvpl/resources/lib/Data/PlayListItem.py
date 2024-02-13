@@ -51,7 +51,7 @@ from resources.lib.Network.utilities import encodeError
 
 from resources.lib.Utilities.PythonEvent import Event
 
-__Version__ = "1.0.2"
+__Version__ = "1.0.3"
 
 MODULEDEBUGMODE=True
 ALARMPADDING = 5
@@ -203,13 +203,11 @@ class PlayListItem(myPickle_io):
     def SuspendedFlag(self, value):
         if value != self.suspendedFlag:
             self.suspendedFlag = value
-            if not value:
-                if self.isAlarmtimeLegal():
-                    self.reStart()
-                else:
-                    raise Exception("Invalid AlarmTime")
+            if self.isAlarmtimeLegal():
+                self.reStart()
             else:
-                self.Cancel()
+                raise Exception("Invalid AlarmTime")
+
 
     @property
     def PreRollTime(self):
@@ -445,4 +443,4 @@ class PlayListItemError(Exception):
     def __repr__(self):
         return str("{}->{}".format(self.message,self.errdata))
 
-    
+
